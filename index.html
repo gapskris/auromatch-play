@@ -1917,7 +1917,7 @@ function syncTeachingsRepository(remoteRepository) {
 }
 
 
-export async function encryptAndExportBackup(password) {
+async function encryptAndExportBackup(password) {
     if (!password) throw new Error("Decryption password is required.");
     
     // PBKDF2 Key Derivation
@@ -1962,7 +1962,7 @@ export async function encryptAndExportBackup(password) {
     return JSON.stringify(exportObj);
 }
 
-export async function decryptAndImportBackup(password, jsonString) {
+async function decryptAndImportBackup(password, jsonString) {
     if (!password) throw new Error("Decryption password is required.");
     
     const backupObj = JSON.parse(jsonString);
@@ -2736,6 +2736,8 @@ class AuroMatchUniversalInput {
 // High-contrast, WCAG AAA compliant styling and visual lock indicators
 
 
+
+
 class BoardRenderer {
   constructor(boardContainerId, options = {}) {
     this.container = document.getElementById(boardContainerId);
@@ -2872,6 +2874,8 @@ function renderBoard(boardId, statusId, onComplete) {
 
 // --- Settings ---
 // Settings Preferences Controller
+
+
 
 function updateVolumeSetting(type, val) {
     const floatVal = parseFloat(val);
@@ -3045,6 +3049,7 @@ function triggerReflectionDissolve(canvasId, text, jarX, jarY, onComplete) {
 // --- Scripture Card ---
 // matched Scripture Card and TTS Narration Engine
 
+
 let currentUtterance = null;
 const glossaryDict = {
     "sadhana": "A dedicated spiritual practice or effort undertaken to align one\'s outer nature with the inner soul.",
@@ -3138,8 +3143,10 @@ function openGlossaryOverlaySheet(termKey, sheetId, sheetTitleId, sheetDescId) {
     sheet.classList.add('active');
 }
 
+
 // --- Constellation Grid ---
 // Constellation Star Calendar Renderer
+
 
 const milestoneCalendar = {
     "02-21": { type: "darshan", title: "The Mother's Birthday", desc: "Celebration of the birth of the Mother in Paris in 1878.", quote: "Sincerity is the key of the divine doors; it is the condition of all progress." },
@@ -3223,19 +3230,17 @@ function renderConstellationCalendar(gridId, svgId) {
     });
 }
 
+
 // --- Game Manager ---
 // Dual-Mode Central Game Manager for AuroMatch
 // Supports Mode A (Vita Mahjong - Match-2 pairs) and Mode B (Tile Club - Match-3 7-slot tray)
 // Senior accessibility toggles, undo history stacks, and guaranteed solvability generation.
 
-import {
-  initAudioEngine,
-  playAshramMeditationGong,
-  playTileSelectChime,
-  playBlockedWarningChime,
-  setTuningScale,
-  unlockAudioContext
-} from '../audio/synthesizer.js';
+
+
+
+
+
 
 class GameManager {
   constructor(options = {}) {
@@ -3603,6 +3608,48 @@ class GameManager {
 
 const activeGameManager = new GameManager();
 
+
+const gardens = [
+  { id: 'samadhi', name: 'Ashram Samadhi Courtyard', concept: 'Concept 2: Circular Mandala', type: 'flowers', style: 2, diff: 'Easy (24 tiles)' },
+  { id: 'playground', name: 'Ashram Playground', concept: 'Concept 2: Circular Mandala', type: 'qualities', style: 2, diff: 'Medium (36 tiles)' },
+  { id: 'matrimandir_ch', name: 'Auroville Matrimandir Chamber', concept: 'Concept 1: Glass Stack', type: 'sanskrit', style: 1, diff: 'Hard (48 tiles)' },
+  { id: 'lake_estate', name: 'Ashram Farms & Lake Estate', concept: 'Concept 3: Tactile Altar', type: 'instruments', style: 3, diff: 'Medium (36 tiles)' },
+  { id: 'service_tree', name: 'Ashram Service Tree', concept: 'Concept 2: Circular Mandala', type: 'flowers', style: 2, diff: 'Easy (24 tiles)' },
+  { id: 'banyan_tree', name: 'Auroville Banyan Tree', concept: 'Concept 2: Circular Mandala', type: 'qualities', style: 2, diff: 'Medium (36 tiles)' },
+  { id: 'coastline', name: 'Pondicherry Promenade Coastline', concept: 'Concept 1: Glass Stack', type: 'sanskrit', style: 1, diff: 'Hard (48 tiles)' },
+  { id: 'library', name: 'SABDA & Ashram Library', concept: 'Concept 3: Tactile Altar', type: 'flowers', style: 3, diff: 'Medium (36 tiles)' },
+  { id: 'golconde', name: 'Ashram Golconde Dormitory', concept: 'Concept 3: Tactile Altar', type: 'qualities', style: 3, diff: 'Easy (24 tiles)' },
+  { id: 'archives', name: 'Ashram Archives & Research', concept: 'Concept 3: Tactile Altar', type: 'sanskrit', style: 3, diff: 'Hard (48 tiles)' },
+  { id: 'matrimandir_pt', name: 'Auroville Matrimandir Petals', concept: 'Concept 1: Glass Stack', type: 'flowers', style: 1, diff: 'Easy (24 tiles)' },
+  { id: 'green_belt', name: 'Auroville Green Belt', concept: 'Concept 2: Circular Mandala', type: 'qualities', style: 2, diff: 'Medium (36 tiles)' },
+  { id: 'classroom', name: 'SAICE & Integral Education', concept: 'Concept 3: Tactile Altar', type: 'flowers', style: 3, diff: 'Medium (36 tiles)' },
+  { id: 'botanical', name: 'Pondicherry Botanical Garden', concept: 'Concept 2: Circular Mandala', type: 'flowers', style: 2, diff: 'Easy (24 tiles)' },
+  { id: 'dining', name: 'Ashram Dining Hall', concept: 'Concept 3: Tactile Altar', type: 'qualities', style: 3, diff: 'Hard (48 tiles)' }
+];
+
+function renderSelectorSanctuaries() {
+  if (typeof document === 'undefined') return;
+  const container = document.getElementById('garden-list');
+  if (!container) return;
+  container.innerHTML = '';
+  
+  gardens.forEach(g => {
+    const card = document.createElement('div');
+    card.className = 'garden-card';
+    card.onclick = () => startGardenSanctuary(g);
+    
+    card.innerHTML = `
+      <div class="garden-meta">
+        <div class="garden-name">${g.name}</div>
+        <div class="garden-concept">${g.concept}</div>
+        <div class="garden-difficulty">${g.diff}</div>
+      </div>
+      <div class="garden-arrow">➔</div>
+    `;
+    container.appendChild(card);
+  });
+}
+
 function routeToScreen(screenId) {
   if (typeof document === 'undefined') return;
   const screens = document.querySelectorAll('.screen-view');
@@ -3621,6 +3668,10 @@ function routeToScreen(screenId) {
   } else if (screenId === 'constellation') {
     if (tabs[3]) tabs[3].classList.add('active-tab');
   }
+
+  if (screenId === 'selector') {
+    renderSelectorSanctuaries();
+  }
 }
 
 function startGardenSanctuary(garden) {
@@ -3630,8 +3681,16 @@ function startGardenSanctuary(garden) {
     titleEl.innerText = garden.name;
   }
   routeToScreen('game');
+  let tileCount = 36;
+  if (garden && garden.diff) {
+    if (garden.diff.includes('24')) tileCount = 24;
+    else if (garden.diff.includes('48')) tileCount = 48;
+  }
   if (activeGameManager) {
-    activeGameManager.init('board', 'center-stage-col');
+    if (!activeGameManager.boardRenderer) {
+      activeGameManager.init('board', 'center-stage-col');
+    }
+    activeGameManager.startNewStage(tileCount);
   }
 }
 
@@ -3691,15 +3750,13 @@ function applySanctuaryModeTheme() {
 
 // --- Main Application Initialization ---
 // Main Application Entry Module
-import { 
-  GameManager,
-  activeGameManager,
-  routeToScreen, 
-  startGardenSanctuary, 
-  drawDailyOracle, 
-  checkCalendarGreetings, 
-  applySanctuaryModeTheme 
-} from './controllers/gameManager.js';
+
+
+
+
+
+
+
 
 window.addEventListener('load', () => {
     // Load local state
