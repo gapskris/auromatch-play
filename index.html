@@ -46555,7 +46555,27 @@ function renderSelectorSanctuaries() {
   });
 }
 
+let currentScreenId = 'welcome';
+let previousScreenId = 'welcome';
+
+function getCurrentScreen() {
+  return currentScreenId;
+}
+
+function getPreviousScreen() {
+  return previousScreenId;
+}
+
 function routeToScreen(screenId) {
+  if (screenId === 'settings') {
+    if (currentScreenId !== 'settings') {
+      previousScreenId = currentScreenId;
+    }
+  } else {
+    previousScreenId = currentScreenId;
+  }
+  currentScreenId = screenId;
+
   if (typeof document === 'undefined') return;
   const screens = document.querySelectorAll('.screen-view');
   screens.forEach(s => s.classList.remove('active-screen'));
@@ -47016,7 +47036,7 @@ window.addEventListener('load', () => {
     };
     
     window.backToSelector = () => {
-        routeToScreen('selector');
+        routeToScreen('welcome');
     };
     
     window.backToWelcome = () => {
@@ -47024,12 +47044,12 @@ window.addEventListener('load', () => {
     };
     
     window.backFromSettings = () => {
-        const titleH = document.getElementById('game-title');
-        if (titleH && titleH.innerText !== 'Select Sanctuary') {
-            routeToScreen('game');
-        } else {
-            routeToScreen('selector');
+        const prev = getPreviousScreen();
+        let targetScreen = prev;
+        if (!targetScreen || targetScreen === 'settings' || targetScreen === 'selector') {
+            targetScreen = (activeGameManager && activeGameManager.tiles.length > 0) ? 'game' : 'welcome';
         }
+        routeToScreen(targetScreen);
     };
 
     window.reshuffleBoard = () => {
@@ -47081,7 +47101,7 @@ window.addEventListener('load', () => {
             saveProfileState();
             input.value = "";
             alert("Reflections surrendered into the Consecration Jar.");
-            routeToScreen('selector');
+            routeToScreen('welcome');
         });
     };
 
