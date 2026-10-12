@@ -1325,6 +1325,25 @@ body {
     }
 }
 
+.hud-player-badge {
+    background: rgba(255, 255, 255, 0.10);
+    border: 1px solid var(--border-current);
+    border-radius: 12px;
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+@media (max-width: 380px) {
+    .hud-player-badge {
+        font-size: 10px;
+        padding: 2px 5px;
+    }
+}
+
 </style>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1350,7 +1369,8 @@ body {
             </svg>
             <h1 class="app-headline" id="welcome-title">AuroMatch</h1>
             <p class="app-subhead" id="welcome-sub">Wisdom Concentration Sanctuary</p>
-            <button class="cta-btn" id="btn-begin-journey" onclick="window.beginDirectJourney()">Begin Journey ➔</button>
+            <button class="cta-btn" id="btn-begin-journey" onclick="window.handleBeginJourneyClick()">Begin Journey ➔</button>
+            <div id="welcome-player-switch" style="display: none; margin-top: 10px; font-size: 12px; color: #c5a880; cursor: pointer; text-decoration: underline;" onclick="window.openNameModal()">Not your name? Change Player</div>
         </div>
 
         <!-- Onboarding Path selector overlay -->
@@ -1387,6 +1407,7 @@ body {
             <header class="app-header">
                 <button class="hdr-btn" onclick="backToWelcome()">←</button>
                 <div class="hud-progression-bar">
+                    <span class="hud-player-badge" id="header-player-badge" title="Player Name">👤 <span id="header-player-name">Seeker</span></span>
                     <span class="hud-rank-badge" id="header-rank-badge" data-full-title="🌱 Aspirant">🌱 Aspirant</span>
                     <span class="hud-level-indicator" id="header-level-indicator">Level 1</span>
                     <span class="hud-sparks-count" id="header-sparks-count">✨ 100</span>
@@ -1581,6 +1602,16 @@ body {
             </header>
             
             <div class="setting-section" style="margin-top: 16px;">
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 16px; margin-bottom: 12px; color: var(--accent-current);">Player Identity</h3>
+                <div class="setting-row">
+                    <span class="setting-label">Seeker Name</span>
+                    <div style="display: flex; gap: 8px; flex: 1; justify-content: flex-end;">
+                        <input type="text" id="set-player-name" placeholder="Seeker" maxlength="24" style="background: rgba(0,0,0,0.15); border: 1px solid var(--border-current); color: var(--text-current); padding: 4px 8px; border-radius: 8px; font-size: 12px; max-width: 140px;" onchange="window.updatePlayerNameFromSettings()" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="setting-section">
                 <h3 style="font-family: 'Playfair Display', serif; font-size: 16px; margin-bottom: 12px; color: var(--accent-current);">Sanctuary Modes</h3>
                 <div class="setting-row">
                     <span class="setting-label">Path Selector</span>
@@ -1654,6 +1685,31 @@ body {
                 <h4 class="sheet-title" id="glossary-title">Sadhana</h4>
                 <p class="sheet-desc" id="glossary-desc">Definition details here.</p>
                 <button class="close-btn" onclick="document.getElementById('glossary-modal').classList.remove('active')">Close</button>
+            </div>
+        </div>
+
+        <!-- Player Name Entry Modal -->
+        <div class="stage-clear-overlay" id="name-entry-modal" style="display: none; z-index: var(--z-overlay);">
+            <div class="stage-clear-card" style="max-width: 360px; text-align: left; padding: 24px; background: rgba(14, 78, 55, 0.98);">
+                <div style="font-size: 32px; text-align: center; margin-bottom: 4px;">✨</div>
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-current); font-weight: 700; text-align: center;">Welcome to AuroMatch</div>
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; color: #ffffff; text-align: center; margin-bottom: 8px;">Begin Your Journey</h3>
+                <p style="font-size: 12px; color: #d4d4d8; line-height: 1.5; text-align: center; margin-bottom: 16px;">
+                    Embark on a mindful journey across 350 illuminating levels of knowledge and wisdom.
+                </p>
+                <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-current); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 8px;">
+                    <label for="player-name-input" style="font-size: 11px; font-weight: 700; color: #ffd700; letter-spacing: 1px; text-transform: uppercase;">
+                        What is your name or adventurer nickname?
+                    </label>
+                    <input type="text" id="player-name-input" placeholder="e.g. Maya, Aarav, Seeker..." maxlength="24"
+                        style="width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-current); background: rgba(0, 0, 0, 0.4); color: #ffffff; font-size: 14px; font-family: 'Outfit', sans-serif; outline: none;" />
+                    <span style="font-size: 10px; color: #a1a1aa;">
+                        🔒 Stored privately on your device. Progress is saved automatically.
+                    </span>
+                </div>
+                <button class="cta-btn" id="btn-submit-name" onclick="window.submitPlayerName()" style="width: 100%; margin-top: 16px;">
+                    Let's Begin Journey ▶
+                </button>
             </div>
         </div>
 
@@ -18741,6 +18797,7 @@ class GameManager {
         if (saved) {
           const parsed = JSON.parse(saved);
           return {
+            name: typeof parsed.name === 'string' ? parsed.name.trim() : '',
             currentLevel: Math.max(1, Math.min(350, parsed.currentLevel || 1)),
             sparks: typeof parsed.sparks === 'number' ? parsed.sparks : 100
           };
@@ -18749,13 +18806,14 @@ class GameManager {
     } catch (e) {
       console.warn('Failed to load player state:', e);
     }
-    return { currentLevel: 1, sparks: 100 };
+    return { name: '', currentLevel: 1, sparks: 100 };
   }
 
   savePlayerState() {
     try {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem('auromatch_player_state', JSON.stringify({
+          name: this.player.name || '',
           currentLevel: this.player.currentLevel,
           sparks: this.player.sparks
         }));
@@ -18763,6 +18821,13 @@ class GameManager {
     } catch (e) {
       console.warn('Failed to save player state:', e);
     }
+  }
+
+  setPlayerName(name) {
+    this.player.name = (name || '').trim();
+    this.savePlayerState();
+    this.notifyState();
+    return this.player.name;
   }
 
   getRank() {
@@ -19190,6 +19255,7 @@ class GameManager {
         matchedPairs: this.matchedPairs,
         remainingTilesCount: this.tiles.filter(t => !t.isMatched).length,
         totalTilesCount: this.tiles.length,
+        name: this.player.name,
         currentLevel: this.player.currentLevel,
         sparks: this.player.sparks,
         rank: this.getRank(),
@@ -19419,6 +19485,11 @@ window.addEventListener('load', () => {
         const rankBadge = document.getElementById('header-rank-badge');
         const levelIndicator = document.getElementById('header-level-indicator');
         const sparksCount = document.getElementById('header-sparks-count');
+        const playerNameEl = document.getElementById('header-player-name');
+
+        if (playerNameEl) {
+            playerNameEl.innerText = state.name || 'Seeker';
+        }
 
         if (rankBadge && state.rank) {
             const fullTitle = `${state.rank.symbol} ${state.rank.name}`;
@@ -19431,6 +19502,23 @@ window.addEventListener('load', () => {
         }
         if (sparksCount) {
             sparksCount.innerText = `✨ ${state.sparks || 100}`;
+        }
+
+        // Welcome screen personalization for returning users
+        const welcomeSub = document.getElementById('welcome-sub');
+        const btnBegin = document.getElementById('btn-begin-journey');
+        const switchPlayer = document.getElementById('welcome-player-switch');
+        const setPlayerInput = document.getElementById('set-player-name');
+
+        if (state.name) {
+            if (welcomeSub) welcomeSub.innerText = `Welcome back, ${state.name}! ✨`;
+            if (btnBegin) btnBegin.innerText = `Continue Level ${state.currentLevel || 1} ➔`;
+            if (switchPlayer) switchPlayer.style.display = 'block';
+            if (setPlayerInput) setPlayerInput.value = state.name;
+        } else {
+            if (welcomeSub) welcomeSub.innerText = 'Wisdom Concentration Sanctuary';
+            if (btnBegin) btnBegin.innerText = 'Begin Journey ➔';
+            if (switchPlayer) switchPlayer.style.display = 'none';
         }
 
         // 6. Matched Flora Preview (Mode A)
@@ -19502,6 +19590,9 @@ window.addEventListener('load', () => {
         }
     };
 
+    // Initial state push for returning player welcome greeting & HUD sync
+    activeGameManager.notifyState();
+
     window.switchGameplayMode = (mode) => {
         activeGameManager.setGameplayMode(mode);
     };
@@ -19525,7 +19616,48 @@ window.addEventListener('load', () => {
         }
     };
     
-    // Zero-Gate Entry: Direct Jump into Level 1
+    window.handleBeginJourneyClick = () => {
+        if (!activeGameManager.player.name) {
+            window.openNameModal();
+        } else {
+            window.beginDirectJourney();
+            const rank = activeGameManager.getRank();
+            window.showToastMessage(`✨ Welcome back, ${activeGameManager.player.name}! Continuing at Level ${activeGameManager.player.currentLevel} (${rank.symbol} ${rank.name})`);
+        }
+    };
+
+    window.openNameModal = () => {
+        const modal = document.getElementById('name-entry-modal');
+        const input = document.getElementById('player-name-input');
+        if (input) input.value = activeGameManager.player.name || '';
+        if (modal) modal.style.display = 'flex';
+        if (input) setTimeout(() => input.focus(), 100);
+    };
+
+    window.closeNameModal = () => {
+        const modal = document.getElementById('name-entry-modal');
+        if (modal) modal.style.display = 'none';
+    };
+
+    window.submitPlayerName = () => {
+        const input = document.getElementById('player-name-input');
+        const enteredName = (input ? input.value : '').trim() || 'Seeker';
+        activeGameManager.setPlayerName(enteredName);
+        window.closeNameModal();
+        window.beginDirectJourney();
+        const rank = activeGameManager.getRank();
+        window.showToastMessage(`✨ Welcome, ${enteredName}! Beginning journey at Level ${activeGameManager.player.currentLevel} (${rank.symbol} ${rank.name})`);
+    };
+
+    window.updatePlayerNameFromSettings = () => {
+        const input = document.getElementById('set-player-name');
+        if (!input) return;
+        const entered = input.value.trim() || 'Seeker';
+        activeGameManager.setPlayerName(entered);
+        window.showToastMessage(`Seeker name updated to ${entered}`);
+    };
+
+    // Zero-Gate Entry: Direct Jump into Level 1 or Saved Level
     window.beginDirectJourney = () => {
         initAudioEngine(profileState.settings.volumeRaga, profileState.settings.volumeGong);
         routeToScreen('game');
@@ -19555,7 +19687,7 @@ window.addEventListener('load', () => {
     // Map window-global click hooks for dynamic index views
     window.openOnboarding = () => {
         initAudioEngine(profileState.settings.volumeRaga, profileState.settings.volumeGong);
-        window.beginDirectJourney();
+        window.handleBeginJourneyClick();
     };
     
     window.selectPath = (path) => {
