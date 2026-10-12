@@ -45071,7 +45071,7 @@ class VitaBoardGenerator {
       }
       coords.push({ x: 2.5, y: 1.5, z: 4 });
       coords.push({ x: 2.5, y: 2.5, z: 4 });
-    } else {
+    } else if (targetCount <= 72) {
       // 72 tiles: 36 on layer 0, 20 on layer 1, 12 on layer 2, 4 on layer 3
       for (let r = 0; r < 6; r++) {
         for (let c = 0; c < 6; c++) {
@@ -45093,6 +45093,29 @@ class VitaBoardGenerator {
           coords.push({ x: c * 1.0 + 2.0, y: r * 1.0 + 2.0, z: 3 });
         }
       }
+    } else if (targetCount <= 84) {
+      // 84 tiles (Twin Pagodas): 42 on layer 0, 25 on layer 1, 12 on layer 2, 4 on layer 3, 1 peak
+      for (let r = 0; r < 6; r++) for (let c = 0; c < 7; c++) coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+      for (let r = 0; r < 5; r++) for (let c = 0; c < 5; c++) coords.push({ x: c * 1.0 + 1.0, y: r * 1.0 + 0.5, z: 1 });
+      for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) coords.push({ x: c * 1.0 + 1.5, y: r * 1.0 + 1.5, z: 2 });
+      for (let r = 0; r < 2; r++) for (let c = 0; c < 2; c++) coords.push({ x: c * 1.0 + 2.5, y: r * 1.0 + 2.0, z: 3 });
+      coords.push({ x: 3.0, y: 2.5, z: 4 });
+    } else if (targetCount <= 96) {
+      // 96 tiles (Sunburst Gateway): 48 on layer 0, 30 on layer 1, 12 on layer 2, 4 on layer 3, 2 peaks
+      for (let r = 0; r < 6; r++) for (let c = 0; c < 8; c++) coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+      for (let r = 0; r < 5; r++) for (let c = 0; c < 6; c++) coords.push({ x: c * 1.0 + 1.0, y: r * 1.0 + 0.5, z: 1 });
+      for (let r = 0; r < 3; r++) for (let c = 0; c < 4; c++) coords.push({ x: c * 1.0 + 2.0, y: r * 1.0 + 1.5, z: 2 });
+      for (let r = 0; r < 2; r++) for (let c = 0; c < 2; c++) coords.push({ x: c * 1.0 + 3.0, y: r * 1.0 + 2.0, z: 3 });
+      coords.push({ x: 3.0, y: 2.5, z: 4 });
+      coords.push({ x: 4.0, y: 2.5, z: 4 });
+    } else {
+      // 108 tiles (Grand Citadel Fortress): 54 on layer 0, 30 on layer 1, 16 on layer 2, 6 on layer 3, 2 peaks
+      for (let r = 0; r < 6; r++) for (let c = 0; c < 9; c++) coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+      for (let r = 0; r < 5; r++) for (let c = 0; c < 6; c++) coords.push({ x: c * 1.0 + 1.5, y: r * 1.0 + 0.5, z: 1 });
+      for (let r = 0; r < 4; r++) for (let c = 0; c < 4; c++) coords.push({ x: c * 1.0 + 2.5, y: r * 1.0 + 1.0, z: 2 });
+      for (let r = 0; r < 2; r++) for (let c = 0; c < 3; c++) coords.push({ x: c * 1.0 + 3.0, y: r * 1.0 + 2.0, z: 3 });
+      coords.push({ x: 3.5, y: 2.5, z: 4 });
+      coords.push({ x: 4.5, y: 2.5, z: 4 });
     }
 
     return coords.slice(0, targetCount);
@@ -45920,6 +45943,8 @@ function renderConstellationCalendar(gridId, svgId) {
 
 
 
+const TOTAL_LEVELS = 520;
+
 const RANKS = [
   { name: 'Aspirant', symbol: '🌱', minLevel: 1, maxLevel: 25 },
   { name: 'Learner', symbol: '📖', minLevel: 26, maxLevel: 60 },
@@ -45927,7 +45952,7 @@ const RANKS = [
   { name: 'Discerner', symbol: '⭐', minLevel: 111, maxLevel: 175 },
   { name: 'Sage', symbol: '🌟', minLevel: 176, maxLevel: 240 },
   { name: 'Explorer', symbol: '💫', minLevel: 241, maxLevel: 300 },
-  { name: 'Luminous', symbol: '✨', minLevel: 301, maxLevel: 350 }
+  { name: 'Luminous', symbol: '✨', minLevel: 301, maxLevel: 520 }
 ];
 
 function getRankForLevel(level) {
@@ -45935,6 +45960,20 @@ function getRankForLevel(level) {
     if (level >= RANKS[i].minLevel) return RANKS[i];
   }
   return RANKS[0];
+}
+
+/**
+ * Smooth S-Curve Tile Density Function across 520 Levels
+ */
+function getTileCountForLevel(levelNum) {
+  if (levelNum === 1) return 24;          // Level 1: 24 tiles (Tutorial)
+  if (levelNum <= 10) return 36;         // Levels 2-10: 36 tiles (Foundation)
+  if (levelNum <= 30) return 48;         // Levels 11-30: 48 tiles (Ascent)
+  if (levelNum <= 75) return 60;         // Levels 31-75: 60 tiles (Depth)
+  if (levelNum <= 150) return 72;        // Levels 76-150: 72 tiles (Mastery)
+  if (levelNum <= 260) return 84;        // Levels 151-260: 84 tiles (Grand Peak)
+  if (levelNum <= 390) return 96;        // Levels 261-390: 96 tiles (Sunburst Gateway)
+  return 108;                            // Levels 391-520+: 108 tiles (Grand Citadel)
 }
 
 class GameManager {
@@ -45945,7 +45984,7 @@ class GameManager {
     this.boardRenderer = null;
     this.inputDispatcher = null;
 
-    // Player progression state (Sparks Economy & 350 Levels)
+    // Player progression state (Sparks Economy & 520 Levels)
     this.player = this.loadPlayerState();
     this.hintsUsedInStage = 0;
 
@@ -45973,7 +46012,7 @@ class GameManager {
           const parsed = JSON.parse(saved);
           return {
             name: typeof parsed.name === 'string' ? parsed.name.trim() : '',
-            currentLevel: Math.max(1, Math.min(350, parsed.currentLevel || 1)),
+            currentLevel: Math.max(1, Math.min(TOTAL_LEVELS, parsed.currentLevel || 1)),
             sparks: typeof parsed.sparks === 'number' ? parsed.sparks : 100
           };
         }
@@ -46045,21 +46084,17 @@ class GameManager {
     let tileCount = null;
 
     if (typeof stageParam === 'number') {
-      if ([12, 24, 36, 48, 60, 72].includes(stageParam)) {
+      if ([12, 24, 36, 48, 60, 72, 84, 96, 108].includes(stageParam)) {
         tileCount = stageParam;
       } else {
-        levelNum = Math.max(1, Math.min(350, stageParam));
+        levelNum = Math.max(1, Math.min(TOTAL_LEVELS, stageParam));
         this.player.currentLevel = levelNum;
         this.savePlayerState();
       }
     }
 
     if (!tileCount) {
-      if (levelNum === 1) tileCount = 24;
-      else if (levelNum <= 5) tileCount = 36;
-      else if (levelNum <= 25) tileCount = 48;
-      else if (levelNum <= 75) tileCount = 60;
-      else tileCount = 72;
+      tileCount = getTileCountForLevel(levelNum);
     }
 
     const K = (this.gameplayMode === 'vita') ? 2 : 3;
@@ -46416,10 +46451,15 @@ class GameManager {
       }
 
       const completedLevel = this.player.currentLevel;
+      const isMilestone = (completedLevel % 10 === 0);
+      if (isMilestone) {
+        earnedSparks += 20; // +20 extra sparks bonus on Sanctuary Milestone levels (Total +30!)
+      }
+
       const oldRank = this.getRank();
 
-      // Advance level
-      this.player.currentLevel = Math.min(350, this.player.currentLevel + 1);
+      // Advance level up to TOTAL_LEVELS (520)
+      this.player.currentLevel = Math.min(TOTAL_LEVELS, this.player.currentLevel + 1);
       const newRank = this.getRank();
       let rankPromoted = false;
       if (newRank.name !== oldRank.name) {
@@ -46436,6 +46476,7 @@ class GameManager {
           nextLevel: this.player.currentLevel,
           earnedSparks,
           cleanSolve,
+          isMilestone,
           rankPromoted,
           oldRank,
           newRank,
@@ -46819,10 +46860,14 @@ window.addEventListener('load', () => {
         const vBonusText = document.getElementById('victory-bonus-text');
         const vRankUp = document.getElementById('victory-rank-up');
 
-        if (vTitle) vTitle.innerText = `Level ${info.completedLevel} Cleared!`;
+        if (vTitle) vTitle.innerText = info.isMilestone ? `🌟 Milestone Level ${info.completedLevel} Cleared!` : `Level ${info.completedLevel} Cleared!`;
         if (vSubtitle) vSubtitle.innerText = `${info.newRank.symbol} ${info.newRank.name} · Next: Level ${info.nextLevel}`;
         if (vSparks) vSparks.innerText = `+${info.earnedSparks} ✨`;
-        if (vBonusText) vBonusText.innerText = info.cleanSolve ? 'Clean Solve +5 ✨' : 'Standard Clear';
+        if (vBonusText) {
+            let bonusStr = info.cleanSolve ? 'Clean Solve +5 ✨' : 'Standard Clear';
+            if (info.isMilestone) bonusStr += ' · Sanctuary Milestone +20 ✨';
+            vBonusText.innerText = bonusStr;
+        }
 
         if (vRankUp) {
             if (info.rankPromoted) {
