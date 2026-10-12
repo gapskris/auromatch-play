@@ -2023,26 +2023,38 @@ body {
 
         <!-- Player Name Entry Modal -->
         <div class="stage-clear-overlay" id="name-entry-modal" style="display: none; z-index: var(--z-overlay);">
-            <div class="stage-clear-card" style="max-width: 360px; text-align: left; padding: 24px; background: rgba(14, 78, 55, 0.98);">
+            <div class="stage-clear-card" style="max-width: 380px; text-align: left; padding: 22px; background: rgba(14, 78, 55, 0.98);">
                 <div style="font-size: 32px; text-align: center; margin-bottom: 4px;">✨</div>
-                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-current); font-weight: 700; text-align: center;">Welcome to AuroMatch</div>
-                <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; color: #ffffff; text-align: center; margin-bottom: 8px;">Begin Your Journey</h3>
-                <p style="font-size: 12px; color: #d4d4d8; line-height: 1.5; text-align: center; margin-bottom: 16px;">
-                    Embark on a mindful journey across 350 illuminating levels of knowledge and wisdom.
+                <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-current); font-weight: 700; text-align: center;">Seeker Profile</div>
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; color: #ffffff; text-align: center; margin-bottom: 6px;" id="name-modal-title">Switch or Create Player</h3>
+                <p style="font-size: 12px; color: #d4d4d8; line-height: 1.5; text-align: center; margin-bottom: 14px;">
+                    Each seeker has their own independent progress across 520 levels. New names start cleanly at Level 1.
                 </p>
+
+                <!-- Saved Profiles Quick-Select -->
+                <div id="saved-profiles-section" style="margin-bottom: 12px; display: none;">
+                    <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #c5a880; margin-bottom: 6px;">Saved Players:</div>
+                    <div id="saved-profiles-list" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
+                </div>
+
                 <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-current); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 8px;">
                     <label for="player-name-input" style="font-size: 11px; font-weight: 700; color: #ffd700; letter-spacing: 1px; text-transform: uppercase;">
-                        What is your name or adventurer nickname?
+                        Seeker Name
                     </label>
-                    <input type="text" id="player-name-input" placeholder="e.g. Maya, Aarav, Seeker..." maxlength="24"
+                    <input type="text" id="player-name-input" placeholder="e.g. Gopal, Maya, Seeker..." maxlength="24"
                         style="width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-current); background: rgba(0, 0, 0, 0.4); color: #ffffff; font-size: 14px; font-family: 'Outfit', sans-serif; outline: none;" />
                     <span style="font-size: 10px; color: #a1a1aa;">
-                        🔒 Stored privately on your device. Progress is saved automatically.
+                        🔒 Progress saved independently on this device.
                     </span>
                 </div>
-                <button class="cta-btn" id="btn-submit-name" onclick="window.submitPlayerName()" style="width: 100%; margin-top: 16px;">
-                    Let's Begin Journey ▶
-                </button>
+                <div style="display: flex; gap: 8px; margin-top: 14px;">
+                    <button class="cta-btn" id="btn-submit-name" onclick="window.submitPlayerName()" style="flex: 1; margin: 0; padding: 12px;">
+                        Confirm ▶
+                    </button>
+                    <button class="cta-btn" onclick="window.closeNameModal()" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; width: auto; padding: 0 16px; margin: 0;">
+                        Cancel
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -46073,23 +46085,54 @@ class GameManager {
     this.onStageComplete = options.onStageComplete || null;
   }
 
+  loadProfilesMap() {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const saved = localStorage.getItem('auromatch_player_profiles');
+        if (saved) return JSON.parse(saved);
+      }
+    } catch (e) {}
+    return {};
+  }
+
+  saveProfilesMap(profiles) {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('auromatch_player_profiles', JSON.stringify(profiles));
+      }
+    } catch (e) {}
+  }
+
   loadPlayerState() {
     try {
       if (typeof localStorage !== 'undefined') {
         const saved = localStorage.getItem('auromatch_player_state');
         if (saved) {
           const parsed = JSON.parse(saved);
-          return {
+          const state = {
             name: typeof parsed.name === 'string' ? parsed.name.trim() : '',
             currentLevel: Math.max(1, Math.min(TOTAL_LEVELS, parsed.currentLevel || 1)),
-            sparks: typeof parsed.sparks === 'number' ? parsed.sparks : 100
+            sparks: typeof parsed.sparks === 'number' ? parsed.sparks : 100,
+            isNewUser: parsed.currentLevel === 1 && !parsed.hasProgress
           };
+          if (state.name) {
+            const profiles = this.loadProfilesMap();
+            if (!profiles[state.name]) {
+              profiles[state.name] = {
+                name: state.name,
+                currentLevel: state.currentLevel,
+                sparks: state.sparks
+              };
+              this.saveProfilesMap(profiles);
+            }
+          }
+          return state;
         }
       }
     } catch (e) {
       console.warn('Failed to load player state:', e);
     }
-    return { name: '', currentLevel: 1, sparks: 100 };
+    return { name: '', currentLevel: 1, sparks: 100, isNewUser: true };
   }
 
   savePlayerState() {
@@ -46098,8 +46141,19 @@ class GameManager {
         localStorage.setItem('auromatch_player_state', JSON.stringify({
           name: this.player.name || '',
           currentLevel: this.player.currentLevel,
-          sparks: this.player.sparks
+          sparks: this.player.sparks,
+          hasProgress: this.player.currentLevel > 1 || this.player.sparks !== 100
         }));
+
+        if (this.player.name) {
+          const profiles = this.loadProfilesMap();
+          profiles[this.player.name] = {
+            name: this.player.name,
+            currentLevel: this.player.currentLevel,
+            sparks: this.player.sparks
+          };
+          this.saveProfilesMap(profiles);
+        }
       }
     } catch (e) {
       console.warn('Failed to save player state:', e);
@@ -46107,10 +46161,75 @@ class GameManager {
   }
 
   setPlayerName(name) {
-    this.player.name = (name || '').trim();
+    return this.switchPlayer(name);
+  }
+
+  switchPlayer(name) {
+    const trimmed = (name || '').trim();
+    if (!trimmed) return this.player;
+
+    const profiles = this.loadProfilesMap();
+
+    // Preserve active player's progress in profiles map
+    if (this.player && this.player.name) {
+      profiles[this.player.name] = {
+        name: this.player.name,
+        currentLevel: this.player.currentLevel,
+        sparks: this.player.sparks
+      };
+    }
+
+    if (profiles[trimmed]) {
+      // Existing player profile found -> restore their exact level and sparks!
+      this.player = {
+        name: trimmed,
+        currentLevel: Math.max(1, Math.min(TOTAL_LEVELS, profiles[trimmed].currentLevel || 1)),
+        sparks: typeof profiles[trimmed].sparks === 'number' ? profiles[trimmed].sparks : 100,
+        isNewUser: false
+      };
+    } else {
+      // BRAND NEW USER -> Initialize cleanly at Level 1 with 100 Sparks!
+      this.player = {
+        name: trimmed,
+        currentLevel: 1,
+        sparks: 100,
+        isNewUser: true
+      };
+      profiles[trimmed] = {
+        name: trimmed,
+        currentLevel: 1,
+        sparks: 100
+      };
+    }
+
+    this.saveProfilesMap(profiles);
     this.savePlayerState();
     this.notifyState();
-    return this.player.name;
+    return this.player;
+  }
+
+  renamePlayer(newName) {
+    const trimmed = (newName || '').trim();
+    if (!trimmed || trimmed === this.player.name) return this.player;
+
+    const oldName = this.player.name;
+    const profiles = this.loadProfilesMap();
+
+    if (oldName && profiles[oldName]) {
+      delete profiles[oldName];
+    }
+
+    this.player.name = trimmed;
+    profiles[trimmed] = {
+      name: trimmed,
+      currentLevel: this.player.currentLevel,
+      sparks: this.player.sparks
+    };
+
+    this.saveProfilesMap(profiles);
+    this.savePlayerState();
+    this.notifyState();
+    return this.player;
   }
 
   getRank() {
@@ -46585,6 +46704,7 @@ class GameManager {
         currentLevel: this.player.currentLevel,
         sparks: this.player.sparks,
         rank: this.getRank(),
+        isNewUser: !!this.player.isNewUser,
         hintsUsedInStage: this.hintsUsedInStage
       });
     }
@@ -46905,8 +47025,17 @@ window.addEventListener('load', () => {
         const setPlayerInput = document.getElementById('set-player-name');
 
         if (state.name) {
-            if (welcomeSub) welcomeSub.innerText = `Welcome back, ${state.name}! ✨`;
-            if (btnBegin) btnBegin.innerText = `Continue Level ${state.currentLevel || 1} ➔`;
+            const isReturning = !state.isNewUser && state.currentLevel > 1;
+            if (welcomeSub) {
+                welcomeSub.innerText = isReturning 
+                    ? `Welcome back, ${state.name}! ✨` 
+                    : `Welcome, ${state.name}! ✨`;
+            }
+            if (btnBegin) {
+                btnBegin.innerText = isReturning 
+                    ? `Continue Level ${state.currentLevel} ➔` 
+                    : `Begin Level ${state.currentLevel || 1} ➔`;
+            }
             if (switchPlayer) switchPlayer.style.display = 'block';
             if (setPlayerInput) setPlayerInput.value = state.name;
         } else {
@@ -47040,6 +47169,37 @@ window.addEventListener('load', () => {
         const modal = document.getElementById('name-entry-modal');
         const input = document.getElementById('player-name-input');
         if (input) input.value = activeGameManager.player.name || '';
+
+        // Populate saved profiles list if any exist
+        const section = document.getElementById('saved-profiles-section');
+        const list = document.getElementById('saved-profiles-list');
+        if (section && list && activeGameManager.loadProfilesMap) {
+            const profiles = activeGameManager.loadProfilesMap();
+            const names = Object.keys(profiles);
+            if (names.length > 0) {
+                section.style.display = 'block';
+                list.innerHTML = '';
+                names.forEach(name => {
+                    const prof = profiles[name];
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = 'saved-profile-pill';
+                    btn.style.cssText = 'background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #fff; padding: 4px 10px; border-radius: 14px; font-size: 11px; cursor: pointer; display: flex; align-items: center; gap: 4px;';
+                    if (name === activeGameManager.player.name) {
+                        btn.style.borderColor = '#ffd700';
+                        btn.style.background = 'rgba(255,215,0,0.18)';
+                    }
+                    btn.innerHTML = `👤 <strong>${name}</strong> <span style="opacity:0.75; font-size: 10px;">· Lvl ${prof.currentLevel || 1}</span>`;
+                    btn.onclick = () => {
+                        if (input) input.value = name;
+                    };
+                    list.appendChild(btn);
+                });
+            } else {
+                section.style.display = 'none';
+            }
+        }
+
         if (modal) modal.style.display = 'flex';
         if (input) setTimeout(() => input.focus(), 100);
     };
@@ -47052,18 +47212,22 @@ window.addEventListener('load', () => {
     window.submitPlayerName = () => {
         const input = document.getElementById('player-name-input');
         const enteredName = (input ? input.value : '').trim() || 'Seeker';
-        activeGameManager.setPlayerName(enteredName);
+        const profile = activeGameManager.switchPlayer(enteredName);
         window.closeNameModal();
-        window.beginDirectJourney();
+
         const rank = activeGameManager.getRank();
-        window.showToastMessage(`✨ Welcome, ${enteredName}! Beginning journey at Level ${activeGameManager.player.currentLevel} (${rank.symbol} ${rank.name})`);
+        if (profile.isNewUser) {
+            window.showToastMessage(`✨ Welcome, ${enteredName}! New profile ready at Level 1`);
+        } else {
+            window.showToastMessage(`✨ Welcome back, ${enteredName}! Resuming Level ${profile.currentLevel} (${rank.symbol} ${rank.name})`);
+        }
     };
 
     window.updatePlayerNameFromSettings = () => {
         const input = document.getElementById('set-player-name');
         if (!input) return;
         const entered = input.value.trim() || 'Seeker';
-        activeGameManager.setPlayerName(entered);
+        activeGameManager.renamePlayer(entered);
         window.showToastMessage(`Seeker name updated to ${entered}`);
     };
 
