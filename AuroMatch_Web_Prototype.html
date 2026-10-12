@@ -1216,31 +1216,29 @@ body {
         0 16px 28px rgba(0, 0, 0, 0.45) !important;
 }
 
-/* Blocked / Occluded Tile */
+/* Blocked / Occluded Tile (Authentic Mahjong Subtle Depth) */
 .tile-blocked {
-    filter: brightness(0.68) contrast(0.9) grayscale(30%);
-    cursor: not-allowed;
-    border-color: #64748b;
-    box-shadow: 0 4px 0 #78716c, 0 6px 12px rgba(0,0,0,0.25);
+    filter: brightness(0.90) contrast(0.96);
+    cursor: pointer;
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.7),
+        0 2px 4px rgba(0, 0, 0, 0.2),
+        0 6px 0 #a38968,
+        0 8px 14px rgba(0, 0, 0, 0.25);
+    opacity: 0.92;
 }
 
-/* Blocked Tile Lock Overlay */
-.tile-lock-overlay {
-    position: absolute;
-    inset: 0;
-    border-radius: 10px;
-    background: rgba(15, 23, 42, 0.45);
-    backdrop-filter: blur(1px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: none;
-    z-index: 6;
+/* Micro-nudge animation when blocked tile is tapped */
+@keyframes blockedTileNudge {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-4px); }
+    40% { transform: translateX(4px); }
+    60% { transform: translateX(-2px); }
+    80% { transform: translateX(2px); }
 }
-.tile-lock-glyph {
-    font-size: 14px;
-    filter: drop-shadow(0 1px 2px rgba(0,0,0,0.8));
-    opacity: 0.85;
+
+.tile-nudge-blocked {
+    animation: blockedTileNudge 0.3s ease-in-out;
 }
 
 /* Modern Tactile Action Bar (Pic 3 Mahjong Style) */
@@ -45126,7 +45124,7 @@ class VitaBoardGenerator {
    * Simulates forward playable extraction to guarantee that matching groups
    * are completely playable without deadlocks.
    */
-  static generateSolvableBoard(layoutAnchors, floraCatalog, mode = 'vita', maxAttempts = 15) {
+  static generateSolvableBoard(layoutAnchors, floraCatalog, mode = 'vita', maxAttempts = 25) {
     const K = (mode === 'vita') ? 2 : 3;
     const totalSlots = layoutAnchors.length;
     const adjustedCount = totalSlots - (totalSlots % K);
@@ -45163,23 +45161,87 @@ class VitaBoardGenerator {
 
     const sim = slots.map(s => ({ ...s }));
     let remaining = sim.length;
+    let attempts = 0;
+    const waitingBuffer = [];
 
-    while (remaining > 0) {
+    while (remaining > 0 && attempts < 500) {
+      attempts++;
       const active = sim.filter(t => !t.isMatched);
       const playable = active.filter(t => this.isTileFree(t, active));
-      const pool = (playable.length >= K) ? playable : active;
       
-      const shuffledPool = [...pool].sort(() => Math.random() - 0.5);
-      const pick = shuffledPool.slice(0, Math.min(K, remaining));
+      if (playable.length === 0) break;
+
+      // Ingest unassigned playable tiles into waiting buffer
+      playable.forEach(p => {
+        if (!waitingBuffer.some(w => w.id === p.id)) {
+          waitingBuffer.push(p);
+        }
+      });
+
+      let bestPick = null;
+
+      if (K === 2) {
+        let bestScore = -Infinity;
+        for (let i = 0; i < waitingBuffer.length; i++) {
+          for (let j = i + 1; j < waitingBuffer.length; j++) {
+            const a = waitingBuffer[i];
+            const b = waitingBuffer[j];
+            const dx = Math.abs(a.x - b.x);
+            const dy = Math.abs(a.y - b.y);
+            const dz = Math.abs(a.z - b.z);
+            const dist = Math.hypot(a.x - b.x, a.y - b.y);
+
+            // Strictly reject adjacent tiles on same layer unless last 4 tiles
+            if (dx <= 1.05 && dy <= 1.05 && dz === 0 && remaining > 4) continue;
+
+            // Prioritize spatial separation across the board + vertical depth difference
+            const score = (dist * 3.0) + (dz > 0 ? 8.0 : 0) + (Math.random() * 1.5);
+            if (score > bestScore) {
+              bestScore = score;
+              bestPick = [a, b];
+            }
+          }
+        }
+      } else {
+        // Mode B: Triads (K = 3)
+        let bestScore = -Infinity;
+        for (let i = 0; i < waitingBuffer.length; i++) {
+          for (let j = i + 1; j < waitingBuffer.length; j++) {
+            for (let m = j + 1; m < waitingBuffer.length; m++) {
+              const a = waitingBuffer[i], b = waitingBuffer[j], c = waitingBuffer[m];
+              const distAB = Math.hypot(a.x - b.x, a.y - b.y);
+              const distBC = Math.hypot(b.x - c.x, b.y - c.y);
+              const distCA = Math.hypot(c.x - a.x, c.y - a.y);
+              const layerCount = new Set([a.z, b.z, c.z]).size;
+              const score = (distAB + distBC + distCA) + (layerCount * 4.0) + (Math.random() * 2.0);
+              if (score > bestScore) {
+                bestScore = score;
+                bestPick = [a, b, c];
+              }
+            }
+          }
+        }
+      }
+
+      // Fallbacks if buffer hasn't found optimal combinations yet
+      if (!bestPick) {
+        if (waitingBuffer.length >= K) {
+          bestPick = waitingBuffer.slice(0, K);
+        } else if (playable.length >= K) {
+          bestPick = playable.slice(0, K);
+        } else {
+          bestPick = active.slice(0, Math.min(K, remaining));
+        }
+      }
+
       const flora = shuffledFlora[floraIndex % shuffledFlora.length];
       floraIndex++;
 
-      pick.forEach(t => {
+      bestPick.forEach(t => {
         t.floraId = flora.id;
         t.floraData = flora;
         t.isMatched = true;
 
-        // Apply back to primary slots
         const original = slots.find(s => s.id === t.id);
         if (original) {
           original.floraId = flora.id;
@@ -45187,7 +45249,14 @@ class VitaBoardGenerator {
         }
       });
 
-      remaining -= pick.length;
+      const removeIds = new Set(bestPick.map(t => t.id));
+      for (let k = waitingBuffer.length - 1; k >= 0; k--) {
+        if (removeIds.has(waitingBuffer[k].id)) {
+          waitingBuffer.splice(k, 1);
+        }
+      }
+
+      remaining -= bestPick.length;
     }
 
     slots.forEach(s => {
@@ -45518,7 +45587,8 @@ class BoardRenderer {
       el.style.zIndex = `${tile.z * 10 + 10}`;
 
       const bonusBadge = (arch === 'golden_relic') ? '<div class="tile-spark-badge">✨+10</div>' : '';
-      const lockOverlay = !isFree ? '<div class="tile-lock-overlay" title="Blocked by upper/lateral tiles"><span class="tile-lock-glyph">🔒</span></div>' : '';
+
+      el.title = isFree ? `${flora.commonName} (${flora.domain})` : `${flora.commonName} (Blocked: clear covering tiles)`;
 
       el.innerHTML = `
         <div class="tile-face">
@@ -45528,7 +45598,6 @@ class BoardRenderer {
           <div class="tile-label-banner">
             <div class="tile-label" style="font-size: ${fontSize}px;">${flora.commonName}</div>
           </div>
-          ${lockOverlay}
         </div>
       `;
 
@@ -46185,6 +46254,17 @@ class GameManager {
 
     if (!isFree) {
       playBlockedWarningChime();
+      if (typeof document !== 'undefined') {
+        const el = document.getElementById(tile.id);
+        if (el) {
+          el.classList.remove('tile-nudge-blocked');
+          void el.offsetWidth;
+          el.classList.add('tile-nudge-blocked');
+        }
+      }
+      if (typeof window !== 'undefined' && window.showToastMessage) {
+        window.showToastMessage("🔒 Tile blocked — clear covering or lateral tiles first");
+      }
       return;
     }
 
