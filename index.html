@@ -447,15 +447,48 @@ body {
     position: relative;
     overflow: hidden;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     width: 100%;
+    height: 100%;
+    min-height: 480px;
+    padding: 6px 0;
+}
+
+.floating-gameplay-prompt {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 18px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--accent-current);
+    border-radius: 20px;
+    color: #fef08a;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    margin-bottom: 6px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+    z-index: 10;
+    animation: gentlePulse 2.5s infinite ease-in-out;
+}
+
+@keyframes gentlePulse {
+    0%, 100% { transform: scale(1); opacity: 0.95; }
+    50% { transform: scale(1.02); opacity: 1; }
 }
 
 .tile-layout {
     position: relative;
-    width: 380px;
-    height: 460px;
+    width: 100%;
+    max-width: 860px;
+    height: 100%;
+    min-height: 520px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 /* 3D Glassmorphic Tile Design */
@@ -1025,10 +1058,41 @@ body {
     cursor: pointer;
     user-select: none;
     touch-action: none;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.2s ease;
+    transition: transform 0.12s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.12s ease, filter 0.2s ease;
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* Authentic Ceramic Tile Tap Depression */
+.tile-element:active:not(.tile-blocked) {
+    transform: translateY(3px) !important;
+    box-shadow: 
+        inset 0 1px 0 rgba(255, 255, 255, 0.6),
+        0 1px 2px rgba(0, 0, 0, 0.2),
+        0 4px 0 #8d6e63,
+        0 6px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Category Color Top Ribbon */
+.tile-category-ribbon {
+    position: absolute;
+    top: 0;
+    left: 8px;
+    right: 8px;
+    height: 3px;
+    border-radius: 0 0 3px 3px;
+    opacity: 0.95;
+    z-index: 4;
+}
+
+/* Recessed Label Banner */
+.tile-label-banner {
+    width: 100%;
+    padding: 2px 3px;
+    background: rgba(0, 0, 0, 0.04);
+    border-radius: 4px;
+    margin-top: 2px;
 }
 
 /* Archetype 1: Classic Carved Ivory Tablet */
@@ -1714,6 +1778,9 @@ body {
 
                     <!-- Interactive 2.5D Board -->
                     <div class="board-container">
+                        <div class="floating-gameplay-prompt" id="gameplay-prompt">
+                            <span>✨ Tap matching pairs (2) to dissolve</span>
+                        </div>
                         <div class="tile-layout" id="board">
                             <!-- Tiles injected dynamically -->
                         </div>
@@ -44693,14 +44760,29 @@ function playAshramMeditationGong() {
 }
 
 /**
- * Selection Tap: 432 Hz pure sine tone with 0.2s duration
+ * Selection Tap: Authentic ceramic tile click transient + 432 Hz Pythagorean resonant body chime
  */
-function playTileSelectChime() {
+function playCeramicTileTap() {
     const ctx = getAudioContext();
     if (!ctx) return;
     unlockAudioContext();
 
     const now = ctx.currentTime;
+    
+    // High-pitched tactile ceramic click transient (1250 Hz -> 320 Hz)
+    const clickOsc = ctx.createOscillator();
+    const clickGain = ctx.createGain();
+    clickOsc.type = 'triangle';
+    clickOsc.frequency.setValueAtTime(1250, now);
+    clickOsc.frequency.exponentialRampToValueAtTime(320, now + 0.04);
+    clickGain.gain.setValueAtTime(0.14, now);
+    clickGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+    clickOsc.connect(clickGain);
+    clickGain.connect(ctx.destination);
+    clickOsc.start(now);
+    clickOsc.stop(now + 0.045);
+
+    // Resonant musical body tone
     const osc = ctx.createOscillator();
     osc.type = 'sine';
     const freq = (ragaDrone.tuningBase === 432) ? 432.0 : 440.0;
@@ -44718,8 +44800,15 @@ function playTileSelectChime() {
     osc.stop(now + 0.24);
 
     setTimeout(() => {
-        try { osc.disconnect(); gain.disconnect(); } catch(e){}
+        try { 
+            clickOsc.disconnect(); clickGain.disconnect();
+            osc.disconnect(); gain.disconnect(); 
+        } catch(e){}
     }, 300);
+}
+
+function playTileSelectChime() {
+    playCeramicTileTap();
 }
 
 /**
@@ -45353,11 +45442,28 @@ class BoardRenderer {
     const colSpacing = width * 0.85;
     const rowSpacing = height * 0.85;
     const boardTotalW = (maxX - minX + 1) * colSpacing;
+    const boardTotalH = (maxY - minY + 1) * rowSpacing;
+
     let offsetX = 20;
     if (this.container && this.container.clientWidth > boardTotalW) {
       offsetX = Math.max(10, Math.floor((this.container.clientWidth - boardTotalW) / 2));
     }
-    const offsetY = 20;
+    let offsetY = 20;
+    if (this.container && this.container.clientHeight > boardTotalH) {
+      offsetY = Math.max(15, Math.floor((this.container.clientHeight - boardTotalH) / 2));
+    }
+
+    const domainRibbons = {
+      'Fauna & Wildlife': '#15803d',
+      'Flora & Ecology': '#16a34a',
+      'Cosmos & Astronomy': '#4f46e5',
+      'Earth & Geology': '#b45309',
+      'Mind & Science': '#0284c7',
+      'Arts & Culture': '#e11d48',
+      'Character & Will': '#d97706',
+      'Heart, Empathy & Peace': '#ec4899',
+      'Wisdom & Integral Yoga': '#9333ea'
+    };
 
     activeTiles.forEach(tile => {
       const isFree = VitaBoardGenerator.isTileFree(tile, activeTiles);
@@ -45373,6 +45479,7 @@ class BoardRenderer {
       // Flora details & Archetype
       const flora = tile.floraData || getFloraById(tile.floraId);
       const arch = flora.archetype || 'ivory';
+      const ribbonColor = domainRibbons[flora.domain] || '#c5a880';
 
       const el = document.createElement('div');
       el.className = `tile-element archetype-${arch} ${isFree ? 'tile-free' : 'tile-blocked'} ${isSelected ? 'tile-selected' : ''}`;
@@ -45392,9 +45499,12 @@ class BoardRenderer {
 
       el.innerHTML = `
         <div class="tile-face">
+          <div class="tile-category-ribbon" style="background: ${ribbonColor};"></div>
           ${bonusBadge}
           <div class="tile-icon" style="font-size: ${iconSize}px;">${flora.symbol || '🪷'}</div>
-          <div class="tile-label" style="font-size: ${fontSize}px;">${flora.commonName}</div>
+          <div class="tile-label-banner">
+            <div class="tile-label" style="font-size: ${fontSize}px;">${flora.commonName}</div>
+          </div>
           ${lockOverlay}
         </div>
       `;
@@ -46540,10 +46650,19 @@ window.addEventListener('load', () => {
             }
         }
 
-        // 2. Tray visibility
+        // 2. Tray visibility & floating gameplay prompt
         const trayContainer = document.getElementById('tray-container');
         if (trayContainer) {
             trayContainer.style.display = state.gameplayMode === 'tile_club' ? 'flex' : 'none';
+        }
+
+        const promptEl = document.getElementById('gameplay-prompt');
+        if (promptEl) {
+            if (state.gameplayMode === 'vita') {
+                promptEl.innerHTML = '<span>✨ Tap matching pairs (2) to dissolve</span>';
+            } else {
+                promptEl.innerHTML = '<span>📥 Tap open tiles to collect into tray below</span>';
+            }
         }
 
         // 3. Render tray slots for Mode B (Tile Club Triads)
