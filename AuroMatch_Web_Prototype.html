@@ -1750,7 +1750,8 @@ body {
     z-index: var(--z-overlay);
     justify-content: center;
     align-items: center;
-    padding: 20px;
+    padding: 16px 12px;
+    box-sizing: border-box;
 }
 
 .stage-clear-overlay.active {
@@ -1761,24 +1762,37 @@ body {
     background: rgba(14, 78, 55, 0.95);
     border: 1px solid var(--accent-current);
     border-radius: 24px;
-    padding: 24px 20px;
+    padding: clamp(14px, 4vw, 22px);
     width: 100%;
-    max-width: 340px;
+    max-width: min(380px, 94vw);
+    max-height: min(88dvh, 88vh);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    box-sizing: border-box;
     text-align: center;
     box-shadow: 0 16px 48px rgba(0,0,0,0.6);
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     animation: scaleUpCard 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-/* Avatar Pill Touch Ergonomics */
+.stage-clear-card::-webkit-scrollbar {
+    width: 4px;
+}
+.stage-clear-card::-webkit-scrollbar-thumb {
+    background: rgba(255, 215, 0, 0.3);
+    border-radius: 4px;
+}
+
+/* Avatar Pill Touch Ergonomics - Responsive Clamp */
 .avatar-pill {
-    width: 40px !important;
-    height: 40px !important;
-    min-width: 40px !important;
-    font-size: 20px !important;
+    width: clamp(32px, 8.2vw, 38px) !important;
+    height: clamp(32px, 8.2vw, 38px) !important;
+    min-width: unset !important;
+    font-size: clamp(16px, 4.2vw, 19px) !important;
+    flex-shrink: 0;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -2383,32 +2397,32 @@ body {
 
         <!-- Player Name Entry Modal -->
         <div class="stage-clear-overlay" id="name-entry-modal" style="display: none; z-index: var(--z-overlay);">
-            <div class="stage-clear-card" style="max-width: 380px; text-align: left; padding: 22px; background: rgba(14, 78, 55, 0.98);">
-                <div style="font-size: 32px; text-align: center; margin-bottom: 4px;">✨</div>
+            <div class="stage-clear-card" style="max-width: min(380px, 92vw); width: 100%; box-sizing: border-box; text-align: left; padding: clamp(14px, 4vw, 20px); background: rgba(14, 78, 55, 0.98); max-height: min(88dvh, 88vh); overflow-y: auto;">
+                <div style="font-size: 24px; text-align: center; margin-bottom: 2px;">✨</div>
                 <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-current); font-weight: 700; text-align: center;">Seeker Profile</div>
-                <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; color: #ffffff; text-align: center; margin-bottom: 6px;" id="name-modal-title">Switch or Create Player</h3>
-                <p style="font-size: 12px; color: #d4d4d8; line-height: 1.5; text-align: center; margin-bottom: 14px;">
-                    Each seeker has their own independent progress across 520 levels. New names start cleanly at Level 1.
+                <h3 style="font-family: 'Playfair Display', serif; font-size: 18px; color: #ffffff; text-align: center; margin-bottom: 4px;" id="name-modal-title">Switch or Create Player</h3>
+                <p style="font-size: 11px; color: #d4d4d8; line-height: 1.4; text-align: center; margin-bottom: 10px;">
+                    Each seeker has independent progress across 520 levels.
                 </p>
 
                 <!-- Saved Profiles Quick-Select -->
-                <div id="saved-profiles-section" style="margin-bottom: 12px; display: none;">
-                    <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #c5a880; margin-bottom: 6px;">Saved Players:</div>
+                <div id="saved-profiles-section" style="margin-bottom: 10px; display: none; width: 100%; box-sizing: border-box;">
+                    <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #c5a880; margin-bottom: 4px;">Saved Players:</div>
                     <div id="saved-profiles-list" style="display: flex; flex-wrap: wrap; gap: 6px;"></div>
                 </div>
 
-                <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-current); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 8px;">
-                    <label for="player-name-input" style="font-size: 11px; font-weight: 700; color: #ffd700; letter-spacing: 1px; text-transform: uppercase;">
+                <div style="width: 100%; box-sizing: border-box; background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border-current); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; gap: 8px;">
+                    <label for="player-name-input" style="font-size: 10px; font-weight: 700; color: #ffd700; letter-spacing: 1px; text-transform: uppercase;">
                         Seeker Name
                     </label>
                     <input type="text" id="player-name-input" placeholder="e.g. Gopal, Maya, Seeker..." maxlength="24"
                         onkeydown="if(event.key==='Enter'){event.preventDefault();window.submitPlayerName();}"
-                        style="width: 100%; box-sizing: border-box; padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-current); background: rgba(0, 0, 0, 0.4); color: #ffffff; font-size: 14px; font-family: 'Outfit', sans-serif; outline: none;" />
+                        style="width: 100%; box-sizing: border-box; padding: 9px 12px; border-radius: 8px; border: 1px solid var(--border-current); background: rgba(0, 0, 0, 0.4); color: #ffffff; font-size: 14px; font-family: 'Outfit', sans-serif; outline: none;" />
                     
                     <!-- Learning Avatar Selector -->
-                    <div style="margin-top: 4px;">
+                    <div style="margin-top: 4px; width: 100%; box-sizing: border-box;">
                         <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: #c5a880;">Learning Avatar:</span>
-                        <div id="avatar-picker-row" style="display: flex; gap: 6px; margin-top: 6px; justify-content: space-between;">
+                        <div id="avatar-picker-row" style="display: flex; gap: 6px; margin-top: 6px; justify-content: center; flex-wrap: wrap; width: 100%; box-sizing: border-box;">
                             <button type="button" class="avatar-pill active" data-avatar="🦉" onclick="window.selectAvatar('🦉')" title="Wisdom Owl" aria-label="Wisdom Owl">🦉</button>
                             <button type="button" class="avatar-pill" data-avatar="🔭" onclick="window.selectAvatar('🔭')" title="Astronomer Telescope" aria-label="Astronomer Telescope">🔭</button>
                             <button type="button" class="avatar-pill" data-avatar="⚛️" onclick="window.selectAvatar('⚛️')" title="Physics Atom" aria-label="Physics Atom">⚛️</button>
@@ -2419,15 +2433,15 @@ body {
                         </div>
                     </div>
 
-                    <span style="font-size: 10px; color: #a1a1aa; margin-top: 4px;">
+                    <span style="font-size: 10px; color: #a1a1aa; margin-top: 2px;">
                         🔒 Progress saved independently on this device.
                     </span>
                 </div>
-                <div style="display: flex; gap: 8px; margin-top: 14px;">
-                    <button class="cta-btn" id="btn-submit-name" onclick="window.submitPlayerName()" style="flex: 1; margin: 0; padding: 12px;">
+                <div style="display: flex; gap: 8px; margin-top: 12px; width: 100%; box-sizing: border-box;">
+                    <button class="cta-btn" id="btn-submit-name" onclick="window.submitPlayerName()" style="flex: 1; margin: 0; padding: 10px 14px; font-size: 13px;">
                         Confirm ▶
                     </button>
-                    <button class="cta-btn" onclick="window.closeNameModal()" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; width: auto; padding: 0 16px; margin: 0;">
+                    <button class="cta-btn" onclick="window.closeNameModal()" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #ffffff; width: auto; padding: 10px 16px; margin: 0; font-size: 13px;">
                         Cancel
                     </button>
                 </div>
