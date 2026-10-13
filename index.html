@@ -1313,11 +1313,12 @@ body {
 
 /* Free / Playable Tile: Warm ambient rim light and elevated 3D presence */
 .tile-free {
+    filter: brightness(1.02);
     box-shadow: 
-        inset 0 2px 0 rgba(255, 255, 255, 0.95),
+        inset 0 2px 0 rgba(255, 255, 255, 0.98),
         0 4px 8px rgba(0, 0, 0, 0.25),
         0 9px 0 #bfa075,
-        0 0 10px rgba(255, 215, 0, 0.25),
+        0 0 12px rgba(255, 215, 0, 0.32),
         0 14px 20px rgba(0, 0, 0, 0.35);
     transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
 }
@@ -1350,21 +1351,21 @@ body {
     box-shadow: 0 0 16px rgba(56, 189, 248, 0.8) !important;
 }
 
-/* Blocked / Occluded Tile: Soft matte shadow, reduced rim light, clear non-free visual cue */
+/* Blocked / Submerged Tile: Deep matte shading, muted saturation, clear non-playable mobile cue */
 .tile-blocked {
-    filter: brightness(0.82) contrast(0.92);
+    filter: brightness(0.72) saturate(0.82) contrast(0.95);
     cursor: pointer;
     box-shadow: 
-        inset 0 1px 0 rgba(255, 255, 255, 0.4),
-        0 2px 4px rgba(0, 0, 0, 0.25),
-        0 5px 0 #7e694f,
-        0 6px 10px rgba(0, 0, 0, 0.3);
-    opacity: 0.88;
-    transition: filter 0.2s ease, opacity 0.2s ease;
+        inset 0 1px 0 rgba(255, 255, 255, 0.25),
+        0 2px 4px rgba(0, 0, 0, 0.35),
+        0 4px 0 #5c4b37,
+        0 6px 10px rgba(0, 0, 0, 0.4);
+    opacity: 0.82;
+    transition: filter 0.2s ease, opacity 0.2s ease, transform 0.15s ease;
 }
 
 .tile-blocked:hover {
-    filter: brightness(0.86) contrast(0.94);
+    filter: brightness(0.78) saturate(0.88) contrast(0.96);
 }
 
 /* Micro-nudge animation when blocked tile is tapped */
@@ -2020,6 +2021,52 @@ body {
         box-shadow: 0 0 30px rgba(255, 215, 0, 0), inset 0 0 20px rgba(255, 215, 0, 0);
         transform: scale(1) translateY(0);
     }
+}
+
+/* Kinetic Starlight Convergence: 2 matching tiles fly to midpoint and collide */
+.tile-converging-smash {
+    animation: tileConvergeAndSmash 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+    pointer-events: none !important;
+    will-change: transform, opacity, filter;
+}
+
+@keyframes tileConvergeAndSmash {
+    0% {
+        transform: translate(0, 0) scale(1) rotate(0deg);
+        opacity: 1;
+        filter: brightness(1) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+    }
+    45% {
+        transform: translate(var(--target-x), var(--target-y)) scale(1.08) rotate(3deg);
+        opacity: 1;
+        filter: brightness(1.35) drop-shadow(0 0 16px #ffd700);
+    }
+    55% {
+        transform: translate(var(--target-x), var(--target-y)) scale(1.15) rotate(-2deg);
+        opacity: 1;
+        filter: brightness(1.6) drop-shadow(0 0 24px #ffffff);
+    }
+    80% {
+        transform: translate(var(--target-x), var(--target-y)) scale(0.85);
+        opacity: 0.65;
+        filter: brightness(1.4) drop-shadow(0 0 16px #f59e0b);
+    }
+    100% {
+        transform: translate(var(--target-x), var(--target-y)) scale(0.25);
+        opacity: 0;
+        filter: brightness(2) drop-shadow(0 0 30px #ffd700);
+    }
+}
+
+/* Board Micro-Impact Nudge on Midpoint Collision */
+.board-micro-impact {
+    animation: boardNudgeImpact 0.16s ease-out;
+}
+
+@keyframes boardNudgeImpact {
+    0% { transform: scale(1); }
+    40% { transform: scale(0.996) translateY(1.5px); }
+    100% { transform: scale(1) translateY(0); }
 }
 
 
@@ -49453,6 +49500,87 @@ function playTileSelectChime() {
 }
 
 /**
+ * Kinetic Starlight Smash & Whoosh: Atmospheric air glide + crisp ceramic impact & meditation chime
+ */
+function playTileSmashWhoosh() {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    unlockAudioContext();
+
+    const now = ctx.currentTime;
+
+    // 1. Air displacement Whoosh (180ms frequency glide)
+    const whooshOsc = ctx.createOscillator();
+    const whooshFilter = ctx.createBiquadFilter();
+    const whooshGain = ctx.createGain();
+
+    whooshOsc.type = 'triangle';
+    whooshOsc.frequency.setValueAtTime(240, now);
+    whooshOsc.frequency.exponentialRampToValueAtTime(720, now + 0.08);
+    whooshOsc.frequency.exponentialRampToValueAtTime(190, now + 0.18);
+
+    whooshFilter.type = 'bandpass';
+    whooshFilter.frequency.setValueAtTime(480, now);
+    whooshFilter.Q.setValueAtTime(1.8, now);
+
+    whooshGain.gain.setValueAtTime(0.01, now);
+    whooshGain.gain.linearRampToValueAtTime(0.14, now + 0.06);
+    whooshGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+
+    whooshOsc.connect(whooshFilter);
+    whooshFilter.connect(whooshGain);
+    whooshGain.connect(ctx.destination);
+
+    whooshOsc.start(now);
+    whooshOsc.stop(now + 0.19);
+
+    // 2. Ceramic Stone Impact Clack at t + 0.16s
+    const impactTime = now + 0.16;
+    const impactOsc = ctx.createOscillator();
+    const impactGain = ctx.createGain();
+
+    impactOsc.type = 'triangle';
+    impactOsc.frequency.setValueAtTime(1600, impactTime);
+    impactOsc.frequency.exponentialRampToValueAtTime(380, impactTime + 0.035);
+
+    impactGain.gain.setValueAtTime(0.22, impactTime);
+    impactGain.gain.exponentialRampToValueAtTime(0.0001, impactTime + 0.04);
+
+    impactOsc.connect(impactGain);
+    impactGain.connect(ctx.destination);
+
+    impactOsc.start(impactTime);
+    impactOsc.stop(impactTime + 0.045);
+
+    // 3. Resonant Starlight Bell Chime (528 Hz Love/Dawn harmonic)
+    const bellOsc = ctx.createOscillator();
+    const bellGain = ctx.createGain();
+    const baseTuning = (ragaDrone.tuningBase === 432) ? 432 : 440;
+    const chimeFreq = (baseTuning === 432) ? 518.4 : 528.0;
+
+    bellOsc.type = 'sine';
+    bellOsc.frequency.setValueAtTime(chimeFreq, impactTime);
+
+    bellGain.gain.setValueAtTime(0.001, impactTime);
+    bellGain.gain.linearRampToValueAtTime(0.20, impactTime + 0.02);
+    bellGain.gain.exponentialRampToValueAtTime(0.0001, impactTime + 0.38);
+
+    bellOsc.connect(bellGain);
+    bellGain.connect(ctx.destination);
+
+    bellOsc.start(impactTime);
+    bellOsc.stop(impactTime + 0.40);
+
+    setTimeout(() => {
+        try {
+            whooshOsc.disconnect(); whooshFilter.disconnect(); whooshGain.disconnect();
+            impactOsc.disconnect(); impactGain.disconnect();
+            bellOsc.disconnect(); bellGain.disconnect();
+        } catch(e){}
+    }, 450);
+}
+
+/**
  * Blocked Tap: Gentle low-pass hum at 196 Hz (G3), 0.15s duration, soft attack, zero harshness
  */
 function playBlockedWarningChime() {
@@ -50522,6 +50650,95 @@ function triggerTileSparkleDissolve(el) {
 }
 
 /**
+ * Kinetic Starlight Convergence: 2 matching tiles fly to midpoint, collide with ceramic smash, and dissolve into stardust
+ */
+function triggerTileConvergenceSmash(el1, el2) {
+    if (!el1 || !el2 || typeof document === 'undefined') return;
+    const parent = el1.parentElement;
+    if (!parent) return;
+
+    try {
+        const x1 = el1.offsetLeft;
+        const y1 = el1.offsetTop;
+        const x2 = el2.offsetLeft;
+        const y2 = el2.offsetTop;
+
+        const mx = (x1 + x2) / 2;
+        const my = (y1 + y2) / 2;
+
+        const dx1 = mx - x1;
+        const dy1 = my - y1;
+        const dx2 = mx - x2;
+        const dy2 = my - y2;
+
+        // Ghost 1
+        const ghost1 = el1.cloneNode(true);
+        ghost1.id = '';
+        ghost1.className = (el1.className || '') + ' tile-converging-smash';
+        ghost1.style.position = 'absolute';
+        ghost1.style.left = `${x1}px`;
+        ghost1.style.top = `${y1}px`;
+        ghost1.style.width = el1.style.width || `${el1.offsetWidth}px`;
+        ghost1.style.height = el1.style.height || `${el1.offsetHeight}px`;
+        ghost1.style.setProperty('--target-x', `${Math.round(dx1)}px`);
+        ghost1.style.setProperty('--target-y', `${Math.round(dy1)}px`);
+        ghost1.style.zIndex = '1001';
+        ghost1.style.pointerEvents = 'none';
+
+        // Ghost 2
+        const ghost2 = el2.cloneNode(true);
+        ghost2.id = '';
+        ghost2.className = (el2.className || '') + ' tile-converging-smash';
+        ghost2.style.position = 'absolute';
+        ghost2.style.left = `${x2}px`;
+        ghost2.style.top = `${y2}px`;
+        ghost2.style.width = el2.style.width || `${el2.offsetWidth}px`;
+        ghost2.style.height = el2.style.height || `${el2.offsetHeight}px`;
+        ghost2.style.setProperty('--target-x', `${Math.round(dx2)}px`);
+        ghost2.style.setProperty('--target-y', `${Math.round(dy2)}px`);
+        ghost2.style.zIndex = '1002';
+        ghost2.style.pointerEvents = 'none';
+
+        parent.appendChild(ghost1);
+        parent.appendChild(ghost2);
+
+        // At midpoint impact (~170ms)
+        setTimeout(() => {
+            const midDummy = {
+                getBoundingClientRect: () => {
+                    const pRect = parent.getBoundingClientRect();
+                    const w = el1.offsetWidth || 68;
+                    const h = el1.offsetHeight || 88;
+                    return {
+                        left: pRect.left + mx,
+                        top: pRect.top + my,
+                        width: w,
+                        height: h
+                    };
+                }
+            };
+            spawnSparkBurst(midDummy, parent, 12);
+
+            // Micro board nudge on collision
+            if (parent.classList) {
+                parent.classList.add('board-micro-impact');
+                setTimeout(() => {
+                    if (parent.classList) parent.classList.remove('board-micro-impact');
+                }, 180);
+            }
+        }, 170);
+
+        // Cleanup ghosts
+        setTimeout(() => {
+            if (ghost1.parentElement) ghost1.parentElement.removeChild(ghost1);
+            if (ghost2.parentElement) ghost2.parentElement.removeChild(ghost2);
+        }, 420);
+    } catch(e) {
+        // Safe fallback
+    }
+}
+
+/**
  * Visual Sparkling Dissolution for Tile Club Mode (3-tile match in tray)
  */
 function triggerTrayTriadSparkle(matchedFloraId) {
@@ -50546,7 +50763,7 @@ function triggerTrayTriadSparkle(matchedFloraId) {
     }
 }
 
-function spawnSparkBurst(targetEl, container) {
+function spawnSparkBurst(targetEl, container, count = 8) {
     if (!targetEl || !container || typeof document === 'undefined') return;
     try {
         const targetRect = targetEl.getBoundingClientRect();
@@ -50554,7 +50771,7 @@ function spawnSparkBurst(targetEl, container) {
         const cx = (targetRect.left - containerRect.left) + targetRect.width / 2;
         const cy = (targetRect.top - containerRect.top) + targetRect.height / 2;
 
-        const sparkCount = 8;
+        const sparkCount = count || 8;
         for (let i = 0; i < sparkCount; i++) {
             const angle = (i / sparkCount) * Math.PI * 2 + (Math.random() * 0.4 - 0.2);
             const distance = 20 + Math.random() * 28;
@@ -51280,14 +51497,19 @@ class GameManager {
         tiles: [firstTile, tile]
       });
 
-      // Visual Starlight Sparkle Dissolution (Ghost Clone + Floating Sparks)
+      // Visual Kinetic Convergence Smash & Stardust Dissolution
       if (typeof document !== 'undefined') {
         const el1 = document.getElementById(firstTile.id);
         const el2 = document.getElementById(tile.id);
-        if (el1) triggerTileSparkleDissolve(el1);
-        if (el2) triggerTileSparkleDissolve(el2);
+        if (el1 && el2) {
+          triggerTileConvergenceSmash(el1, el2);
+        } else {
+          if (el1) triggerTileSparkleDissolve(el1);
+          if (el2) triggerTileSparkleDissolve(el2);
+        }
       }
 
+      playTileSmashWhoosh();
       playAshramMeditationGong();
 
       if (this.onMatchSuccess) {
@@ -51363,6 +51585,7 @@ class GameManager {
         return true;
       });
 
+      playTileSmashWhoosh();
       playAshramMeditationGong();
       const flora = cleared[0].floraData || getFloraById(matchedFloraId);
 
