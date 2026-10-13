@@ -1,0 +1,152 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <!-- Background Sanctuary Emerald Gradient -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#021a12"/>
+      <stop offset="45%" stop-color="#07382a"/>
+      <stop offset="100%" stop-color="#0d4a37"/>
+    </linearGradient>
+
+    <!-- Golden Rim Gradient -->
+    <linearGradient id="gold-rim" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="30%" stop-color="#f59e0b"/>
+      <stop offset="70%" stop-color="#d97706"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+
+    <!-- Golden Petal Gradient -->
+    <linearGradient id="gold-petal" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fffbeb"/>
+      <stop offset="35%" stop-color="#fde047"/>
+      <stop offset="80%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+
+    <!-- Triad Petal Gradient -->
+    <linearGradient id="gold-triad" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" stop-color="#d97706"/>
+      <stop offset="50%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#ffffff"/>
+    </linearGradient>
+
+    <!-- Inner Core Radiant Glow -->
+    <radialGradient id="core-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fde047" stop-opacity="0.75"/>
+      <stop offset="40%" stop-color="#10b981" stop-opacity="0.35"/>
+      <stop offset="75%" stop-color="#059669" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#021a12" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Subtle Golden Bevel Highlight -->
+    <linearGradient id="bevel-light" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.45"/>
+      <stop offset="15%" stop-color="#ffffff" stop-opacity="0.05"/>
+      <stop offset="85%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.4"/>
+    </linearGradient>
+
+    <!-- Drop Shadow Filter for Jewel Elevation -->
+    <filter id="jewel-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="14" flood-color="#000000" flood-opacity="0.55"/>
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-color="#f59e0b" flood-opacity="0.25"/>
+    </filter>
+
+    <!-- Bloom Glow Filter for Central Spark -->
+    <filter id="bloom" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- 1. Master Squircle Body (iOS & Android Shape Adaptive Friendly) -->
+  <rect x="12" y="12" width="488" height="488" rx="112" fill="url(#bg-grad)" stroke="url(#gold-rim)" stroke-width="7" filter="url(#jewel-shadow)"/>
+  
+  <!-- Tactile 3D Bevel Overlay -->
+  <rect x="16" y="16" width="480" height="480" rx="108" fill="url(#bevel-light)" pointer-events="none"/>
+
+  <!-- Delicate Constellation Inner Border -->
+  <rect x="28" y="28" width="456" height="456" rx="98" fill="none" stroke="rgba(251, 191, 36, 0.3)" stroke-width="1.8" stroke-dasharray="10 7"/>
+
+  <!-- 2. Cosmic Sanctuary Radial Glow Center -->
+  <circle cx="256" cy="256" r="190" fill="url(#core-glow)"/>
+
+  <!-- 3. Outer Sacred Geometry Rings & 12 Starlight Nodes -->
+  <circle cx="256" cy="256" r="168" fill="none" stroke="rgba(251, 191, 36, 0.22)" stroke-width="1.5"/>
+  <circle cx="256" cy="256" r="144" fill="none" stroke="rgba(251, 191, 36, 0.35)" stroke-width="1.2" stroke-dasharray="3 5"/>
+
+  <!-- 12 Cardinal Starlight Orbit Nodes -->
+  <g fill="#fde68a" opacity="0.85">
+    <circle cx="256" cy="88" r="3"/>
+    <circle cx="340" cy="110" r="2.5"/>
+    <circle cx="402" cy="172" r="2.5"/>
+    <circle cx="424" cy="256" r="3"/>
+    <circle cx="402" cy="340" r="2.5"/>
+    <circle cx="340" cy="402" r="2.5"/>
+    <circle cx="256" cy="424" r="3"/>
+    <circle cx="172" cy="402" r="2.5"/>
+    <circle cx="110" cy="340" r="2.5"/>
+    <circle cx="88" cy="256" r="3"/>
+    <circle cx="110" cy="172" r="2.5"/>
+    <circle cx="172" cy="110" r="2.5"/>
+  </g>
+
+  <!-- 4. The 12 Golden Lotus Petals (Mother's Integral Symbol Heritage) -->
+  <g id="twelve-petals" transform="translate(256, 256)">
+    <!-- Petal template repeated across 12 angles (every 30 deg) -->
+    <!-- 0 deg -->
+    <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -38 Z" fill="url(#gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+    <!-- 30 deg -->
+    <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -38 Z" transform="rotate(30)" fill="url(#gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+    <!-- 60 deg -->
+    <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -38 Z" transform="rotate(60)" fill="url(#gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+    <!-- 90 deg -->
+    <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -138 Z" transform="rotate(90)" fill="url(#gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+    <!-- 120 deg -->
+    <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -138 Z" transform="rotate(120)" fill="url(#gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+    <!-- 150 deg -->
+    <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -138 Z" transform="rotate(150)" fill="url(#gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+    <!-- 180 deg -->
+    <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -138 Z" transform="rotate(180)" fill="url(#gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+    <!-- 210 deg -->
+    <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -138 Z" transform="rotate(210)" fill="url(#gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+    <!-- 240 deg -->
+    <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -138 Z" transform="rotate(240)" fill="url(#gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+    <!-- 270 deg -->
+    <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -138 Z" transform="rotate(270)" fill="url(#gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+    <!-- 300 deg -->
+    <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -138 Z" transform="rotate(300)" fill="url(#gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+    <!-- 330 deg -->
+    <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -138 Z" transform="rotate(330)" fill="url(#gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+  </g>
+
+  <!-- 5. Inner Triad Concentric Arcs (3-Match Trinity / Tile Club Triad Mechanics) -->
+  <g id="triad-trinity" transform="translate(256, 256)" filter="url(#bloom)">
+    <!-- 3 Interlocking Triad Nodes at 0, 120, 240 deg -->
+    <path d="M0 -22 C-26 -48 -28 -82 0 -105 C28 -82 26 -48 0 -22 Z" fill="url(#gold-triad)" stroke="#ffd700" stroke-width="1.8"/>
+    <path d="M0 -22 C-26 -48 -28 -82 0 -105 C28 -82 26 -48 0 -22 Z" transform="rotate(120)" fill="url(#gold-triad)" stroke="#ffd700" stroke-width="1.8"/>
+    <path d="M0 -22 C-26 -48 -28 -82 0 -105 C28 -82 26 -48 0 -22 Z" transform="rotate(240)" fill="url(#gold-triad)" stroke="#ffd700" stroke-width="1.8"/>
+  </g>
+
+  <!-- 6. Central Luminous Core & Morning Star Diamond (Consciousness Spark ✨) -->
+  <g id="center-morning-star" transform="translate(256, 256)">
+    <!-- Golden Core Shield Ring -->
+    <circle cx="0" cy="0" r="32" fill="#042219" stroke="url(#gold-rim)" stroke-width="3"/>
+    <circle cx="0" cy="0" r="26" fill="url(#core-glow)"/>
+
+    <!-- 4-Pointed Primary Diamond Starburst -->
+    <polygon points="0,-42 9,-11 40,0 9,11 0,42 -9,11 -40,0 -9,-11" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.5" filter="url(#bloom)"/>
+    
+    <!-- 4-Pointed Secondary Diagonal Sparkle Rays -->
+    <polygon points="0,-22 5,-5 22,0 5,5 0,22 -5,5 -22,0 -5,-5" transform="rotate(45)" fill="#fde047" opacity="0.85"/>
+
+    <!-- Pure White Central Nucleus Spark -->
+    <circle cx="0" cy="0" r="8" fill="#ffffff" filter="url(#bloom)"/>
+    <circle cx="0" cy="0" r="4" fill="#fffef0"/>
+  </g>
+
+  <!-- 7. Subtle Elegant Wordmark Ribbon (Crest Subhead) -->
+  <g opacity="0.92">
+    <text x="256" y="468" text-anchor="middle" font-family="'Outfit', -apple-system, sans-serif" font-size="20" font-weight="700" letter-spacing="7" fill="#fde68a" text-transform="uppercase">AUROMATCH</text>
+  </g>
+</svg>

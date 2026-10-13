@@ -1,0 +1,37 @@
+{
+  "name": "AuroMatch - Concentration Quest",
+  "short_name": "AuroMatch",
+  "description": "A mindful 3D concentration quest across 520 levels and contemplative sanctuaries.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#021a12",
+  "theme_color": "#07382a",
+  "categories": ["games", "education", "puzzle"],
+  "icons": [
+    {
+      "src": "./Assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./Assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./Assets/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "./Assets/icons/logo.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

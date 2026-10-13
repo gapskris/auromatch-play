@@ -2,8 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>AuroMatch - Triple Garden of Significances</title>
+
+    <!-- Cross-Platform PWA & Mobile Meta (Android, iOS, iPadOS, Tablets, PC) -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="AuroMatch">
+    <meta name="application-name" content="AuroMatch">
+    <meta name="theme-color" content="#07382a">
+    <meta name="msapplication-TileColor" content="#021a12">
+
+    <!-- Multi-Platform App Icons (SVG, PNG, Apple Touch Icon, Manifest) -->
+    <link rel="icon" type="image/svg+xml" href="./Assets/icons/logo.svg">
+    <link rel="alternate icon" type="image/png" href="./Assets/icons/favicon.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./Assets/icons/apple-touch-icon.png">
+    <link rel="manifest" href="./manifest.json">
+
     <!-- CSS Design System -->
     <style>
 :root {
@@ -1881,13 +1897,79 @@ body {
                 <button class="hdr-btn" onclick="navTo('settings')" title="Sanctuary Settings" style="background: rgba(255,255,255,0.08); border: 1px solid var(--border-current); width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; color: #ffffff; cursor: pointer; transition: all 0.2s ease;">⚙</button>
             </div>
 
-            <!-- Glowing Lotus Logo shape -->
-            <svg class="logo-glowing-lotus" viewBox="0 0 100 100">
-                <path d="M50 15 C45 35 30 45 50 85 C70 45 55 35 50 15 Z" fill="none" stroke="currentColor" stroke-width="2.5" />
-                <path d="M50 25 C35 40 20 55 50 85 C80 55 65 40 50 25 Z" fill="none" stroke="currentColor" stroke-width="2" opacity="0.8" />
-                <path d="M50 35 C25 45 10 65 50 85 C90 65 75 45 50 35 Z" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.6" />
-                <path d="M50 85 C35 70 30 65 20 60 C30 55 45 65 50 85 Z" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5" />
-                <path d="M50 85 C65 70 70 65 80 60 C70 55 55 65 50 85 Z" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.5" />
+            <!-- Master Glowing App Emblem -->
+            <svg class="logo-glowing-lotus" viewBox="0 0 512 512" aria-label="AuroMatch Emblem" role="img">
+              <defs>
+                <linearGradient id="wel-bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#021a12"/>
+                  <stop offset="45%" stop-color="#07382a"/>
+                  <stop offset="100%" stop-color="#0d4a37"/>
+                </linearGradient>
+                <linearGradient id="wel-gold-rim" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#fde68a"/>
+                  <stop offset="30%" stop-color="#f59e0b"/>
+                  <stop offset="70%" stop-color="#d97706"/>
+                  <stop offset="100%" stop-color="#b45309"/>
+                </linearGradient>
+                <linearGradient id="wel-gold-petal" x1="0%" y1="0%" x2="0%" y2="100%">
+                  <stop offset="0%" stop-color="#fffbeb"/>
+                  <stop offset="35%" stop-color="#fde047"/>
+                  <stop offset="80%" stop-color="#f59e0b"/>
+                  <stop offset="100%" stop-color="#d97706"/>
+                </linearGradient>
+                <linearGradient id="wel-gold-triad" x1="0%" y1="100%" x2="0%" y2="0%">
+                  <stop offset="0%" stop-color="#d97706"/>
+                  <stop offset="50%" stop-color="#fbbf24"/>
+                  <stop offset="100%" stop-color="#ffffff"/>
+                </linearGradient>
+                <radialGradient id="wel-core-glow" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#fde047" stop-opacity="0.8"/>
+                  <stop offset="40%" stop-color="#10b981" stop-opacity="0.35"/>
+                  <stop offset="75%" stop-color="#059669" stop-opacity="0.12"/>
+                  <stop offset="100%" stop-color="#021a12" stop-opacity="0"/>
+                </radialGradient>
+              </defs>
+              <rect x="16" y="16" width="480" height="480" rx="108" fill="url(#wel-bg-grad)" stroke="url(#wel-gold-rim)" stroke-width="7"/>
+              <rect x="28" y="28" width="456" height="456" rx="98" fill="none" stroke="rgba(251, 191, 36, 0.35)" stroke-width="1.8" stroke-dasharray="10 7"/>
+              <circle cx="256" cy="256" r="190" fill="url(#wel-core-glow)"/>
+              <circle cx="256" cy="256" r="168" fill="none" stroke="rgba(251, 191, 36, 0.25)" stroke-width="1.5"/>
+              <circle cx="256" cy="256" r="144" fill="none" stroke="rgba(251, 191, 36, 0.35)" stroke-width="1.2" stroke-dasharray="3 5"/>
+              <!-- 12 Cardinal Orbit Nodes -->
+              <g fill="#fde68a" opacity="0.85">
+                <circle cx="256" cy="88" r="3.5"/><circle cx="340" cy="110" r="3"/><circle cx="402" cy="172" r="3"/><circle cx="424" cy="256" r="3.5"/>
+                <circle cx="402" cy="340" r="3"/><circle cx="340" cy="402" r="3"/><circle cx="256" cy="424" r="3.5"/><circle cx="172" cy="402" r="3"/>
+                <circle cx="110" cy="340" r="3"/><circle cx="88" cy="256" r="3.5"/><circle cx="110" cy="172" r="3"/><circle cx="172" cy="110" r="3"/>
+              </g>
+              <!-- 12 Golden Lotus Petals -->
+              <g transform="translate(256, 256)">
+                <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -38 Z" fill="url(#wel-gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+                <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -38 Z" transform="rotate(30)" fill="url(#wel-gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+                <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -38 Z" transform="rotate(60)" fill="url(#wel-gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+                <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -38 Z" transform="rotate(90)" fill="url(#wel-gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+                <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -38 Z" transform="rotate(120)" fill="url(#wel-gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+                <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -38 Z" transform="rotate(150)" fill="url(#wel-gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+                <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -38 Z" transform="rotate(180)" fill="url(#wel-gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+                <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -38 Z" transform="rotate(210)" fill="url(#wel-gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+                <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -38 Z" transform="rotate(240)" fill="url(#wel-gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+                <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -38 Z" transform="rotate(270)" fill="url(#wel-gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+                <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -38 Z" transform="rotate(300)" fill="url(#wel-gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+                <path d="M0 -38 C-14 -68 -16 -108 0 -138 C16 -108 14 -68 0 -38 Z" transform="rotate(330)" fill="url(#wel-gold-petal)" opacity="0.9" stroke="#b45309" stroke-width="1"/>
+              </g>
+              <!-- Inner Triad Trinity Arcs -->
+              <g transform="translate(256, 256)">
+                <path d="M0 -22 C-26 -48 -28 -82 0 -105 C28 -82 26 -48 0 -22 Z" fill="url(#wel-gold-triad)" stroke="#ffd700" stroke-width="2"/>
+                <path d="M0 -22 C-26 -48 -28 -82 0 -105 C28 -82 26 -48 0 -22 Z" transform="rotate(120)" fill="url(#wel-gold-triad)" stroke="#ffd700" stroke-width="2"/>
+                <path d="M0 -22 C-26 -48 -28 -82 0 -105 C28 -82 26 -48 0 -22 Z" transform="rotate(240)" fill="url(#wel-gold-triad)" stroke="#ffd700" stroke-width="2"/>
+              </g>
+              <!-- Central Core & Morning Star Diamond Spark -->
+              <g transform="translate(256, 256)">
+                <circle cx="0" cy="0" r="32" fill="#042219" stroke="url(#wel-gold-rim)" stroke-width="3"/>
+                <circle cx="0" cy="0" r="26" fill="url(#wel-core-glow)"/>
+                <polygon points="0,-42 9,-11 40,0 9,11 0,42 -9,11 -40,0 -9,-11" fill="#fffbeb" stroke="#f59e0b" stroke-width="1.5"/>
+                <polygon points="0,-22 5,-5 22,0 5,5 0,22 -5,5 -22,0 -5,-5" transform="rotate(45)" fill="#fde047" opacity="0.85"/>
+                <circle cx="0" cy="0" r="8" fill="#ffffff"/>
+                <circle cx="0" cy="0" r="4" fill="#fffef0"/>
+              </g>
             </svg>
             <h1 class="app-headline" id="welcome-title">AuroMatch</h1>
             <p class="app-subhead" id="welcome-sub">General Knowledge Concentration Quest</p>

@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="128" height="128">
+  <defs>
+    <linearGradient id="fav-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#031e16"/>
+      <stop offset="100%" stop-color="#0a4332"/>
+    </linearGradient>
+    <linearGradient id="fav-gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+    <radialGradient id="fav-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#fde047" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#059669" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Squircle Canvas Base -->
+  <rect x="4" y="4" width="120" height="120" rx="28" fill="url(#fav-bg)" stroke="url(#fav-gold)" stroke-width="4"/>
+  <circle cx="64" cy="64" r="46" fill="url(#fav-glow)"/>
+
+  <!-- 8 Petal Golden Star for High Legibility at 16-32px -->
+  <g transform="translate(64, 64)" fill="url(#fav-gold)" stroke="#b45309" stroke-width="0.8">
+    <path d="M0 -12 C-6 -22 -6 -34 0 -44 C6 -34 6 -22 0 -12 Z"/>
+    <path d="M0 -12 C-6 -22 -6 -34 0 -44 C6 -34 6 -22 0 -12 Z" transform="rotate(45)"/>
+    <path d="M0 -12 C-6 -22 -6 -34 0 -44 C6 -34 6 -22 0 -12 Z" transform="rotate(90)"/>
+    <path d="M0 -12 C-6 -22 -6 -34 0 -44 C6 -34 6 -22 0 -12 Z" transform="rotate(135)"/>
+    <path d="M0 -12 C-6 -22 -6 -34 0 -44 C6 -34 6 -22 0 -12 Z" transform="rotate(180)"/>
+    <path d="M0 -12 C-6 -22 -6 -34 0 -44 C6 -34 6 -22 0 -12 Z" transform="rotate(225)"/>
+    <path d="M0 -12 C-6 -22 -6 -34 0 -44 C6 -34 6 -22 0 -12 Z" transform="rotate(270)"/>
+    <path d="M0 -12 C-6 -22 -6 -34 0 -44 C6 -34 6 -22 0 -12 Z" transform="rotate(315)"/>
+  </g>
+
+  <!-- Triad Inner Arc -->
+  <g transform="translate(64, 64)" fill="#ffffff" stroke="#f59e0b" stroke-width="1.2">
+    <path d="M0 -8 C-8 -18 -8 -28 0 -34 C8 -28 8 -18 0 -8 Z"/>
+    <path d="M0 -8 C-8 -18 -8 -28 0 -34 C8 -28 8 -18 0 -8 Z" transform="rotate(120)"/>
+    <path d="M0 -8 C-8 -18 -8 -28 0 -34 C8 -28 8 -18 0 -8 Z" transform="rotate(240)"/>
+  </g>
+
+  <!-- Central Spark -->
+  <circle cx="64" cy="64" r="12" fill="#042219" stroke="url(#fav-gold)" stroke-width="1.5"/>
+  <polygon points="64,52 67,61 76,64 67,67 64,76 61,67 52,64 61,61" fill="#ffffff"/>
+  <circle cx="64" cy="64" r="3" fill="#fde047"/>
+</svg>
