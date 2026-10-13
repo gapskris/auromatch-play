@@ -1915,6 +1915,114 @@ body {
     }
 }
 
+/* Golden Starlight Dissolution Animation (Vita Pairs & Tile Club Triads) */
+.tile-dissolving-sparkle {
+    position: absolute !important;
+    pointer-events: none !important;
+    z-index: 1000 !important;
+    animation: tileSparkleDissolve 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+
+@keyframes tileSparkleDissolve {
+    0% {
+        transform: translateY(0) scale(1);
+        filter: drop-shadow(0 0 6px #ffd700) brightness(1);
+        opacity: 1;
+    }
+    30% {
+        transform: translateY(-8px) scale(1.08);
+        filter: drop-shadow(0 0 20px #fde047) brightness(1.35);
+        opacity: 0.95;
+    }
+    70% {
+        transform: translateY(-16px) scale(0.92);
+        filter: drop-shadow(0 0 28px #ffd700) brightness(1.5);
+        opacity: 0.6;
+    }
+    100% {
+        transform: translateY(-24px) scale(0.65);
+        filter: drop-shadow(0 0 35px #fbbf24) brightness(1.8);
+        opacity: 0;
+    }
+}
+
+/* Floating Stardust Particles */
+.celestial-spark-particle {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1100;
+    font-size: 14px;
+    line-height: 1;
+    user-select: none;
+    animation: sparkFlyOut 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.celestial-spark-dot {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1100;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffffff 20%, #fde047 60%, #f59e0b 100%);
+    box-shadow: 0 0 8px #ffd700, 0 0 16px #f59e0b;
+    animation: sparkDotFlyOut 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+@keyframes sparkFlyOut {
+    0% {
+        transform: translate(0, 0) scale(0.3) rotate(0deg);
+        opacity: 1;
+        filter: drop-shadow(0 0 4px #ffd700);
+    }
+    50% {
+        opacity: 1;
+        transform: translate(var(--dx), var(--dy)) scale(1.2) rotate(var(--rot));
+        filter: drop-shadow(0 0 12px #fde047);
+    }
+    100% {
+        transform: translate(calc(var(--dx) * 1.3), calc(var(--dy) * 1.3 - 10px)) scale(0);
+        opacity: 0;
+        filter: drop-shadow(0 0 20px #ffd700);
+    }
+}
+
+@keyframes sparkDotFlyOut {
+    0% {
+        transform: translate(0, 0) scale(0.5);
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+        transform: translate(var(--dx), var(--dy)) scale(1.3);
+    }
+    100% {
+        transform: translate(calc(var(--dx) * 1.25), calc(var(--dy) * 1.25 - 8px)) scale(0);
+        opacity: 0;
+    }
+}
+
+/* Tray Triad Dissolve Flash */
+.tray-slot-triad-sparkle {
+    animation: trayTriadFlash 0.38s ease-out forwards !important;
+}
+
+@keyframes trayTriadFlash {
+    0% {
+        box-shadow: inset 0 0 0 rgba(255, 215, 0, 0);
+        transform: scale(1);
+    }
+    30% {
+        box-shadow: 0 0 20px #ffd700, inset 0 0 14px #fde047;
+        transform: scale(1.08) translateY(-4px);
+    }
+    100% {
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0), inset 0 0 20px rgba(255, 215, 0, 0);
+        transform: scale(1) translateY(0);
+    }
+}
+
+
 </style>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -50380,6 +50488,112 @@ function triggerReflectionDissolve(canvasId, text, jarX, jarY, onComplete) {
     animate();
 }
 
+/**
+ * Visual Sparkling Dissolution for Vita Mode (2-tile match on board)
+ */
+function triggerTileSparkleDissolve(el) {
+    if (!el || typeof document === 'undefined') return;
+    const parent = el.parentElement;
+    if (!parent) return;
+
+    try {
+        const ghost = el.cloneNode(true);
+        ghost.id = '';
+        ghost.className = (el.className || '') + ' tile-dissolving-sparkle';
+        ghost.style.position = 'absolute';
+        ghost.style.left = `${el.offsetLeft}px`;
+        ghost.style.top = `${el.offsetTop}px`;
+        ghost.style.width = el.style.width || `${el.offsetWidth}px`;
+        ghost.style.height = el.style.height || `${el.offsetHeight}px`;
+        ghost.style.zIndex = '999';
+        ghost.style.pointerEvents = 'none';
+
+        parent.appendChild(ghost);
+        spawnSparkBurst(ghost, parent);
+
+        setTimeout(() => {
+            if (ghost.parentElement) {
+                ghost.parentElement.removeChild(ghost);
+            }
+        }, 420);
+    } catch (e) {
+        // Safe fallback in minimal environments
+    }
+}
+
+/**
+ * Visual Sparkling Dissolution for Tile Club Mode (3-tile match in tray)
+ */
+function triggerTrayTriadSparkle(matchedFloraId) {
+    if (typeof document === 'undefined') return;
+    const trayEl = document.getElementById('tray-container');
+    if (!trayEl) return;
+
+    try {
+        const slots = trayEl.querySelectorAll('.tray-slot');
+        slots.forEach(slot => {
+            const tile = slot.querySelector('.tray-tile');
+            if (tile) {
+                slot.classList.add('tray-slot-triad-sparkle');
+                spawnSparkBurst(slot, trayEl);
+                setTimeout(() => {
+                    slot.classList.remove('tray-slot-triad-sparkle');
+                }, 420);
+            }
+        });
+    } catch (e) {
+        // Safe fallback
+    }
+}
+
+function spawnSparkBurst(targetEl, container) {
+    if (!targetEl || !container || typeof document === 'undefined') return;
+    try {
+        const targetRect = targetEl.getBoundingClientRect();
+        const containerRect = container.getBoundingClientRect();
+        const cx = (targetRect.left - containerRect.left) + targetRect.width / 2;
+        const cy = (targetRect.top - containerRect.top) + targetRect.height / 2;
+
+        const sparkCount = 8;
+        for (let i = 0; i < sparkCount; i++) {
+            const angle = (i / sparkCount) * Math.PI * 2 + (Math.random() * 0.4 - 0.2);
+            const distance = 20 + Math.random() * 28;
+            const dx = Math.cos(angle) * distance;
+            const dy = Math.sin(angle) * distance - 6;
+            const rot = Math.round((Math.random() - 0.5) * 60);
+
+            const spark = document.createElement('span');
+            if (i % 2 === 0) {
+                spark.className = 'celestial-spark-particle';
+                spark.innerText = '✨';
+                spark.style.fontSize = `${10 + Math.random() * 6}px`;
+            } else {
+                spark.className = 'celestial-spark-dot';
+                const dotSize = 4 + Math.random() * 4;
+                spark.style.width = `${dotSize}px`;
+                spark.style.height = `${dotSize}px`;
+            }
+
+            spark.style.left = `${cx}px`;
+            spark.style.top = `${cy}px`;
+            spark.style.setProperty('--dx', `${Math.round(dx)}px`);
+            spark.style.setProperty('--dy', `${Math.round(dy)}px`);
+            spark.style.setProperty('--rot', `${rot}deg`);
+
+            container.appendChild(spark);
+
+            setTimeout(() => {
+                if (spark.parentElement) {
+                    spark.parentElement.removeChild(spark);
+                }
+            }, 460);
+        }
+    } catch (e) {
+        // Safe fallback
+    }
+}
+
+
 // --- Scripture Card ---
 // matched Scripture Card and TTS Narration Engine
 
@@ -50589,6 +50803,7 @@ function renderConstellationCalendar(gridId, svgId) {
 // Dual-Mode Central Game Manager for AuroMatch
 // Supports Mode A (Vita Mahjong - Match-2 pairs) and Mode B (Tile Club - Match-3 7-slot tray)
 // Senior accessibility toggles, undo history stacks, and guaranteed solvability generation.
+
 
 
 
@@ -51065,6 +51280,14 @@ class GameManager {
         tiles: [firstTile, tile]
       });
 
+      // Visual Starlight Sparkle Dissolution (Ghost Clone + Floating Sparks)
+      if (typeof document !== 'undefined') {
+        const el1 = document.getElementById(firstTile.id);
+        const el2 = document.getElementById(tile.id);
+        if (el1) triggerTileSparkleDissolve(el1);
+        if (el2) triggerTileSparkleDissolve(el2);
+      }
+
       playAshramMeditationGong();
 
       if (this.onMatchSuccess) {
@@ -51125,6 +51348,11 @@ class GameManager {
     }
 
     if (matchedFloraId) {
+      // Visual Starlight Triad Sparkle
+      if (typeof document !== 'undefined') {
+        triggerTrayTriadSparkle(matchedFloraId);
+      }
+
       // Triad completed!
       const cleared = [];
       this.tray = this.tray.filter(t => {
