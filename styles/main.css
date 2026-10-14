@@ -1436,7 +1436,6 @@ body {
     overflow: hidden;
 }
 
-/* Authentic Artwork Tile Skins (Photo-Real Mockup Extraction) */
 /* Authentic Artwork Tile Skins (Photo-Real Dedicated 3D Tile Sets) */
 .tile-element.tile-authentic-art {
     background: transparent !important;
@@ -1453,29 +1452,36 @@ body {
     padding: 0 !important;
 }
 
-.tile-element.tile-authentic-art.tile-selected {
-    filter: drop-shadow(0 0 10px #fbbf24) brightness(1.18) !important;
-    transform: translateY(-5px) scale(1.04) !important;
-}
-
-.tile-element.tile-authentic-art.tile-hint-aura {
-    filter: drop-shadow(0 0 12px #38bdf8) brightness(1.22) !important;
-    animation: tilePulseHint 1.2s infinite ease-in-out;
-}
-
 .tile-art-face {
     width: 100%;
     height: 100%;
-    background-repeat: no-repeat !important;
-    background-size: contain !important;
-    background-position: center !important;
-    border-radius: 12px;
     position: relative;
-    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
 }
 
-.tile-art-glow {
-    display: none;
+.tile-art-img {
+    width: 100%;
+    height: 100%;
+    object-fit: fill;
+    display: block;
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.45));
+    transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.tile-element.tile-authentic-art.tile-selected .tile-art-img {
+    filter: drop-shadow(0 0 12px #fbbf24) brightness(1.22);
+    transform: translateY(-5px) scale(1.05);
+}
+
+.tile-element.tile-authentic-art.tile-hint-aura .tile-art-img {
+    filter: drop-shadow(0 0 14px #38bdf8) brightness(1.25);
+    animation: tilePulseHint 1.2s infinite ease-in-out;
 }
 
 .tile-icon {

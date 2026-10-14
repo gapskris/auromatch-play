@@ -160,9 +160,15 @@ export class BoardRenderer {
 
       if (customImg) {
         el.classList.add('tile-authentic-art');
+        const tileName = tile.thematicName || (flora && flora.customName) || (flora && flora.commonName) || 'Tile';
+        const tileSym = tile.thematicSymbol || (flora && flora.customSymbol) || (flora && flora.symbol) || '✨';
         el.innerHTML = `
-          <div class="tile-face tile-art-face" style="background-image: url('${customImg}');">
-            <div class="tile-art-glow"></div>
+          <div class="tile-face tile-art-face">
+            <img class="tile-art-img" src="${customImg}" alt="${tileName}" draggable="false" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" />
+            <div class="tile-art-fallback" style="display: none; width: 100%; height: 100%; flex-direction: column; align-items: center; justify-content: center; background: #1e293b; border: 2px solid #fbbf24; border-radius: 12px; color: #fff; text-align: center; padding: 4px;">
+              <span style="font-size: ${iconSize}px;">${tileSym}</span>
+              <span style="font-size: ${dynFontSize}px; font-weight: 700; margin-top: 2px;">${tileName}</span>
+            </div>
             ${bonusBadge}
           </div>
         `;
