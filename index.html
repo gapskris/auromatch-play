@@ -1194,18 +1194,19 @@ body {
 
 /* Recessed Label Banner */
 .tile-label-banner {
-    width: 100%;
-    min-height: 22px;
-    max-height: 30px;
-    padding: 2px 2px;
-    background: rgba(0, 0, 0, 0.04);
-    border-radius: 4px;
-    margin-top: 1px;
+    width: calc(100% - 6px);
+    min-height: 16px;
+    max-height: 22px;
+    padding: 1px 3px;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 3px;
+    margin: 0 0 2px 0;
     display: flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
     overflow: hidden;
+    flex-shrink: 0;
 }
 
 /* Archetype 1: Classic Carved Ivory Tablet */
@@ -1458,8 +1459,8 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 3px 2px;
+    justify-content: space-between;
+    padding: 4px 3px 3px 3px;
     position: relative;
     box-sizing: border-box;
     overflow: hidden;
@@ -1523,10 +1524,23 @@ body {
 }
 
 .tile-icon {
-    font-size: 24px;
-    margin-bottom: 1px;
-    filter: drop-shadow(0 2px 3px rgba(0,0,0,0.2));
+    font-size: var(--tile-icon-size, 42px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+    line-height: 1;
+    margin: 2px 0 0 0;
+    filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.32)) drop-shadow(0 0 10px rgba(251, 191, 36, 0.42));
+    transition: transform 0.15s ease, filter 0.15s ease;
+    user-select: none;
+    -webkit-user-select: none;
     flex-shrink: 0;
+}
+
+.tile-free:hover .tile-icon {
+    transform: scale(1.08);
+    filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 14px rgba(251, 191, 36, 0.65));
 }
 
 .tile-label {
@@ -1769,8 +1783,8 @@ body {
 }
 
 .senior-view .tile-label-banner {
-    min-height: 28px;
-    max-height: 38px;
+    min-height: 20px;
+    max-height: 28px;
 }
 
 .senior-view .tile-label {
@@ -1780,7 +1794,7 @@ body {
 }
 
 .senior-view .tile-icon {
-    font-size: 32px !important;
+    font-size: clamp(38px, 6vw, 56px) !important;
 }
 
 /* Contrast ratio > 11:1 for senior readability */
@@ -51330,16 +51344,16 @@ class BoardRenderer {
       if (containerWidth && containerWidth < 460) {
         const w = Math.max(52, Math.min(85, Math.floor(containerWidth / 5.2)));
         const h = Math.round(w * 1.29);
-        return { width: w, height: h, fontSize: Math.max(12, Math.round(w * 0.19)), iconSize: Math.max(20, Math.round(w * 0.33)) };
+        return { width: w, height: h, fontSize: Math.max(12, Math.round(w * 0.17)), iconSize: Math.max(26, Math.round(w * 0.54)) };
       }
-      return { width: 85, height: 110, fontSize: 16, iconSize: 28 };
+      return { width: 85, height: 110, fontSize: 13, iconSize: 48 };
     }
     if (containerWidth && containerWidth < 460) {
       const w = Math.max(44, Math.min(68, Math.floor(containerWidth / 5.5)));
       const h = Math.round(w * 1.29);
-      return { width: w, height: h, fontSize: Math.max(10, Math.round(w * 0.19)), iconSize: Math.max(16, Math.round(w * 0.32)) };
+      return { width: w, height: h, fontSize: Math.max(10, Math.round(w * 0.16)), iconSize: Math.max(22, Math.round(w * 0.54)) };
     }
-    return { width: 68, height: 88, fontSize: 13, iconSize: 22 };
+    return { width: 68, height: 88, fontSize: 11, iconSize: 42 };
   }
 
   render() {
@@ -51377,8 +51391,8 @@ class BoardRenderer {
 
     let width = 68;
     let height = 88;
-    let fontSize = 13;
-    let iconSize = 22;
+    let fontSize = 11;
+    let iconSize = 42;
 
     if (containerW && containerW > 100) {
       const availW = Math.max(300, containerW - 20);
@@ -51397,27 +51411,28 @@ class BoardRenderer {
       let targetW = Math.floor(Math.min(maxWFromWidth, maxWFromHeight));
 
       if (isRealmsMode) {
-        // Luxury Squircle: dynamic scaling up to 115px on desktop, min 48px on mobile
+        // Luxury Squircle: dynamic scaling up to 130px on desktop
         const isMobile = containerW < 480;
-        const minAllowed = isMobile ? 48 : 60;
-        const maxAllowed = isMobile ? (isTileClubMode ? 78 : 84) : (isTileClubMode ? 102 : 115);
+        const minAllowed = isMobile ? 48 : 64;
+        const maxAllowed = isMobile ? (isTileClubMode ? 82 : 90) : (isTileClubMode ? 112 : 130);
         targetW = Math.max(minAllowed, Math.min(maxAllowed, targetW));
       } else if (this.options.seniorView) {
         const isMobile = containerW < 480;
-        const minAllowed = isMobile ? 52 : 72;
-        const maxAllowed = isMobile ? (isTileClubMode ? 80 : 88) : (isTileClubMode ? 96 : 110);
+        const minAllowed = isMobile ? 54 : 76;
+        const maxAllowed = isMobile ? (isTileClubMode ? 84 : 94) : (isTileClubMode ? 108 : 126);
         targetW = Math.max(minAllowed, Math.min(maxAllowed, targetW));
       } else {
         const isMobile = containerW < 480;
-        const minAllowed = isMobile ? 42 : 54;
-        const maxAllowed = isMobile ? (isTileClubMode ? 68 : 76) : (isTileClubMode ? 86 : 96);
+        const minAllowed = isMobile ? 44 : 58;
+        const maxAllowed = isMobile ? (isTileClubMode ? 74 : 84) : (isTileClubMode ? 100 : 120);
         targetW = Math.max(minAllowed, Math.min(maxAllowed, targetW));
       }
 
       width = targetW;
       height = Math.round(width * aspect);
-      fontSize = Math.max(10, Math.round(width * 0.19));
-      iconSize = Math.max(18, Math.round(width * 0.35));
+      fontSize = Math.max(9.5, Math.round(width * 0.16));
+      // HERO ICON: Big, bold, colorful game icon (55% to 60% of tile width!)
+      iconSize = Math.max(28, Math.round(width * 0.56));
     } else {
       const baseDims = this.getTileDimensions();
       width = baseDims.width;
@@ -52550,14 +52565,13 @@ function getRankForLevel(level) {
  * Smooth S-Curve Tile Density Function across 520 Levels
  */
 function getTileCountForLevel(levelNum) {
-  if (levelNum === 1) return 24;          // Level 1: 24 tiles (Tutorial)
-  if (levelNum <= 10) return 36;         // Levels 2-10: 36 tiles (Foundation)
-  if (levelNum <= 30) return 48;         // Levels 11-30: 48 tiles (Ascent)
-  if (levelNum <= 75) return 60;         // Levels 31-75: 60 tiles (Depth)
-  if (levelNum <= 150) return 72;        // Levels 76-150: 72 tiles (Mastery)
-  if (levelNum <= 260) return 84;        // Levels 151-260: 84 tiles (Grand Peak)
-  if (levelNum <= 390) return 96;        // Levels 261-390: 96 tiles (Sunburst Gateway)
-  return 108;                            // Levels 391-520+: 108 tiles (Grand Citadel)
+  if (levelNum === 1) return 36;          // Level 1: 36 tiles (Introductory Grand Solitaire)
+  if (levelNum <= 10) return 48;         // Levels 2-10: 48 tiles (Foundation)
+  if (levelNum <= 30) return 60;         // Levels 11-30: 60 tiles (Ascent)
+  if (levelNum <= 75) return 72;         // Levels 31-75: 72 tiles (Depth)
+  if (levelNum <= 150) return 84;        // Levels 76-150: 84 tiles (Mastery)
+  if (levelNum <= 260) return 96;        // Levels 151-260: 96 tiles (Grand Peak)
+  return 108;                            // Levels 261-520+: 108 tiles (Grand Citadel)
 }
 
 class GameManager {
