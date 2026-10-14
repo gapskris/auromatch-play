@@ -257,9 +257,34 @@ window.addEventListener('load', () => {
                 matchedList.appendChild(row);
             });
         }
+        // 7. Field Guide Realm Synchronization when no tile is yet matched
+        if (!window.currentDiscoveredFlora && state.activeRealm) {
+            initFieldGuideForRealm(state.activeRealm);
+        }
     };
 
     window.currentDiscoveredFlora = null;
+
+    function initFieldGuideForRealm(realm) {
+        if (!realm) return;
+        const fgTitle = document.getElementById('field-guide-title');
+        const fgDomainPill = document.getElementById('fg-domain-pill');
+        const fgIcon = document.getElementById('fg-icon');
+        const fgName = document.getElementById('fg-name');
+        const fgBinomial = document.getElementById('fg-binomial');
+        const fgFamily = document.getElementById('fg-family');
+        const fgRole = document.getElementById('fg-role');
+        const fgQuality = document.getElementById('fg-quality');
+
+        if (fgTitle) fgTitle.innerText = 'Knowledge Field Guide';
+        if (fgDomainPill) fgDomainPill.innerText = `Chapter ${realm.chapter} · ${realm.name}`;
+        if (fgIcon) fgIcon.innerText = realm.icon || '🌲';
+        if (fgName) fgName.innerText = realm.name;
+        if (fgBinomial) fgBinomial.innerText = realm.subtitle;
+        if (fgFamily) fgFamily.innerText = `Sanctuary Realm (${realm.isMasterArtLevel ? 'Master Authentic Art' : 'Classic Mastery'}).`;
+        if (fgRole) fgRole.innerText = 'Match unlocked tile pairs to dissolve the board and explore deep knowledge lore.';
+        if (fgQuality) fgQuality.innerText = 'Concentration, calmness & cognitive clarity';
+    }
 
     function syncFieldGuideAndCard(flora) {
         if (!flora) return;
@@ -486,11 +511,11 @@ window.addEventListener('load', () => {
                     <div class="realm-card-title">${r.name}</div>
                     <div class="realm-card-levels" style="margin-bottom: 6px;">31 Levels Total</div>
                     <div style="display: flex; gap: 4px; width: 100%; justify-content: center;">
-                        <button class="c-btn" onclick="window.selectRealm('${r.id}', ${r.levelStart})" style="padding: 4px 6px; font-size: 10px; flex: 1;">
-                            Classic (1-16)
+                        <button class="c-btn" onclick="window.selectRealm('${r.id}', ${r.masterLevelStart})" style="padding: 4px 6px; font-size: 10px; flex: 1.1; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 700;">
+                            ✨ Master Art (1-15)
                         </button>
-                        <button class="c-btn" onclick="window.selectRealm('${r.id}', ${r.masterLevelStart})" style="padding: 4px 6px; font-size: 10px; flex: 1; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 700;">
-                            ✨ Master Art (17-31)
+                        <button class="c-btn" onclick="window.selectRealm('${r.id}', ${r.classicLevelStart})" style="padding: 4px 6px; font-size: 10px; flex: 0.9;">
+                            Classic (16-31)
                         </button>
                     </div>
                 </div>

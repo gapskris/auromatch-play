@@ -684,7 +684,7 @@ describe("AuroMatch Vita Mahjong & Accessibility QA Suite", () => {
       assert.ok(realmInfo.levelInRealm >= 1 && realmInfo.levelInRealm <= 31, `Level ${lvl} must have levelInRealm (1-31)`);
       assert.ok(realmInfo.archetype, `Level ${lvl} must define a tactile tile archetype`);
 
-      if (realmInfo.levelInRealm > 16) {
+      if (realmInfo.levelInRealm <= 15) {
         assert.strictEqual(realmInfo.isMasterArtLevel, true, `Level ${lvl} (levelInRealm ${realmInfo.levelInRealm}) must be flagged as isMasterArtLevel`);
         assert.ok(realmInfo.masterLevelIndex >= 1 && realmInfo.masterLevelIndex <= 15, `Level ${lvl} must have masterLevelIndex (1-15)`);
       } else {
@@ -697,8 +697,8 @@ describe("AuroMatch Vita Mahjong & Accessibility QA Suite", () => {
     gm.setGameplayMode('realms');
     assert.strictEqual(gm.gameplayMode, 'realms');
 
-    // Test Level 17 (Whispering Pines - Master Art Level 1 with Leaf & Bark tiles)
-    gm.loadLevel(17);
+    // Test Level 1 (Whispering Pines - Master Art Level 1 with Leaf & Bark tiles)
+    gm.loadLevel(1);
     assert.strictEqual(gm.activeRealm.id, 'whispering_pines');
     assert.strictEqual(gm.activeRealm.isMasterArtLevel, true);
     assert.strictEqual(gm.activeRealm.masterLevelIndex, 1);
@@ -706,6 +706,11 @@ describe("AuroMatch Vita Mahjong & Accessibility QA Suite", () => {
     // Verify tiles have authentic customImage skins applied
     const tilesWithArt = gm.tiles.filter(t => t.customImage && (t.customImage.includes('tile_leaf') || t.customImage.includes('tile_bark')));
     assert.strictEqual(tilesWithArt.length, gm.tiles.length, "All tiles in Master Art level must receive authentic mockup tile skins");
+
+    // Test Level 16 (Whispering Pines - Classic Mastery Level 1)
+    gm.loadLevel(16);
+    assert.strictEqual(gm.activeRealm.id, 'whispering_pines');
+    assert.strictEqual(gm.activeRealm.isMasterArtLevel, false);
 
     // Initial score check
     assert.strictEqual(typeof gm.player.score, 'number');

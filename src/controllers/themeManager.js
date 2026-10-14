@@ -18,7 +18,8 @@ export const REALMS = [
     audioPreset: 'forest',
     levelStart: 1,
     levelEnd: 31,
-    masterLevelStart: 17,
+    masterLevelStart: 1,
+    classicLevelStart: 16,
     icon: '🌲',
     customTiles: [
       { name: 'Emerald Leaf', image: './Assets/themes/whispering_pines/tile_leaf.png', symbol: '🍃' },
@@ -36,7 +37,8 @@ export const REALMS = [
     audioPreset: 'zen_stone',
     levelStart: 32,
     levelEnd: 62,
-    masterLevelStart: 48,
+    masterLevelStart: 32,
+    classicLevelStart: 47,
     icon: '🏛️',
     customTiles: [
       { name: 'Blueprint Arch', image: './Assets/themes/temple_of_lines/tile_slate_arch.png', symbol: '⛩️' },
@@ -54,7 +56,8 @@ export const REALMS = [
     audioPreset: 'parchment',
     levelStart: 63,
     levelEnd: 93,
-    masterLevelStart: 79,
+    masterLevelStart: 63,
+    classicLevelStart: 78,
     icon: '📚',
     customTiles: [
       { name: 'Gilded Owl Tome', image: './Assets/themes/biblios_wisdom/tile_book_owl.png', symbol: '🦉' },
@@ -66,12 +69,14 @@ export const REALMS = [
     chapter: 4,
     name: 'Celestial Starlight',
     subtitle: 'Aquamarine Crystal & 24K Gold Bevels',
-    bgImage: './Assets/backgrounds/celestial_starlight.jpg',
+    bgImage: './Assets/backgrounds/celestial_starlight_clean.png',
+    originalBgImage: './Assets/backgrounds/celestial_starlight.jpg',
     archetype: 'cosmic_glass',
     audioPreset: 'crystal_bell',
     levelStart: 94,
     levelEnd: 124,
-    masterLevelStart: 110,
+    masterLevelStart: 94,
+    classicLevelStart: 109,
     icon: '✨',
     customTiles: [
       { name: 'Cosmic Rune', image: './Assets/themes/golden_nebula/tile_cosmic_gold.png', symbol: '✨' },
@@ -83,12 +88,14 @@ export const REALMS = [
     chapter: 5,
     name: 'Golden Nebula',
     subtitle: 'Obsidian Mirrors & Radiant Runes',
-    bgImage: './Assets/backgrounds/golden_nebula.png',
+    bgImage: './Assets/backgrounds/golden_nebula_clean.png',
+    originalBgImage: './Assets/backgrounds/golden_nebula.png',
     archetype: 'gold_mantra',
     audioPreset: 'deep_drone',
     levelStart: 125,
     levelEnd: 155,
-    masterLevelStart: 141,
+    masterLevelStart: 125,
+    classicLevelStart: 140,
     icon: '🌌',
     customTiles: [
       { name: 'Luminous Rune', image: './Assets/themes/golden_nebula/tile_cosmic_gold.png', symbol: '💫' },
@@ -106,7 +113,8 @@ export const REALMS = [
     audioPreset: 'bronze_bell',
     levelStart: 156,
     levelEnd: 186,
-    masterLevelStart: 172,
+    masterLevelStart: 156,
+    classicLevelStart: 171,
     icon: '🕯️',
     customTiles: [
       { name: 'Marble Lotus', image: './Assets/themes/spirit_altar/tile_marble_lotus.png', symbol: '🪷' },
@@ -118,12 +126,14 @@ export const REALMS = [
     chapter: 7,
     name: 'Sacred Sanctuary',
     subtitle: 'Chiseled Gold Lotus & Incense Mist',
-    bgImage: './Assets/backgrounds/sacred_sanctuary.png',
+    bgImage: './Assets/backgrounds/sacred_sanctuary_clean.png',
+    originalBgImage: './Assets/backgrounds/sacred_sanctuary.png',
     archetype: 'brass_lotus',
     audioPreset: 'singing_bowl',
     levelStart: 187,
     levelEnd: 217,
-    masterLevelStart: 203,
+    masterLevelStart: 187,
+    classicLevelStart: 202,
     icon: '🪷',
     customTiles: [
       { name: 'Chiseled Lotus', image: './Assets/themes/spirit_altar/tile_marble_lotus.png', symbol: '🪷' },
@@ -141,7 +151,8 @@ export const REALMS = [
     audioPreset: 'ocean_tide',
     levelStart: 218,
     levelEnd: 248,
-    masterLevelStart: 234,
+    masterLevelStart: 218,
+    classicLevelStart: 233,
     icon: '🌊',
     customTiles: [
       { name: 'Azure Sea Glass', image: './Assets/themes/ocean_horizon/tile_seaglass_blue.png', symbol: '🫧' },
@@ -159,7 +170,8 @@ export const REALMS = [
     audioPreset: 'clay_pot',
     levelStart: 249,
     levelEnd: 279,
-    masterLevelStart: 265,
+    masterLevelStart: 249,
+    classicLevelStart: 264,
     icon: '🏺',
     customTiles: [
       { name: 'Tree of Life', image: './Assets/themes/terracotta_earth/tile_roots.png', symbol: '🌳' },
@@ -171,12 +183,14 @@ export const REALMS = [
     chapter: 10,
     name: 'Floral Harmony',
     subtitle: 'Rose-Quartz Enamel Floral Cameos',
-    bgImage: './Assets/backgrounds/floral_harmony.png',
+    bgImage: './Assets/backgrounds/floral_harmony_clean.png',
+    originalBgImage: './Assets/backgrounds/floral_harmony.png',
     archetype: 'enamel_cameo',
     audioPreset: 'quartz_bowl',
     levelStart: 280,
     levelEnd: 310,
-    masterLevelStart: 296,
+    masterLevelStart: 280,
+    classicLevelStart: 295,
     icon: '🌸',
     customTiles: [
       { name: 'Lotus Cameo', image: './Assets/themes/floral_harmony/tile_cameo_lotus.png', symbol: '🪷' },
@@ -188,12 +202,14 @@ export const REALMS = [
     chapter: 11,
     name: 'Blooming Mandala',
     subtitle: 'Circular Porcelain Cameos & Gold Wire',
-    bgImage: './Assets/backgrounds/blooming_mandala.jpg',
+    bgImage: './Assets/backgrounds/blooming_mandala_clean.png',
+    originalBgImage: './Assets/backgrounds/blooming_mandala.jpg',
     archetype: 'porcelain_cameo',
     audioPreset: 'birdsong',
     levelStart: 311,
     levelEnd: 341,
-    masterLevelStart: 327,
+    masterLevelStart: 311,
+    classicLevelStart: 326,
     icon: '🏵️',
     customTiles: [
       { name: 'Porcelain Lotus', image: './Assets/themes/floral_harmony/tile_cameo_lotus.png', symbol: '🌸' },
@@ -205,12 +221,14 @@ export const REALMS = [
     chapter: 12,
     name: 'Sacred Spiral',
     subtitle: 'Golden Vine Orbits & Botanical Blooms',
-    bgImage: './Assets/backgrounds/sacred_spiral.png',
+    bgImage: './Assets/backgrounds/sacred_spiral_clean.png',
+    originalBgImage: './Assets/backgrounds/sacred_spiral.png',
     archetype: 'spiral_vine',
     audioPreset: 'bansuri_flute',
     levelStart: 342,
     levelEnd: 372,
-    masterLevelStart: 358,
+    masterLevelStart: 342,
+    classicLevelStart: 357,
     icon: '🌿',
     customTiles: [
       { name: 'Golden Vine', image: './Assets/themes/whispering_pines/tile_leaf.png', symbol: '🌿' },
@@ -222,12 +240,14 @@ export const REALMS = [
     chapter: 13,
     name: 'Master Sanctuary',
     subtitle: 'Carved Walnut Tray & Classic Botanicals',
-    bgImage: './Assets/backgrounds/master_sanctuary.png',
+    bgImage: './Assets/backgrounds/master_sanctuary_clean.png',
+    originalBgImage: './Assets/backgrounds/master_sanctuary.png',
     archetype: 'ivory_wood',
     audioPreset: 'meditation_gong',
     levelStart: 373,
     levelEnd: 403,
-    masterLevelStart: 389,
+    masterLevelStart: 373,
+    classicLevelStart: 388,
     icon: '👑',
     customTiles: [
       { name: 'Carved Walnut', image: './Assets/themes/whispering_pines/tile_bark.png', symbol: '🪵' },
@@ -245,8 +265,11 @@ export class ThemeManager {
     const realmIdx = Math.floor((safeLevel - 1) / LEVELS_PER_REALM) % REALMS.length;
     const realm = REALMS[realmIdx];
     const levelInRealm = ((safeLevel - 1) % LEVELS_PER_REALM) + 1;
-    const isMasterArtLevel = levelInRealm > STANDARD_LEVELS_PER_REALM;
-    const masterLevelIndex = isMasterArtLevel ? (levelInRealm - STANDARD_LEVELS_PER_REALM) : null;
+    // Levels 1-15: Master Authentic Art Levels (featuring theme-specific tiles)
+    // Levels 16-31: Classic Mastery Levels (progressive architectural formations)
+    const isMasterArtLevel = levelInRealm <= MASTER_LEVELS_PER_REALM;
+    const masterLevelIndex = isMasterArtLevel ? levelInRealm : null;
+    const classicLevelIndex = !isMasterArtLevel ? (levelInRealm - MASTER_LEVELS_PER_REALM) : null;
 
     return {
       ...realm,
@@ -254,6 +277,7 @@ export class ThemeManager {
       levelInRealm,
       isMasterArtLevel,
       masterLevelIndex,
+      classicLevelIndex,
       isFirstInRealm: levelInRealm === 1,
       isLastInRealm: levelInRealm === LEVELS_PER_REALM
     };

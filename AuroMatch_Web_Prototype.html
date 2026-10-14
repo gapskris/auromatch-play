@@ -2606,9 +2606,9 @@ body {
                         <span id="fg-domain-pill" class="fg-domain-badge">Knowledge Quest</span>
                     </div>
                     <div id="field-guide-card" style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-current); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 8px;">
-                        <div id="fg-icon" style="font-size: 38px; text-align: center; margin-bottom: 2px;">🪷</div>
-                        <div id="fg-name" style="font-size: 16px; font-weight: 700; color: #ffffff; text-align: center;">Sacred Lotus</div>
-                        <div id="fg-binomial" style="font-size: 12px; font-style: italic; color: #c5a880; text-align: center;">Nelumbo nucifera</div>
+                        <div id="fg-icon" style="font-size: 38px; text-align: center; margin-bottom: 2px;">🌲</div>
+                        <div id="fg-name" style="font-size: 16px; font-weight: 700; color: #ffffff; text-align: center;">Whispering Pines</div>
+                        <div id="fg-binomial" style="font-size: 12px; font-style: italic; color: #c5a880; text-align: center;">Woodland Bark & Emerald Veins</div>
                         
                         <div class="fg-audio-bar" style="display: flex; justify-content: center; gap: 8px; margin: 4px 0;">
                             <button class="c-btn fg-listen-btn" onclick="window.playFieldGuideTTS()" title="Listen to pronunciation and lore" style="padding: 4px 12px; font-size: 11px;">🔊 Listen</button>
@@ -2616,9 +2616,9 @@ body {
                         </div>
 
                         <div style="height: 1px; background: var(--border-current); margin: 4px 0;"></div>
-                        <div><strong class="fg-meta-label" id="fg-label-definition">Concept / Definition:</strong> <p id="fg-family" style="font-size: 12px; line-height: 1.4; color: #ffffff; margin: 2px 0 0 0;">Aquatic perennial plant with remarkable hydro-repellent leaves.</p></div>
-                        <div><strong class="fg-meta-label" id="fg-label-lore">Discovery Lore:</strong> <p id="fg-role" style="font-size: 12px; line-height: 1.45; color: #dedede; margin: 2px 0 0 0;">Aquatic bio-filter & wetland stabilizer</p></div>
-                        <div><strong class="fg-meta-label" id="fg-label-insight">Key Significance:</strong> <p id="fg-quality" style="font-size: 12px; line-height: 1.45; color: #ffd700; margin: 2px 0 0 0;">Divine purity and spiritual unfoldment</p></div>
+                        <div><strong class="fg-meta-label" id="fg-label-definition">Realm Concept:</strong> <p id="fg-family" style="font-size: 12px; line-height: 1.4; color: #ffffff; margin: 2px 0 0 0;">Deep evergreen woodland sanctuary with cedarwood and pine needle textures.</p></div>
+                        <div><strong class="fg-meta-label" id="fg-label-lore">Sanctuary Objective:</strong> <p id="fg-role" style="font-size: 12px; line-height: 1.45; color: #dedede; margin: 2px 0 0 0;">Match unlocked tile pairs to dissolve the board and unlock progressive knowledge.</p></div>
+                        <div><strong class="fg-meta-label" id="fg-label-insight">Key Focus:</strong> <p id="fg-quality" style="font-size: 12px; line-height: 1.45; color: #ffd700; margin: 2px 0 0 0;">Calm focus and cognitive clarity</p></div>
                     </div>
                 </aside>
 
@@ -50062,7 +50062,8 @@ function getAudioEngineState() {
   return {
     baseFrequency: ragaDrone.tuningBase,
     volumeRaga: ragaDrone.volume,
-    volumeGong: ragaDrone.gongVolume
+    volumeGong: ragaDrone.gongVolume,
+    disabled: !!ragaDrone.disabled
   };
 }
 
@@ -51794,7 +51795,8 @@ const REALMS = [
     audioPreset: 'forest',
     levelStart: 1,
     levelEnd: 31,
-    masterLevelStart: 17,
+    masterLevelStart: 1,
+    classicLevelStart: 16,
     icon: '🌲',
     customTiles: [
       { name: 'Emerald Leaf', image: './Assets/themes/whispering_pines/tile_leaf.png', symbol: '🍃' },
@@ -51812,7 +51814,8 @@ const REALMS = [
     audioPreset: 'zen_stone',
     levelStart: 32,
     levelEnd: 62,
-    masterLevelStart: 48,
+    masterLevelStart: 32,
+    classicLevelStart: 47,
     icon: '🏛️',
     customTiles: [
       { name: 'Blueprint Arch', image: './Assets/themes/temple_of_lines/tile_slate_arch.png', symbol: '⛩️' },
@@ -51830,7 +51833,8 @@ const REALMS = [
     audioPreset: 'parchment',
     levelStart: 63,
     levelEnd: 93,
-    masterLevelStart: 79,
+    masterLevelStart: 63,
+    classicLevelStart: 78,
     icon: '📚',
     customTiles: [
       { name: 'Gilded Owl Tome', image: './Assets/themes/biblios_wisdom/tile_book_owl.png', symbol: '🦉' },
@@ -51842,12 +51846,14 @@ const REALMS = [
     chapter: 4,
     name: 'Celestial Starlight',
     subtitle: 'Aquamarine Crystal & 24K Gold Bevels',
-    bgImage: './Assets/backgrounds/celestial_starlight.jpg',
+    bgImage: './Assets/backgrounds/celestial_starlight_clean.png',
+    originalBgImage: './Assets/backgrounds/celestial_starlight.jpg',
     archetype: 'cosmic_glass',
     audioPreset: 'crystal_bell',
     levelStart: 94,
     levelEnd: 124,
-    masterLevelStart: 110,
+    masterLevelStart: 94,
+    classicLevelStart: 109,
     icon: '✨',
     customTiles: [
       { name: 'Cosmic Rune', image: './Assets/themes/golden_nebula/tile_cosmic_gold.png', symbol: '✨' },
@@ -51859,12 +51865,14 @@ const REALMS = [
     chapter: 5,
     name: 'Golden Nebula',
     subtitle: 'Obsidian Mirrors & Radiant Runes',
-    bgImage: './Assets/backgrounds/golden_nebula.png',
+    bgImage: './Assets/backgrounds/golden_nebula_clean.png',
+    originalBgImage: './Assets/backgrounds/golden_nebula.png',
     archetype: 'gold_mantra',
     audioPreset: 'deep_drone',
     levelStart: 125,
     levelEnd: 155,
-    masterLevelStart: 141,
+    masterLevelStart: 125,
+    classicLevelStart: 140,
     icon: '🌌',
     customTiles: [
       { name: 'Luminous Rune', image: './Assets/themes/golden_nebula/tile_cosmic_gold.png', symbol: '💫' },
@@ -51882,7 +51890,8 @@ const REALMS = [
     audioPreset: 'bronze_bell',
     levelStart: 156,
     levelEnd: 186,
-    masterLevelStart: 172,
+    masterLevelStart: 156,
+    classicLevelStart: 171,
     icon: '🕯️',
     customTiles: [
       { name: 'Marble Lotus', image: './Assets/themes/spirit_altar/tile_marble_lotus.png', symbol: '🪷' },
@@ -51894,12 +51903,14 @@ const REALMS = [
     chapter: 7,
     name: 'Sacred Sanctuary',
     subtitle: 'Chiseled Gold Lotus & Incense Mist',
-    bgImage: './Assets/backgrounds/sacred_sanctuary.png',
+    bgImage: './Assets/backgrounds/sacred_sanctuary_clean.png',
+    originalBgImage: './Assets/backgrounds/sacred_sanctuary.png',
     archetype: 'brass_lotus',
     audioPreset: 'singing_bowl',
     levelStart: 187,
     levelEnd: 217,
-    masterLevelStart: 203,
+    masterLevelStart: 187,
+    classicLevelStart: 202,
     icon: '🪷',
     customTiles: [
       { name: 'Chiseled Lotus', image: './Assets/themes/spirit_altar/tile_marble_lotus.png', symbol: '🪷' },
@@ -51917,7 +51928,8 @@ const REALMS = [
     audioPreset: 'ocean_tide',
     levelStart: 218,
     levelEnd: 248,
-    masterLevelStart: 234,
+    masterLevelStart: 218,
+    classicLevelStart: 233,
     icon: '🌊',
     customTiles: [
       { name: 'Azure Sea Glass', image: './Assets/themes/ocean_horizon/tile_seaglass_blue.png', symbol: '🫧' },
@@ -51935,7 +51947,8 @@ const REALMS = [
     audioPreset: 'clay_pot',
     levelStart: 249,
     levelEnd: 279,
-    masterLevelStart: 265,
+    masterLevelStart: 249,
+    classicLevelStart: 264,
     icon: '🏺',
     customTiles: [
       { name: 'Tree of Life', image: './Assets/themes/terracotta_earth/tile_roots.png', symbol: '🌳' },
@@ -51947,12 +51960,14 @@ const REALMS = [
     chapter: 10,
     name: 'Floral Harmony',
     subtitle: 'Rose-Quartz Enamel Floral Cameos',
-    bgImage: './Assets/backgrounds/floral_harmony.png',
+    bgImage: './Assets/backgrounds/floral_harmony_clean.png',
+    originalBgImage: './Assets/backgrounds/floral_harmony.png',
     archetype: 'enamel_cameo',
     audioPreset: 'quartz_bowl',
     levelStart: 280,
     levelEnd: 310,
-    masterLevelStart: 296,
+    masterLevelStart: 280,
+    classicLevelStart: 295,
     icon: '🌸',
     customTiles: [
       { name: 'Lotus Cameo', image: './Assets/themes/floral_harmony/tile_cameo_lotus.png', symbol: '🪷' },
@@ -51964,12 +51979,14 @@ const REALMS = [
     chapter: 11,
     name: 'Blooming Mandala',
     subtitle: 'Circular Porcelain Cameos & Gold Wire',
-    bgImage: './Assets/backgrounds/blooming_mandala.jpg',
+    bgImage: './Assets/backgrounds/blooming_mandala_clean.png',
+    originalBgImage: './Assets/backgrounds/blooming_mandala.jpg',
     archetype: 'porcelain_cameo',
     audioPreset: 'birdsong',
     levelStart: 311,
     levelEnd: 341,
-    masterLevelStart: 327,
+    masterLevelStart: 311,
+    classicLevelStart: 326,
     icon: '🏵️',
     customTiles: [
       { name: 'Porcelain Lotus', image: './Assets/themes/floral_harmony/tile_cameo_lotus.png', symbol: '🌸' },
@@ -51981,12 +51998,14 @@ const REALMS = [
     chapter: 12,
     name: 'Sacred Spiral',
     subtitle: 'Golden Vine Orbits & Botanical Blooms',
-    bgImage: './Assets/backgrounds/sacred_spiral.png',
+    bgImage: './Assets/backgrounds/sacred_spiral_clean.png',
+    originalBgImage: './Assets/backgrounds/sacred_spiral.png',
     archetype: 'spiral_vine',
     audioPreset: 'bansuri_flute',
     levelStart: 342,
     levelEnd: 372,
-    masterLevelStart: 358,
+    masterLevelStart: 342,
+    classicLevelStart: 357,
     icon: '🌿',
     customTiles: [
       { name: 'Golden Vine', image: './Assets/themes/whispering_pines/tile_leaf.png', symbol: '🌿' },
@@ -51998,12 +52017,14 @@ const REALMS = [
     chapter: 13,
     name: 'Master Sanctuary',
     subtitle: 'Carved Walnut Tray & Classic Botanicals',
-    bgImage: './Assets/backgrounds/master_sanctuary.png',
+    bgImage: './Assets/backgrounds/master_sanctuary_clean.png',
+    originalBgImage: './Assets/backgrounds/master_sanctuary.png',
     archetype: 'ivory_wood',
     audioPreset: 'meditation_gong',
     levelStart: 373,
     levelEnd: 403,
-    masterLevelStart: 389,
+    masterLevelStart: 373,
+    classicLevelStart: 388,
     icon: '👑',
     customTiles: [
       { name: 'Carved Walnut', image: './Assets/themes/whispering_pines/tile_bark.png', symbol: '🪵' },
@@ -52021,8 +52042,11 @@ class ThemeManager {
     const realmIdx = Math.floor((safeLevel - 1) / LEVELS_PER_REALM) % REALMS.length;
     const realm = REALMS[realmIdx];
     const levelInRealm = ((safeLevel - 1) % LEVELS_PER_REALM) + 1;
-    const isMasterArtLevel = levelInRealm > STANDARD_LEVELS_PER_REALM;
-    const masterLevelIndex = isMasterArtLevel ? (levelInRealm - STANDARD_LEVELS_PER_REALM) : null;
+    // Levels 1-15: Master Authentic Art Levels (featuring theme-specific tiles)
+    // Levels 16-31: Classic Mastery Levels (progressive architectural formations)
+    const isMasterArtLevel = levelInRealm <= MASTER_LEVELS_PER_REALM;
+    const masterLevelIndex = isMasterArtLevel ? levelInRealm : null;
+    const classicLevelIndex = !isMasterArtLevel ? (levelInRealm - MASTER_LEVELS_PER_REALM) : null;
 
     return {
       ...realm,
@@ -52030,6 +52054,7 @@ class ThemeManager {
       levelInRealm,
       isMasterArtLevel,
       masterLevelIndex,
+      classicLevelIndex,
       isFirstInRealm: levelInRealm === 1,
       isLastInRealm: levelInRealm === LEVELS_PER_REALM
     };
@@ -53405,9 +53430,34 @@ window.addEventListener('load', () => {
                 matchedList.appendChild(row);
             });
         }
+        // 7. Field Guide Realm Synchronization when no tile is yet matched
+        if (!window.currentDiscoveredFlora && state.activeRealm) {
+            initFieldGuideForRealm(state.activeRealm);
+        }
     };
 
     window.currentDiscoveredFlora = null;
+
+    function initFieldGuideForRealm(realm) {
+        if (!realm) return;
+        const fgTitle = document.getElementById('field-guide-title');
+        const fgDomainPill = document.getElementById('fg-domain-pill');
+        const fgIcon = document.getElementById('fg-icon');
+        const fgName = document.getElementById('fg-name');
+        const fgBinomial = document.getElementById('fg-binomial');
+        const fgFamily = document.getElementById('fg-family');
+        const fgRole = document.getElementById('fg-role');
+        const fgQuality = document.getElementById('fg-quality');
+
+        if (fgTitle) fgTitle.innerText = 'Knowledge Field Guide';
+        if (fgDomainPill) fgDomainPill.innerText = `Chapter ${realm.chapter} · ${realm.name}`;
+        if (fgIcon) fgIcon.innerText = realm.icon || '🌲';
+        if (fgName) fgName.innerText = realm.name;
+        if (fgBinomial) fgBinomial.innerText = realm.subtitle;
+        if (fgFamily) fgFamily.innerText = `Sanctuary Realm (${realm.isMasterArtLevel ? 'Master Authentic Art' : 'Classic Mastery'}).`;
+        if (fgRole) fgRole.innerText = 'Match unlocked tile pairs to dissolve the board and explore deep knowledge lore.';
+        if (fgQuality) fgQuality.innerText = 'Concentration, calmness & cognitive clarity';
+    }
 
     function syncFieldGuideAndCard(flora) {
         if (!flora) return;
@@ -53634,11 +53684,11 @@ window.addEventListener('load', () => {
                     <div class="realm-card-title">${r.name}</div>
                     <div class="realm-card-levels" style="margin-bottom: 6px;">31 Levels Total</div>
                     <div style="display: flex; gap: 4px; width: 100%; justify-content: center;">
-                        <button class="c-btn" onclick="window.selectRealm('${r.id}', ${r.levelStart})" style="padding: 4px 6px; font-size: 10px; flex: 1;">
-                            Classic (1-16)
+                        <button class="c-btn" onclick="window.selectRealm('${r.id}', ${r.masterLevelStart})" style="padding: 4px 6px; font-size: 10px; flex: 1.1; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 700;">
+                            ✨ Master Art (1-15)
                         </button>
-                        <button class="c-btn" onclick="window.selectRealm('${r.id}', ${r.masterLevelStart})" style="padding: 4px 6px; font-size: 10px; flex: 1; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 700;">
-                            ✨ Master Art (17-31)
+                        <button class="c-btn" onclick="window.selectRealm('${r.id}', ${r.classicLevelStart})" style="padding: 4px 6px; font-size: 10px; flex: 0.9;">
+                            Classic (16-31)
                         </button>
                     </div>
                 </div>
