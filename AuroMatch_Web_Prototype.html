@@ -524,7 +524,7 @@ body {
 .board-container {
     flex-grow: 1;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -532,7 +532,8 @@ body {
     width: 100%;
     height: 100%;
     min-height: 480px;
-    padding: 6px 0;
+    padding: 6px 0 12px 0;
+    box-sizing: border-box;
     background: rgba(0, 0, 0, 0.22);
     border-radius: 16px;
     box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
@@ -2060,6 +2061,7 @@ body {
         max-width: 880px;
         height: 600px;
         position: relative;
+        overflow: visible;
     }
 }
 
@@ -50156,28 +50158,97 @@ class VitaBoardGenerator {
     return active.filter(t => this.isTileFree(t, active));
   }
 
-  // Helper: Scale layouts up to high tile counts (e.g. 72, 84, 96, 108) by stacking upper tiers
+  // Multi-Tier Stacking Engine: Preserves 3 to 5 layers with true underneath occlusions and stable foundations
   static _padToTarget(coords, targetCount) {
-    if (coords.length >= targetCount) {
-      return coords.slice(0, targetCount);
-    }
-    const set = new Set(coords.map(c => `${c.x}_${c.y}_${c.z}`));
-    let zTier = 1;
-    while (coords.length < targetCount && zTier <= 5) {
-      const currentLen = coords.length;
-      for (let i = 0; i < currentLen && coords.length < targetCount; i++) {
-        const base = coords[i];
-        if (base.z === zTier - 1) {
-          const key = `${base.x}_${base.y}_${zTier}`;
-          if (!set.has(key)) {
-            set.add(key);
-            coords.push({ x: base.x, y: base.y, z: zTier });
+    if (coords.length === targetCount) return coords;
+
+    // Upward expansion when targetCount exceeds base template
+    if (coords.length < targetCount) {
+      const result = [...coords];
+      const set = new Set(result.map(c => `${c.x}_${c.y}_${c.z}`));
+      let zTier = 1;
+      while (result.length < targetCount && zTier <= 5) {
+        const currentLen = result.length;
+        for (let i = 0; i < currentLen && result.length < targetCount; i++) {
+          const base = result[i];
+          if (base.z === zTier - 1) {
+            const key = `${base.x}_${base.y}_${zTier}`;
+            if (!set.has(key)) {
+              set.add(key);
+              result.push({ x: base.x, y: base.y, z: zTier });
+            }
           }
         }
+        zTier++;
       }
-      zTier++;
+      return result.slice(0, targetCount);
     }
-    return coords.slice(0, targetCount);
+
+    // Smart Multi-Tier Quota Trimming: Protects upper layers & foundations, trimming outer perimeter
+    const minLayer0 = Math.ceil(targetCount * 0.45);
+    const maxLayer1 = Math.floor(targetCount * 0.32);
+    const maxLayer2 = Math.floor(targetCount * 0.18);
+    const maxLayer3 = Math.max(1, Math.floor(targetCount * 0.10));
+
+    let current = [...coords];
+    const cx = current.reduce((sum, t) => sum + t.x, 0) / current.length;
+    const cy = current.reduce((sum, t) => sum + t.y, 0) / current.length;
+
+    while (current.length > targetCount) {
+      const layerCounts = {};
+      current.forEach(t => layerCounts[t.z] = (layerCounts[t.z] || 0) + 1);
+
+      const candidates = [];
+      for (let i = 0; i < current.length; i++) {
+        const t = current[i];
+        // Tile is unsupporting if no other tile sits directly on top at z + 1
+        const isSupporting = current.some(u => u.z === t.z + 1 && Math.abs(u.x - t.x) <= 0.85 && Math.abs(u.y - t.y) <= 0.85);
+        if (!isSupporting) {
+          const dist = Math.hypot(t.x - cx, t.y - cy);
+          let layerOverQuota = false;
+          if (t.z >= 3 && (layerCounts[t.z] || 0) > maxLayer3) layerOverQuota = true;
+          else if (t.z === 2 && (layerCounts[t.z] || 0) > maxLayer2) layerOverQuota = true;
+          else if (t.z === 1 && (layerCounts[t.z] || 0) > maxLayer1) layerOverQuota = true;
+
+          let score = dist;
+          if (layerOverQuota) {
+            score += 5000 + t.z * 100;
+          } else if (t.z === 0) {
+            if ((layerCounts[0] || 0) <= minLayer0) score -= 2000;
+            else score += 1000;
+          } else {
+            score += (4 - t.z) * 500;
+          }
+          candidates.push({ index: i, score, tile: t });
+        }
+      }
+
+      if (candidates.length === 0) {
+        current.pop();
+        continue;
+      }
+
+      candidates.sort((a, b) => b.score - a.score);
+
+      // Verify that removal leaves at least 2 free playable tiles
+      let picked = false;
+      for (const cand of candidates) {
+        const testRemain = current.filter((_, idx) => idx !== cand.index);
+        const dummy = testRemain.map(c => ({ id: `${c.x}_${c.y}_${c.z}`, x: c.x, y: c.y, z: c.z, isMatched: false }));
+        const playable = dummy.filter(t => VitaBoardGenerator.isTileFree(t, dummy));
+        if (playable.length >= 2) {
+          current.splice(cand.index, 1);
+          picked = true;
+          break;
+        }
+      }
+
+      if (!picked) {
+        current.splice(candidates[0].index, 1);
+      }
+    }
+
+    return current;
   }
 
   // 1. Pyramid (Shikhara - Concentric centered pyramid)
@@ -51276,6 +51347,7 @@ class BoardRenderer {
     this.container.innerHTML = '';
 
     const isRealmsMode = (this.options.gameplayMode === 'realms');
+    const isTileClubMode = (this.options.gameplayMode === 'tile_club');
 
     const containerW = (this.container && this.container.clientWidth > 100)
       ? this.container.clientWidth
@@ -51310,7 +51382,8 @@ class BoardRenderer {
 
     if (containerW && containerW > 100) {
       const availW = Math.max(300, containerW - 20);
-      const availH = Math.max(380, containerH - 30);
+      const trayDeduction = isTileClubMode ? 100 : 0;
+      const availH = Math.max(300, containerH - 30 - trayDeduction);
       const aspect = isRealmsMode ? 1.125 : 1.294;
       const spacingFactor = isRealmsMode ? 0.86 : 0.85;
 
@@ -51327,17 +51400,17 @@ class BoardRenderer {
         // Luxury Squircle: dynamic scaling up to 115px on desktop, min 48px on mobile
         const isMobile = containerW < 480;
         const minAllowed = isMobile ? 48 : 60;
-        const maxAllowed = isMobile ? 84 : 115;
+        const maxAllowed = isMobile ? (isTileClubMode ? 78 : 84) : (isTileClubMode ? 102 : 115);
         targetW = Math.max(minAllowed, Math.min(maxAllowed, targetW));
       } else if (this.options.seniorView) {
         const isMobile = containerW < 480;
         const minAllowed = isMobile ? 52 : 72;
-        const maxAllowed = isMobile ? 88 : 110;
+        const maxAllowed = isMobile ? (isTileClubMode ? 80 : 88) : (isTileClubMode ? 96 : 110);
         targetW = Math.max(minAllowed, Math.min(maxAllowed, targetW));
       } else {
         const isMobile = containerW < 480;
-        const minAllowed = isMobile ? 44 : 56;
-        const maxAllowed = isMobile ? 76 : 96;
+        const minAllowed = isMobile ? 42 : 54;
+        const maxAllowed = isMobile ? (isTileClubMode ? 68 : 76) : (isTileClubMode ? 86 : 96);
         targetW = Math.max(minAllowed, Math.min(maxAllowed, targetW));
       }
 
@@ -51363,9 +51436,15 @@ class BoardRenderer {
     if (containerW && containerW > boardTotalW) {
       offsetX = Math.max(10, Math.floor((containerW - boardTotalW) / 2));
     }
-    let offsetY = 15;
+    let offsetY = 12;
     if (containerH && containerH > boardTotalH) {
-      offsetY = Math.max(12, Math.floor((containerH - boardTotalH) / 2));
+      const usableH = isTileClubMode ? Math.max(boardTotalH + 10, containerH - 95) : containerH;
+      offsetY = Math.max(8, Math.floor((usableH - boardTotalH) / 2));
+    }
+    // Safety clamp: bottom tile must not exceed container boundary or tray boundary
+    const maxBottom = isTileClubMode ? (containerH - 95) : (containerH - 12);
+    if (offsetY + boardTotalH > maxBottom) {
+      offsetY = Math.max(6, maxBottom - boardTotalH);
     }
 
     const domainRibbons = {
