@@ -51410,15 +51410,18 @@ class BoardRenderer {
       ...options
     };
     this.tiles = [];
+    this.stageLayoutMetrics = null;
   }
 
   setSeniorView(enabled) {
     this.options.seniorView = !!enabled;
+    this.stageLayoutMetrics = null;
     this.render();
   }
 
   setGameplayMode(mode) {
     this.options.gameplayMode = mode;
+    this.stageLayoutMetrics = null;
     this.render();
   }
 
@@ -51429,6 +51432,7 @@ class BoardRenderer {
 
   setTiles(tiles) {
     this.tiles = tiles || [];
+    this.stageLayoutMetrics = null;
     this.render();
   }
 
@@ -51449,27 +51453,18 @@ class BoardRenderer {
     return { width: 68, height: 88, fontSize: 11, iconSize: 42 };
   }
 
-  render() {
-    if (!this.container) return;
-    this.container.innerHTML = '';
-
+  computeStageMetrics(containerW, containerH) {
     const isRealmsMode = (this.options.gameplayMode === 'realms');
     const isTileClubMode = (this.options.gameplayMode === 'tile_club');
+    const isSenior = !!this.options.seniorView;
+    const isMobile = containerW < 480;
+    const isTablet = containerW >= 480 && containerW < 1024;
 
-    const containerW = (this.container && this.container.clientWidth > 100)
-      ? this.container.clientWidth
-      : (typeof window !== 'undefined' && window.innerWidth < 768 ? window.innerWidth - 24 : null);
-
-    const containerH = (this.container && this.container.clientHeight > 100)
-      ? this.container.clientHeight
-      : (typeof window !== 'undefined' && window.innerHeight ? Math.floor(window.innerHeight * 0.65) : 560);
-
-    const activeTiles = this.tiles.filter(t => !t.isMatched);
-
-    // Compute bounding coordinate bounds for dynamic centering
+    // 1. Compute bounding coordinate bounds from the FULL permanent stage layout (this.tiles)
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    if (activeTiles.length > 0) {
-      activeTiles.forEach(t => {
+    const allStageTiles = (this.tiles && this.tiles.length > 0) ? this.tiles : [];
+    if (allStageTiles.length > 0) {
+      allStageTiles.forEach(t => {
         if (t.x < minX) minX = t.x;
         if (t.x > maxX) maxX = t.x;
         if (t.y < minY) minY = t.y;
@@ -51482,65 +51477,61 @@ class BoardRenderer {
     const colSpan = Math.max(1, maxX - minX + 1);
     const rowSpan = Math.max(1, maxY - minY + 1);
 
-    let width = 68;
-    let height = 88;
-    let fontSize = 11;
-    let iconSize = 42;
+    const aspect = isRealmsMode ? 1.125 : 1.294;
+    const spacingFactor = isRealmsMode ? 0.86 : 0.85;
 
-    if (containerW && containerW > 100) {
-      const availW = Math.max(300, containerW - 20);
-      const trayDeduction = isTileClubMode ? 100 : 0;
-      const availH = Math.max(300, containerH - 30 - trayDeduction);
-      const aspect = isRealmsMode ? 1.125 : 1.294;
-      const spacingFactor = isRealmsMode ? 0.86 : 0.85;
+    // Available board area
+    const availW = Math.max(280, containerW - 20);
+    const trayDeduction = isTileClubMode ? 100 : 0;
+    const availH = Math.max(280, containerH - 30 - trayDeduction);
 
-      const colDenominator = 1 + (colSpan - 1) * spacingFactor;
-      const rowDenominator = 1 + (rowSpan - 1) * spacingFactor;
+    const colDenominator = 1 + (colSpan - 1) * spacingFactor;
+    const rowDenominator = 1 + (rowSpan - 1) * spacingFactor;
 
-      const maxWFromWidth = (availW * 0.90) / colDenominator;
-      const maxHFromHeight = (availH * 0.88) / rowDenominator;
-      const maxWFromHeight = maxHFromHeight / aspect;
+    const maxWFromWidth = (availW * 0.92) / colDenominator;
+    const maxHFromHeight = (availH * 0.90) / rowDenominator;
+    const maxWFromHeight = maxHFromHeight / aspect;
 
-      let targetW = Math.floor(Math.min(maxWFromWidth, maxWFromHeight));
+    // Raw geometric fit
+    let rawFitW = Math.floor(Math.min(maxWFromWidth, maxWFromHeight));
 
-      if (isRealmsMode) {
-        // Luxury Squircle: dynamic scaling up to 130px on desktop
-        const isMobile = containerW < 480;
-        const minAllowed = isMobile ? 48 : 64;
-        const maxAllowed = isMobile ? (isTileClubMode ? 82 : 90) : (isTileClubMode ? 114 : 130);
-        targetW = Math.max(minAllowed, Math.min(maxAllowed, targetW));
-      } else if (this.options.seniorView) {
-        const isMobile = containerW < 480;
-        const minAllowed = isMobile ? 54 : 76;
-        const maxAllowed = isMobile ? (isTileClubMode ? 86 : 96) : (isTileClubMode ? 114 : 130);
-        targetW = Math.max(minAllowed, Math.min(maxAllowed, targetW));
-      } else {
-        // Tabs 1 (Pairs), 2 (Tile Club), 3 (Classic): full dynamic expansion up to 130px on desktop!
-        const isMobile = containerW < 480;
-        const minAllowed = isMobile ? 44 : 58;
-        const maxAllowed = isMobile ? (isTileClubMode ? 80 : 90) : (isTileClubMode ? 114 : 130);
-        targetW = Math.max(minAllowed, Math.min(maxAllowed, targetW));
-      }
+    // 2. Canonical Target Width Clamping for Level Consistency:
+    // Keeps tiles and icons uniform across all levels rather than ballooning or shrinking
+    let targetW;
+    let iconSize;
+    let fontSize;
 
-      width = targetW;
-      height = Math.round(width * aspect);
-      fontSize = Math.max(9.5, Math.round(width * 0.16));
-      // HERO ICON: Big, bold, colorful game icon (55% to 60% of tile width!)
-      iconSize = Math.max(28, Math.round(width * 0.56));
+    if (isMobile) {
+      // Mobile Viewport (< 480px): Consistent ~46px - 50px thumb-friendly size across all levels
+      const canonicalW = isSenior ? 54 : (isTileClubMode ? 46 : 48);
+      targetW = Math.min(canonicalW, rawFitW);
+      targetW = Math.max(42, targetW); // Safety floor
+      iconSize = isSenior ? 32 : 28;
+      fontSize = isSenior ? 11 : 9.5;
+    } else if (isTablet) {
+      // Tablet Viewport (480px - 1023px): Consistent ~66px - 72px
+      const canonicalW = isSenior ? 82 : (isTileClubMode ? 66 : 70);
+      targetW = Math.min(canonicalW, rawFitW);
+      targetW = Math.max(54, targetW);
+      iconSize = isSenior ? 46 : 38;
+      fontSize = isSenior ? 13 : 11;
     } else {
-      const baseDims = this.getTileDimensions();
-      width = baseDims.width;
-      height = baseDims.height;
-      fontSize = baseDims.fontSize;
-      iconSize = baseDims.iconSize;
+      // Desktop Viewport (>= 1024px): Consistent ~78px - 84px across all levels
+      const canonicalW = isSenior ? 96 : (isTileClubMode ? 74 : 82);
+      targetW = Math.min(canonicalW, rawFitW);
+      targetW = Math.max(62, targetW);
+      iconSize = isSenior ? 54 : 46;
+      fontSize = isSenior ? 14 : 12;
     }
 
-    const spacingFactor = isRealmsMode ? 0.86 : 0.85;
+    const width = targetW;
+    const height = Math.round(width * aspect);
     const colSpacing = Math.round(width * spacingFactor);
     const rowSpacing = Math.round(height * spacingFactor);
     const boardTotalW = (maxX - minX) * colSpacing + width;
     const boardTotalH = (maxY - minY) * rowSpacing + height;
 
+    // Centering offsets
     let offsetX = 10;
     if (containerW && containerW > boardTotalW) {
       offsetX = Math.max(10, Math.floor((containerW - boardTotalW) / 2));
@@ -51550,11 +51541,62 @@ class BoardRenderer {
       const usableH = isTileClubMode ? Math.max(boardTotalH + 10, containerH - 95) : containerH;
       offsetY = Math.max(8, Math.floor((usableH - boardTotalH) / 2));
     }
-    // Safety clamp: bottom tile must not exceed container boundary or tray boundary
     const maxBottom = isTileClubMode ? (containerH - 95) : (containerH - 12);
     if (offsetY + boardTotalH > maxBottom) {
       offsetY = Math.max(6, maxBottom - boardTotalH);
     }
+
+    return {
+      minX, maxX, minY, maxY,
+      colSpan, rowSpan,
+      width, height,
+      fontSize, iconSize,
+      colSpacing, rowSpacing,
+      offsetX, offsetY,
+      containerW, containerH,
+      seniorView: this.options.seniorView,
+      gameplayMode: this.options.gameplayMode
+    };
+  }
+
+  render() {
+    if (!this.container) return;
+    this.container.innerHTML = '';
+
+    const containerW = (this.container && this.container.clientWidth > 100)
+      ? this.container.clientWidth
+      : (typeof window !== 'undefined' && window.innerWidth < 768 ? window.innerWidth - 24 : null);
+
+    const containerH = (this.container && this.container.clientHeight > 100)
+      ? this.container.clientHeight
+      : (typeof window !== 'undefined' && window.innerHeight ? Math.floor(window.innerHeight * 0.65) : 560);
+
+    if (containerW && containerW > 100) {
+      if (!this.stageLayoutMetrics ||
+          this.stageLayoutMetrics.containerW !== containerW ||
+          this.stageLayoutMetrics.containerH !== containerH ||
+          this.stageLayoutMetrics.seniorView !== this.options.seniorView ||
+          this.stageLayoutMetrics.gameplayMode !== this.options.gameplayMode) {
+        this.stageLayoutMetrics = this.computeStageMetrics(containerW, containerH);
+      }
+    }
+
+    const metrics = this.stageLayoutMetrics || {
+      ...this.getTileDimensions(),
+      minX: 0, maxX: 5, minY: 0, maxY: 3,
+      colSpacing: 58, rowSpacing: 75,
+      offsetX: 10, offsetY: 12
+    };
+
+    const {
+      minX, minY,
+      width, height,
+      fontSize, iconSize,
+      colSpacing, rowSpacing,
+      offsetX, offsetY
+    } = metrics;
+
+    const activeTiles = this.tiles.filter(t => !t.isMatched);
 
     const domainRibbons = {
       'Fauna & Wildlife': '#15803d',
