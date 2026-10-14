@@ -333,9 +333,12 @@ export class GameManager {
           t.thematicName = art.name;
           t.thematicSymbol = art.symbol;
           if (t.floraData) {
-            t.floraData.customImage = art.image;
-            t.floraData.customName = art.name;
-            t.floraData.customSymbol = art.symbol;
+            t.floraData = {
+              ...t.floraData,
+              customImage: art.image,
+              customName: art.name,
+              customSymbol: art.symbol
+            };
           }
         }
       });

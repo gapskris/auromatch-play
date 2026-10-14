@@ -156,7 +156,8 @@ export class BoardRenderer {
         dynLineHeight = '0.98';
       }
 
-      const customImg = tile.customImage || (flora && flora.customImage) || null;
+      const isRealmsMode = (this.options.gameplayMode === 'realms');
+      const customImg = isRealmsMode ? (tile.customImage || (flora && flora.customImage) || null) : null;
 
       if (customImg) {
         el.classList.add('tile-authentic-art');
