@@ -1461,45 +1461,45 @@ body {
 }
 
 /* Authentic Artwork Tile Skins (Photo-Real Mockup Extraction) */
+/* Authentic Artwork Tile Skins (Photo-Real Dedicated 3D Tile Sets) */
 .tile-element.tile-authentic-art {
-    background: #000000 !important;
-    border: 2px solid rgba(255, 255, 255, 0.45) !important;
-    box-shadow: 
-        inset 0 1px 0 rgba(255, 255, 255, 0.8),
-        0 4px 6px rgba(0, 0, 0, 0.4),
-        0 8px 0 rgba(20, 20, 20, 0.9),
-        0 14px 24px rgba(0, 0, 0, 0.6) !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+}
+
+.tile-element.tile-authentic-art .tile-face {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+}
+
+.tile-element.tile-authentic-art.tile-selected {
+    filter: drop-shadow(0 0 10px #fbbf24) brightness(1.18) !important;
+    transform: translateY(-5px) scale(1.04) !important;
+}
+
+.tile-element.tile-authentic-art.tile-hint-aura {
+    filter: drop-shadow(0 0 12px #38bdf8) brightness(1.22) !important;
+    animation: tilePulseHint 1.2s infinite ease-in-out;
 }
 
 .tile-art-face {
+    width: 100%;
+    height: 100%;
     background-repeat: no-repeat !important;
-    border-radius: 10px;
+    background-size: contain !important;
+    background-position: center !important;
+    border-radius: 12px;
     position: relative;
-}
-
-.tile-art-glow {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    border-radius: 10px;
-    background: radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.22) 0%, transparent 70%);
     pointer-events: none;
 }
 
-.tile-art-label-banner {
-    position: absolute;
-    bottom: 2px;
-    left: 4px;
-    right: 4px;
-    background: rgba(0, 0, 0, 0.65) !important;
-    backdrop-filter: blur(4px);
-    border-radius: 6px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    min-height: 16px !important;
-    max-height: 20px !important;
-    padding: 1px 2px !important;
+.tile-art-glow {
+    display: none;
 }
 
 .tile-icon {
@@ -1800,6 +1800,18 @@ body {
     color: #0b1215;
     border-color: var(--accent-current);
     font-weight: 700;
+}
+
+.mode-btn-classic {
+    border-color: rgba(96, 165, 250, 0.4);
+    color: #93c5fd;
+}
+
+.mode-btn-classic.active {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #ffffff;
+    border-color: #60a5fa;
+    box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
 }
 
 .mode-btn-realms {
@@ -2590,9 +2602,10 @@ body {
 
             <!-- Mode Switcher HUD Bar -->
             <div class="mode-toggle-bar">
-                <button class="mode-btn active" id="btn-mode-vita" onclick="window.switchGameplayMode('vita')">Pairs</button>
-                <button class="mode-btn" id="btn-mode-tileclub" onclick="window.switchGameplayMode('tile_club')">Tile Club</button>
-                <button class="mode-btn mode-btn-realms" id="btn-mode-realms" onclick="window.switchGameplayMode('realms')" title="Explore 13 Secular Realms (208 Levels)">🗺️ Realms</button>
+                <button class="mode-btn active" id="btn-mode-vita" onclick="window.switchGameplayMode('vita')">🪷 Pairs</button>
+                <button class="mode-btn" id="btn-mode-tileclub" onclick="window.switchGameplayMode('tile_club')">📥 Tile Club</button>
+                <button class="mode-btn mode-btn-classic" id="btn-mode-classic" onclick="window.switchGameplayMode('classic')" title="Classic Mahjong Solitaire Campaign (200 Levels)">🏛️ Classic (200)</button>
+                <button class="mode-btn mode-btn-realms" id="btn-mode-realms" onclick="window.switchGameplayMode('realms')" title="13 Thematic Realms (195 Levels)">🗺️ Realms (13)</button>
                 <button class="senior-toggle-btn" id="btn-toggle-senior" onclick="window.toggleSeniorViewMode()">[Aa] Senior</button>
             </div>
 
@@ -3031,8 +3044,8 @@ body {
             <div class="realms-browser-card">
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
                     <div>
-                        <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; color: #ffd700; margin: 0;">🗺️ 13 Realms Campaign</h3>
-                        <p style="font-size: 11px; color: #c5a880; margin: 2px 0 0 0;">208 Master Levels across 13 Secular Themes</p>
+                        <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; color: #ffd700; margin: 0;">🗺️ The 13 Thematic Realms</h3>
+                        <p style="font-size: 11px; color: #c5a880; margin: 2px 0 0 0;">195 Signature Levels (15 per Realm) with Dedicated 3D Artistic Tiles</p>
                     </div>
                     <button class="hdr-btn" onclick="window.closeRealmsBrowser()" style="font-size: 18px;">✕</button>
                 </div>
@@ -50451,6 +50464,209 @@ class VitaBoardGenerator {
     return VitaBoardGenerator._padToTarget(coords, targetCount);
   }
 
+  // 13. Mountain Ridge (Twin Peaks)
+  static _genMountainRidge(targetCount) {
+    const coords = [];
+    // Base foothills: 8 wide x 3 deep
+    for (let r = 0; r <= 3; r++) {
+      for (let c = 0; c <= 7; c++) coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+    }
+    // Twin Peaks on left (col 1, 2) and right (col 5, 6)
+    [1, 2, 5, 6].forEach(c => {
+      coords.push({ x: c * 1.0, y: 1.0, z: 1 });
+      coords.push({ x: c * 1.0, y: 2.0, z: 1 });
+    });
+    // Peak summits
+    [1.5, 5.5].forEach(c => {
+      coords.push({ x: c * 1.0, y: 1.5, z: 2 });
+      coords.push({ x: c * 1.0, y: 1.5, z: 3 });
+    });
+    return VitaBoardGenerator._padToTarget(coords, targetCount);
+  }
+
+  // 14. Sacred Trident (Trishula)
+  static _genTrident(targetCount) {
+    const coords = [];
+    // Base plinth
+    for (let c = 1; c <= 5; c++) coords.push({ x: c * 1.0, y: 5.0, z: 0 });
+    for (let c = 2; c <= 4; c++) coords.push({ x: c * 1.0, y: 4.0, z: 0 });
+    // Center shaft
+    for (let r = 0; r <= 3; r++) coords.push({ x: 3.0, y: r * 1.0, z: 0 });
+    // Left prong
+    for (let r = 0; r <= 2; r++) coords.push({ x: 1.0, y: r * 1.0, z: 0 });
+    // Right prong
+    for (let r = 0; r <= 2; r++) coords.push({ x: 5.0, y: r * 1.0, z: 0 });
+    // Connecting bottom curve
+    coords.push({ x: 2.0, y: 3.0, z: 0 });
+    coords.push({ x: 4.0, y: 3.0, z: 0 });
+    // Upper tiers on prongs
+    [1.0, 3.0, 5.0].forEach(c => {
+      coords.push({ x: c, y: 1.0, z: 1 });
+      coords.push({ x: c, y: 0.0, z: 1 });
+      coords.push({ x: c, y: 0.0, z: 2 });
+    });
+    return VitaBoardGenerator._padToTarget(coords, targetCount);
+  }
+
+  // 15. Crescent Moon (Chandra)
+  static _genCrescentMoon(targetCount) {
+    const coords = [];
+    const cx = 3.5, cy = 3.0;
+    for (let r = 0; r <= 6; r++) {
+      for (let c = 0; c <= 6; c++) {
+        const dOuter = Math.sqrt((c - cx) ** 2 + (r - cy) ** 2);
+        const dInner = Math.sqrt((c - (cx + 1.2)) ** 2 + (r - cy) ** 2);
+        if (dOuter <= 3.2 && dInner >= 1.8) {
+          coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+        }
+      }
+    }
+    // Arc body upper layer
+    for (let r = 1; r <= 5; r++) {
+      for (let c = 1; c <= 3; c++) {
+        coords.push({ x: c * 1.0 + 0.5, y: r * 1.0, z: 1 });
+      }
+    }
+    coords.push({ x: 2.0, y: 3.0, z: 2 });
+    coords.push({ x: 2.0, y: 3.0, z: 3 });
+    return VitaBoardGenerator._padToTarget(coords, targetCount);
+  }
+
+  // 16. Arrowhead Chevron
+  static _genArrowhead(targetCount) {
+    const coords = [];
+    // Pointed top at row 0, spreading out downwards
+    for (let r = 0; r <= 5; r++) {
+      const halfW = r;
+      for (let c = 3 - halfW; c <= 3 + halfW; c++) {
+        if (c >= 0 && c <= 6) {
+          // Hollow tail notch
+          if (r >= 3 && Math.abs(c - 3) <= (r - 3)) continue;
+          coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+        }
+      }
+    }
+    // Raised chevron core
+    for (let r = 1; r <= 3; r++) {
+      coords.push({ x: 3.0, y: r * 1.0, z: 1 });
+      coords.push({ x: 3.0 - (r * 0.5), y: r * 1.0, z: 1 });
+      coords.push({ x: 3.0 + (r * 0.5), y: r * 1.0, z: 1 });
+    }
+    coords.push({ x: 3.0, y: 1.0, z: 2 });
+    coords.push({ x: 3.0, y: 1.0, z: 3 });
+    return VitaBoardGenerator._padToTarget(coords, targetCount);
+  }
+
+  // 17. Amphora Vase (Kumbha)
+  static _genAmphora(targetCount) {
+    const coords = [];
+    // Rim
+    for (let c = 2; c <= 4; c++) coords.push({ x: c * 1.0, y: 0.0, z: 0 });
+    // Neck
+    coords.push({ x: 3.0, y: 1.0, z: 0 });
+    // Belly (wide)
+    for (let r = 2; r <= 4; r++) {
+      for (let c = 1; c <= 5; c++) coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+    }
+    // Handles
+    coords.push({ x: 0.0, y: 2.0, z: 0 });
+    coords.push({ x: 6.0, y: 2.0, z: 0 });
+    coords.push({ x: 0.0, y: 3.0, z: 0 });
+    coords.push({ x: 6.0, y: 3.0, z: 0 });
+    // Base
+    for (let c = 2; c <= 4; c++) coords.push({ x: c * 1.0, y: 5.0, z: 0 });
+    // Raised belly tiers
+    for (let r = 2; r <= 4; r++) {
+      for (let c = 2; c <= 4; c++) coords.push({ x: c * 1.0, y: r * 1.0, z: 1 });
+    }
+    coords.push({ x: 3.0, y: 3.0, z: 2 });
+    coords.push({ x: 3.0, y: 3.0, z: 3 });
+    return VitaBoardGenerator._padToTarget(coords, targetCount);
+  }
+
+  // 18. Hero's Shield (Kavacha)
+  static _genHeroShield(targetCount) {
+    const coords = [];
+    // Wide top curved down to point
+    for (let c = 0; c <= 6; c++) coords.push({ x: c * 1.0, y: 0.0, z: 0 });
+    for (let r = 1; r <= 2; r++) {
+      for (let c = 0; c <= 6; c++) coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+    }
+    for (let c = 1; c <= 5; c++) coords.push({ x: c * 1.0, y: 3.0, z: 0 });
+    for (let c = 2; c <= 4; c++) coords.push({ x: c * 1.0, y: 4.0, z: 0 });
+    coords.push({ x: 3.0, y: 5.0, z: 0 });
+    // Raised shield boss
+    for (let r = 1; r <= 3; r++) {
+      for (let c = 2; c <= 4; c++) coords.push({ x: c * 1.0, y: r * 1.0, z: 1 });
+    }
+    coords.push({ x: 3.0, y: 2.0, z: 2 });
+    coords.push({ x: 3.0, y: 2.0, z: 3 });
+    return VitaBoardGenerator._padToTarget(coords, targetCount);
+  }
+
+  // 19. Double Diamond (Yugma)
+  static _genDoubleDiamond(targetCount) {
+    const coords = [];
+    const centers = [2, 5];
+    centers.forEach(cx => {
+      for (let r = 0; r <= 4; r++) {
+        for (let c = cx - 2; c <= cx + 2; c++) {
+          if (Math.abs(c - cx) + Math.abs(r - 2) <= 2) {
+            coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+          }
+        }
+      }
+      coords.push({ x: cx * 1.0, y: 2.0, z: 1 });
+      coords.push({ x: cx * 1.0, y: 2.0, z: 2 });
+    });
+    return VitaBoardGenerator._padToTarget(coords, targetCount);
+  }
+
+  // 20. Spiral Vortex (Kundalini)
+  static _genSpiralVortex(targetCount) {
+    const coords = [];
+    // S-curve spiral arm
+    for (let c = 0; c <= 4; c++) coords.push({ x: c * 1.0, y: 0.0, z: 0 });
+    for (let r = 1; r <= 2; r++) coords.push({ x: 4.0, y: r * 1.0, z: 0 });
+    for (let c = 2; c <= 4; c++) coords.push({ x: c * 1.0, y: 2.0, z: 0 });
+    for (let r = 2; r <= 4; r++) coords.push({ x: 2.0, y: r * 1.0, z: 0 });
+    for (let c = 2; c <= 6; c++) coords.push({ x: c * 1.0, y: 4.0, z: 0 });
+    for (let r = 0; r <= 4; r++) coords.push({ x: 6.0, y: r * 1.0, z: 0 });
+    // Raised spiral center
+    coords.push({ x: 3.0, y: 2.0, z: 1 });
+    coords.push({ x: 3.0, y: 2.0, z: 2 });
+    coords.push({ x: 3.0, y: 2.0, z: 3 });
+    return VitaBoardGenerator._padToTarget(coords, targetCount);
+  }
+
+  // 21. Stupa Shrine (Chaitya)
+  static _genStupaShrine(targetCount) {
+    const coords = [];
+    // Square base plinth
+    for (let r = 4; r <= 5; r++) {
+      for (let c = 0; c <= 6; c++) coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+    }
+    // Stepped terrace
+    for (let r = 2; r <= 3; r++) {
+      for (let c = 1; c <= 5; c++) coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+    }
+    // Cylindrical dome
+    for (let c = 2; c <= 4; c++) coords.push({ x: c * 1.0, y: 1.0, z: 0 });
+    coords.push({ x: 3.0, y: 0.0, z: 0 });
+    // Dome upper tiers
+    for (let c = 2; c <= 4; c++) {
+      coords.push({ x: c * 1.0, y: 2.0, z: 1 });
+      coords.push({ x: c * 1.0, y: 3.0, z: 1 });
+    }
+    coords.push({ x: 3.0, y: 1.0, z: 1 });
+    coords.push({ x: 3.0, y: 2.0, z: 2 });
+    coords.push({ x: 3.0, y: 1.0, z: 2 });
+    coords.push({ x: 3.0, y: 0.0, z: 1 });
+    coords.push({ x: 3.0, y: 0.0, z: 2 });
+    coords.push({ x: 3.0, y: 0.0, z: 3 });
+    return VitaBoardGenerator._padToTarget(coords, targetCount);
+  }
+
   static FORMATIONS = [
     { name: 'Pyramid (Shikhara)', generator: VitaBoardGenerator._genPyramid },
     { name: 'Twin Pillars (H-Gate)', generator: VitaBoardGenerator._genHGate },
@@ -50463,7 +50679,16 @@ class VitaBoardGenerator {
     { name: 'Constellation Star', generator: VitaBoardGenerator._genStar },
     { name: 'Pagoda Gateway', generator: VitaBoardGenerator._genPagoda },
     { name: 'Sunburst (Surya)', generator: VitaBoardGenerator._genSunburst },
-    { name: 'Infinity Knot (Ananta)', generator: VitaBoardGenerator._genInfinity }
+    { name: 'Infinity Knot (Ananta)', generator: VitaBoardGenerator._genInfinity },
+    { name: 'Mountain Ridge (Twin Peaks)', generator: VitaBoardGenerator._genMountainRidge },
+    { name: 'Sacred Trident (Trishula)', generator: VitaBoardGenerator._genTrident },
+    { name: 'Crescent Moon (Chandra)', generator: VitaBoardGenerator._genCrescentMoon },
+    { name: 'Arrowhead Chevron', generator: VitaBoardGenerator._genArrowhead },
+    { name: 'Amphora Vase (Kumbha)', generator: VitaBoardGenerator._genAmphora },
+    { name: 'Hero Shield (Kavacha)', generator: VitaBoardGenerator._genHeroShield },
+    { name: 'Double Diamond (Yugma)', generator: VitaBoardGenerator._genDoubleDiamond },
+    { name: 'Spiral Vortex (Kundalini)', generator: VitaBoardGenerator._genSpiralVortex },
+    { name: 'Stupa Shrine (Chaitya)', generator: VitaBoardGenerator._genStupaShrine }
   ];
 
   static getFormationName(levelNum = 1) {
@@ -51133,12 +51358,9 @@ class BoardRenderer {
       if (customImg) {
         el.classList.add('tile-authentic-art');
         el.innerHTML = `
-          <div class="tile-face tile-art-face" style="background-image: url('${customImg}'); background-size: cover; background-position: center;">
+          <div class="tile-face tile-art-face" style="background-image: url('${customImg}');">
             <div class="tile-art-glow"></div>
             ${bonusBadge}
-            <div class="tile-label-banner tile-art-label-banner">
-              <div class="tile-label" style="font-size: ${Math.max(7.5, dynFontSize * 0.9)}px; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.9); font-weight: 700;">${flora.commonName}</div>
-            </div>
           </div>
         `;
       } else {
@@ -51775,13 +51997,155 @@ function renderConstellationCalendar(gridId, svgId) {
 
 
 // --- Theme Manager ---
-// ThemeManager: Manages the 13 Secular Realms Campaign (403 Total Levels)
-// Coordinates background wallpapers, authentic graphic tile skins, CSS tile material archetypes, and audio presets.
+// ThemeManager: Manages the 13 Secular Realms Campaign (195 Total Thematic Levels)
+// Coordinates clean background wallpapers, authentic 3D graphic tile skins, and audio presets.
 
-const TOTAL_REALM_LEVELS = 403; // 13 Themes * 31 Levels (16 Standard + 15 Master Authentic Art)
-const LEVELS_PER_REALM = 31;
-const STANDARD_LEVELS_PER_REALM = 16;
-const MASTER_LEVELS_PER_REALM = 15;
+const TOTAL_REALM_LEVELS = 195; // 13 Themes * 15 Thematic Levels
+const LEVELS_PER_REALM = 15;
+const TOTAL_CLASSIC_LEVELS = 200; // Dedicated Classic Solitaire Campaign
+
+// 16 distinct emblems with symbolic labels for each theme
+const THEME_TILE_DEFS = {
+  whispering_pines: [
+    { name: "Emerald Leaf", symbol: "🍃" }, { name: "Pinecone", symbol: "🌲" },
+    { name: "Acorn", symbol: "🌰" }, { name: "Oak Leaf", symbol: "🍂" },
+    { name: "Fern Frond", symbol: "🌿" }, { name: "Forest Mushroom", symbol: "🍄" },
+    { name: "Cedar Bark", symbol: "🪵" }, { name: "Maple Wing", symbol: "🍁" },
+    { name: "Clover Sprout", symbol: "☘️" }, { name: "Wild Berry", symbol: "🫐" },
+    { name: "Woodland Owl", symbol: "🦉" }, { name: "Forest Deer", symbol: "🦌" },
+    { name: "Pine Needle", symbol: "🎋" }, { name: "Sunlit Sprout", symbol: "🌱" },
+    { name: "Tree of Life", symbol: "🌳" }, { name: "Forest Blossom", symbol: "🌸" }
+  ],
+  temple_of_lines: [
+    { name: "Blueprint Arch", symbol: "⛩️" }, { name: "Slate Dome", symbol: "🏛️" },
+    { name: "Torana Gate", symbol: "🛕" }, { name: "Zen Pillar", symbol: "🏛️" },
+    { name: "Sacred Triangle", symbol: "📐" }, { name: "Compass Rose", symbol: "🧭" },
+    { name: "Keystone", symbol: "🧱" }, { name: "Spiral Column", symbol: "🌀" },
+    { name: "Stepped Terrace", symbol: "🪜" }, { name: "Temple Bell", symbol: "🔔" },
+    { name: "Golden Caliper", symbol: "📏" }, { name: "Sanctuary Obelisk", symbol: "🗿" },
+    { name: "Lattice Grid", symbol: "🕸️" }, { name: "Zen Stone", symbol: "🪨" },
+    { name: "Balance Scale", symbol: "⚖️" }, { name: "Horizon Portal", symbol: "🪟" }
+  ],
+  biblios_wisdom: [
+    { name: "Gilded Owl", symbol: "🦉" }, { name: "Sunburst Tome", symbol: "☀️" },
+    { name: "Feather Quill", symbol: "🪶" }, { name: "Open Codex", symbol: "📖" },
+    { name: "Astrolabe", symbol: "🧭" }, { name: "Vintage Hourglass", symbol: "⏳" },
+    { name: "Laurel Wreath", symbol: "🌿" }, { name: "Celestial Globe", symbol: "🌐" },
+    { name: "Inkpot Scroll", symbol: "📜" }, { name: "Library Lamp", symbol: "🏮" },
+    { name: "Sealing Wax", symbol: "🏷️" }, { name: "Scholar Key", symbol: "🗝️" },
+    { name: "Radiant Star", symbol: "🌟" }, { name: "Illuminated Folio", symbol: "📑" },
+    { name: "Wisdom Crown", symbol: "👑" }, { name: "Looking Glass", symbol: "🔍" }
+  ],
+  celestial_starlight: [
+    { name: "Cosmic Star", symbol: "✨" }, { name: "Aquamarine Tablet", symbol: "💎" },
+    { name: "Crescent Moon", symbol: "🌙" }, { name: "Solar Crest", symbol: "☀️" },
+    { name: "Polaris Compass", symbol: "🧭" }, { name: "Comet Trail", symbol: "☄️" },
+    { name: "Saturn Ring", symbol: "🪐" }, { name: "Astral Orbit", symbol: "💫" },
+    { name: "Radiant Nova", symbol: "🌟" }, { name: "Starlight Crown", symbol: "👑" },
+    { name: "Crystal Prism", symbol: "🔮" }, { name: "Eclipse Ring", symbol: "⭕" },
+    { name: "Zodiac Rune", symbol: "♈" }, { name: "Zenith Spark", symbol: "⚡" },
+    { name: "Cosmic Bell", symbol: "🔔" }, { name: "Infinity Spiral", symbol: "♾️" }
+  ],
+  golden_nebula: [
+    { name: "Luminous Rune", symbol: "💫" }, { name: "Golden Tablet", symbol: "🌟" },
+    { name: "Solar Flare", symbol: "☀️" }, { name: "Nebula Spiral", symbol: "🌀" },
+    { name: "Gold Constellation", symbol: "✨" }, { name: "Supernova", symbol: "💥" },
+    { name: "Galaxy Disc", symbol: "🌌" }, { name: "Astral Gateway", symbol: "⛩️" },
+    { name: "Golden Lotus", symbol: "🪷" }, { name: "Radiant Phoenix", symbol: "🦅" },
+    { name: "Cosmic Eye", symbol: "👁️" }, { name: "Golden Sceptre", symbol: "🪄" },
+    { name: "Eclipse Sun", symbol: "🌕" }, { name: "Astral Hourglass", symbol: "⏳" },
+    { name: "Star Chime", symbol: "🔔" }, { name: "Celestial Crown", symbol: "👑" }
+  ],
+  spirit_altar: [
+    { name: "Marble Lotus", symbol: "🪷" }, { name: "Marble Rosette", symbol: "🏵️" },
+    { name: "Concentric Mandala", symbol: "💮" }, { name: "Bodhi Leaf", symbol: "🍃" },
+    { name: "Meditation Flame", symbol: "🔥" }, { name: "Bronze Chime", symbol: "🔔" },
+    { name: "Incense Censer", symbol: "🪔" }, { name: "Offering Bowl", symbol: "🥣" },
+    { name: "Sacred Conch", symbol: "🐚" }, { name: "Endless Knot", symbol: "♾️" },
+    { name: "White Jasmine", symbol: "🌼" }, { name: "Water Lily", symbol: "🪷" },
+    { name: "Golden Vessel", symbol: "🏺" }, { name: "Spiritual Halo", symbol: "⭕" },
+    { name: "Temple Camellia", symbol: "🌺" }, { name: "Serene Pearl", symbol: "⚪" }
+  ],
+  sacred_sanctuary: [
+    { name: "Chiseled Lotus", symbol: "🪷" }, { name: "Brass Rosette", symbol: "🏵️" },
+    { name: "Sanctuary Flame", symbol: "🔥" }, { name: "Golden Bell", symbol: "🔔" },
+    { name: "Temple Pillar", symbol: "🏛️" }, { name: "Incense Mist", symbol: "💨" },
+    { name: "Amber Jewel", symbol: "💎" }, { name: "Sacred Garland", symbol: "📿" },
+    { name: "Solar Disk", symbol: "☀️" }, { name: "Peace Dove", symbol: "🕊️" },
+    { name: "Temple Gateway", symbol: "⛩️" }, { name: "Vessel of Light", symbol: "🏺" },
+    { name: "Radiant Chime", symbol: "🎐" }, { name: "Aura Halo", symbol: "⭕" },
+    { name: "Golden Leaf", symbol: "🍂" }, { name: "Eternal Lamp", symbol: "🪔" }
+  ],
+  ocean_horizon: [
+    { name: "Azure Sea Glass", symbol: "🫧" }, { name: "Luminous Pearl", symbol: "⚪" },
+    { name: "Nautilus Shell", symbol: "🐚" }, { name: "Sea Star", symbol: "⭐" },
+    { name: "Ocean Wave", symbol: "🌊" }, { name: "Coral Branch", symbol: "🪸" },
+    { name: "Driftwood Tablet", symbol: "🪵" }, { name: "Dolphin Crest", symbol: "🐬" },
+    { name: "Tide Compass", symbol: "🧭" }, { name: "Deep Lagoon", symbol: "💧" },
+    { name: "Sea Anemone", symbol: "🌸" }, { name: "Ambergris Gem", symbol: "💎" },
+    { name: "Coastal Breeze", symbol: "💨" }, { name: "Lighthouse Lamp", symbol: "🏮" },
+    { name: "Seagrass Frond", symbol: "🌿" }, { name: "Sunken Coin", symbol: "🪙" }
+  ],
+  terracotta_earth: [
+    { name: "Tree of Life", symbol: "🌳" }, { name: "Terracotta Leaf", symbol: "🍂" },
+    { name: "Clay Amphora", symbol: "🏺" }, { name: "Deep Root", symbol: "🌱" },
+    { name: "Sun-Baked Brick", symbol: "🧱" }, { name: "Potter Wheel", symbol: "⚙️" },
+    { name: "River Pebble", symbol: "🪨" }, { name: "Earthy Wheat", symbol: "🌾" },
+    { name: "Hearth Flame", symbol: "🔥" }, { name: "Clay Basin", symbol: "🥣" },
+    { name: "Ancient Fossil", symbol: "🐚" }, { name: "Desert Bloom", symbol: "🌵" },
+    { name: "Sienna Sun", symbol: "☀️" }, { name: "Clay Tablet", symbol: "📜" },
+    { name: "Terra Cameo", symbol: "🏵️" }, { name: "Harvest Basket", symbol: "🧺" }
+  ],
+  floral_harmony: [
+    { name: "Lotus Cameo", symbol: "🪷" }, { name: "Rose Cameo", symbol: "🌹" },
+    { name: "Magnolia Blossom", symbol: "🌸" }, { name: "Orchid Sprig", symbol: "🌺" },
+    { name: "Cherry Petal", symbol: "🌸" }, { name: "Jasmine Garland", symbol: "🌼" },
+    { name: "Peony Crown", symbol: "🏵️" }, { name: "Tulip Cup", symbol: "🌷" },
+    { name: "Sunflower Crest", symbol: "🌻" }, { name: "Lavender Scent", symbol: "🪻" },
+    { name: "Iris Blade", symbol: "🌿" }, { name: "Blush Cameo", symbol: "💮" },
+    { name: "Garden Butterfly", symbol: "🦋" }, { name: "Honey Blossom", symbol: "🍯" },
+    { name: "Morning Dew", symbol: "💧" }, { name: "Cameo Brooch", symbol: "💎" }
+  ],
+  blooming_mandala: [
+    { name: "Porcelain Lotus", symbol: "🌸" }, { name: "Gold Cameo", symbol: "🏵️" },
+    { name: "Concentric Ring", symbol: "⭕" }, { name: "Radial Star", symbol: "✳️" },
+    { name: "Mandala Hub", symbol: "💮" }, { name: "Filigree Petal", symbol: "🪷" },
+    { name: "Sacred Wheel", symbol: "☸️" }, { name: "Porcelain Rose", symbol: "🌹" },
+    { name: "Gold Wire Crest", symbol: "⚜️" }, { name: "Sunburst Halo", symbol: "☀️" },
+    { name: "Lace Mandala", symbol: "🕸️" }, { name: "Imperial Brocade", symbol: "👑" },
+    { name: "Celestial Rosette", symbol: "🌟" }, { name: "Ivory Cameo", symbol: "🤍" },
+    { name: "Radiant Bloom", symbol: "🌺" }, { name: "Geometric Jewel", symbol: "💎" }
+  ],
+  sacred_spiral: [
+    { name: "Golden Vine", symbol: "🌿" }, { name: "Sacred Bloom", symbol: "🪷" },
+    { name: "Fibonacci Spiral", symbol: "🌀" }, { name: "Fern Sprout", symbol: "🌱" },
+    { name: "Spiral Shell", symbol: "🐚" }, { name: "Curled Tendril", symbol: "🌾" },
+    { name: "Helix Crest", symbol: "🧬" }, { name: "Emerald Jewel", symbol: "💎" },
+    { name: "Sunlit Canopy", symbol: "🌳" }, { name: "Verdant Clover", symbol: "🍀" },
+    { name: "Botanical Orbit", symbol: "💫" }, { name: "Forest Fern", symbol: "🌿" },
+    { name: "Twisting Branch", symbol: "🪵" }, { name: "Dewdrop Frond", symbol: "💧" },
+    { name: "Spiral Galaxy", symbol: "🌌" }, { name: "Verdant Crown", symbol: "👑" }
+  ],
+  master_sanctuary: [
+    { name: "Carved Walnut", symbol: "🪵" }, { name: "Marble Inlay", symbol: "🪷" },
+    { name: "Master Crown", symbol: "👑" }, { name: "Golden Key", symbol: "🗝️" },
+    { name: "Grand Chime", symbol: "🔔" }, { name: "Imperial Crest", symbol: "⚜️" },
+    { name: "Sanctuary Sceptre", symbol: "🪄" }, { name: "Royal Astrolabe", symbol: "🧭" },
+    { name: "Grand Hourglass", symbol: "⏳" }, { name: "Polished Cameo", symbol: "🏵️" },
+    { name: "Altar Vessel", symbol: "🏺" }, { name: "Diamond Star", symbol: "💎" },
+    { name: "Golden Laurel", symbol: "🌿" }, { name: "Master Codex", symbol: "📖" },
+    { name: "Shield of Honor", symbol: "🛡️" }, { name: "Radiant Sun", symbol: "☀️" }
+  ]
+};
+
+function buildCustomTilesForTheme(themeId) {
+  const defs = THEME_TILE_DEFS[themeId] || THEME_TILE_DEFS.whispering_pines;
+  return defs.map((d, idx) => ({
+    name: d.name,
+    image: `./Assets/themes/${themeId}/tile_${String(idx + 1).padStart(2, '0')}.png`,
+    symbol: d.symbol
+  }));
+}
 
 const REALMS = [
   {
@@ -51790,18 +52154,12 @@ const REALMS = [
     name: 'Whispering Pines',
     subtitle: 'Woodland Bark & Emerald Veins',
     bgImage: './Assets/backgrounds/whispering_pines_clean.png',
-    originalBgImage: './Assets/backgrounds/whispering_pines.png',
     archetype: 'bark_leaf',
     audioPreset: 'forest',
     levelStart: 1,
-    levelEnd: 31,
-    masterLevelStart: 1,
-    classicLevelStart: 16,
+    levelEnd: 15,
     icon: '🌲',
-    customTiles: [
-      { name: 'Emerald Leaf', image: './Assets/themes/whispering_pines/tile_leaf.png', symbol: '🍃' },
-      { name: 'Woodland Bark', image: './Assets/themes/whispering_pines/tile_bark.png', symbol: '🪵' }
-    ]
+    customTiles: buildCustomTilesForTheme('whispering_pines')
   },
   {
     id: 'temple_of_lines',
@@ -51809,18 +52167,12 @@ const REALMS = [
     name: 'Temple of Lines',
     subtitle: 'Layered Slate & Blueprint Geometry',
     bgImage: './Assets/backgrounds/temple_of_lines_clean.png',
-    originalBgImage: './Assets/backgrounds/temple_of_lines.png',
     archetype: 'slate_zen',
     audioPreset: 'zen_stone',
-    levelStart: 32,
-    levelEnd: 62,
-    masterLevelStart: 32,
-    classicLevelStart: 47,
+    levelStart: 16,
+    levelEnd: 30,
     icon: '🏛️',
-    customTiles: [
-      { name: 'Blueprint Arch', image: './Assets/themes/temple_of_lines/tile_slate_arch.png', symbol: '⛩️' },
-      { name: 'Slate Dome', image: './Assets/themes/temple_of_lines/tile_slate_dome.png', symbol: '🏛️' }
-    ]
+    customTiles: buildCustomTilesForTheme('temple_of_lines')
   },
   {
     id: 'biblios_wisdom',
@@ -51828,18 +52180,12 @@ const REALMS = [
     name: 'Biblios Wisdom',
     subtitle: 'Leather-Bound Tomes & Gilded Edges',
     bgImage: './Assets/backgrounds/biblios_wisdom_clean.png',
-    originalBgImage: './Assets/backgrounds/biblios_wisdom.png',
     archetype: 'leather_tome',
     audioPreset: 'parchment',
-    levelStart: 63,
-    levelEnd: 93,
-    masterLevelStart: 63,
-    classicLevelStart: 78,
+    levelStart: 31,
+    levelEnd: 45,
     icon: '📚',
-    customTiles: [
-      { name: 'Gilded Owl Tome', image: './Assets/themes/biblios_wisdom/tile_book_owl.png', symbol: '🦉' },
-      { name: 'Sunburst Tome', image: './Assets/themes/biblios_wisdom/tile_book_sun.png', symbol: '☀️' }
-    ]
+    customTiles: buildCustomTilesForTheme('biblios_wisdom')
   },
   {
     id: 'celestial_starlight',
@@ -51847,18 +52193,12 @@ const REALMS = [
     name: 'Celestial Starlight',
     subtitle: 'Aquamarine Crystal & 24K Gold Bevels',
     bgImage: './Assets/backgrounds/celestial_starlight_clean.png',
-    originalBgImage: './Assets/backgrounds/celestial_starlight.jpg',
     archetype: 'cosmic_glass',
     audioPreset: 'crystal_bell',
-    levelStart: 94,
-    levelEnd: 124,
-    masterLevelStart: 94,
-    classicLevelStart: 109,
+    levelStart: 46,
+    levelEnd: 60,
     icon: '✨',
-    customTiles: [
-      { name: 'Cosmic Rune', image: './Assets/themes/golden_nebula/tile_cosmic_gold.png', symbol: '✨' },
-      { name: 'Aquamarine Tablet', image: './Assets/themes/golden_nebula/tile_cosmic_tablet.png', symbol: '💎' }
-    ]
+    customTiles: buildCustomTilesForTheme('celestial_starlight')
   },
   {
     id: 'golden_nebula',
@@ -51866,18 +52206,12 @@ const REALMS = [
     name: 'Golden Nebula',
     subtitle: 'Obsidian Mirrors & Radiant Runes',
     bgImage: './Assets/backgrounds/golden_nebula_clean.png',
-    originalBgImage: './Assets/backgrounds/golden_nebula.png',
     archetype: 'gold_mantra',
     audioPreset: 'deep_drone',
-    levelStart: 125,
-    levelEnd: 155,
-    masterLevelStart: 125,
-    classicLevelStart: 140,
+    levelStart: 61,
+    levelEnd: 75,
     icon: '🌌',
-    customTiles: [
-      { name: 'Luminous Rune', image: './Assets/themes/golden_nebula/tile_cosmic_gold.png', symbol: '💫' },
-      { name: 'Golden Tablet', image: './Assets/themes/golden_nebula/tile_cosmic_tablet.png', symbol: '🌟' }
-    ]
+    customTiles: buildCustomTilesForTheme('golden_nebula')
   },
   {
     id: 'spirit_altar',
@@ -51885,18 +52219,12 @@ const REALMS = [
     name: 'Spirit Altar',
     subtitle: 'Carrara Marble on Teak Wood',
     bgImage: './Assets/backgrounds/spirit_altar_clean.png',
-    originalBgImage: './Assets/backgrounds/spirit_altar.jpg',
     archetype: 'marble_altar',
     audioPreset: 'bronze_bell',
-    levelStart: 156,
-    levelEnd: 186,
-    masterLevelStart: 156,
-    classicLevelStart: 171,
+    levelStart: 76,
+    levelEnd: 90,
     icon: '🕯️',
-    customTiles: [
-      { name: 'Marble Lotus', image: './Assets/themes/spirit_altar/tile_marble_lotus.png', symbol: '🪷' },
-      { name: 'Marble Rosette', image: './Assets/themes/spirit_altar/tile_marble_rosette.png', symbol: '🏵️' }
-    ]
+    customTiles: buildCustomTilesForTheme('spirit_altar')
   },
   {
     id: 'sacred_sanctuary',
@@ -51904,18 +52232,12 @@ const REALMS = [
     name: 'Sacred Sanctuary',
     subtitle: 'Chiseled Gold Lotus & Incense Mist',
     bgImage: './Assets/backgrounds/sacred_sanctuary_clean.png',
-    originalBgImage: './Assets/backgrounds/sacred_sanctuary.png',
     archetype: 'brass_lotus',
     audioPreset: 'singing_bowl',
-    levelStart: 187,
-    levelEnd: 217,
-    masterLevelStart: 187,
-    classicLevelStart: 202,
+    levelStart: 91,
+    levelEnd: 105,
     icon: '🪷',
-    customTiles: [
-      { name: 'Chiseled Lotus', image: './Assets/themes/spirit_altar/tile_marble_lotus.png', symbol: '🪷' },
-      { name: 'Brass Rosette', image: './Assets/themes/spirit_altar/tile_marble_rosette.png', symbol: '🏵️' }
-    ]
+    customTiles: buildCustomTilesForTheme('sacred_sanctuary')
   },
   {
     id: 'ocean_horizon',
@@ -51923,18 +52245,12 @@ const REALMS = [
     name: 'Ocean Horizon',
     subtitle: 'Tumbled Seaglass & Luminous Pearls',
     bgImage: './Assets/backgrounds/ocean_horizon_clean.png',
-    originalBgImage: './Assets/backgrounds/ocean_horizon.png',
     archetype: 'seaglass',
     audioPreset: 'ocean_tide',
-    levelStart: 218,
-    levelEnd: 248,
-    masterLevelStart: 218,
-    classicLevelStart: 233,
+    levelStart: 106,
+    levelEnd: 120,
     icon: '🌊',
-    customTiles: [
-      { name: 'Azure Sea Glass', image: './Assets/themes/ocean_horizon/tile_seaglass_blue.png', symbol: '🫧' },
-      { name: 'Luminous Pearl', image: './Assets/themes/ocean_horizon/tile_pearl_white.png', symbol: '⚪' }
-    ]
+    customTiles: buildCustomTilesForTheme('ocean_horizon')
   },
   {
     id: 'terracotta_earth',
@@ -51942,18 +52258,12 @@ const REALMS = [
     name: 'Terracotta Earth',
     subtitle: 'Red Earth Clay & Tree of Life',
     bgImage: './Assets/backgrounds/terracotta_earth_clean.png',
-    originalBgImage: './Assets/backgrounds/terracotta_earth.png',
     archetype: 'terracotta',
     audioPreset: 'clay_pot',
-    levelStart: 249,
-    levelEnd: 279,
-    masterLevelStart: 249,
-    classicLevelStart: 264,
+    levelStart: 121,
+    levelEnd: 135,
     icon: '🏺',
-    customTiles: [
-      { name: 'Tree of Life', image: './Assets/themes/terracotta_earth/tile_roots.png', symbol: '🌳' },
-      { name: 'Terracotta Leaf', image: './Assets/themes/terracotta_earth/tile_leaf.png', symbol: '🍂' }
-    ]
+    customTiles: buildCustomTilesForTheme('terracotta_earth')
   },
   {
     id: 'floral_harmony',
@@ -51961,18 +52271,12 @@ const REALMS = [
     name: 'Floral Harmony',
     subtitle: 'Rose-Quartz Enamel Floral Cameos',
     bgImage: './Assets/backgrounds/floral_harmony_clean.png',
-    originalBgImage: './Assets/backgrounds/floral_harmony.png',
     archetype: 'enamel_cameo',
     audioPreset: 'quartz_bowl',
-    levelStart: 280,
-    levelEnd: 310,
-    masterLevelStart: 280,
-    classicLevelStart: 295,
+    levelStart: 136,
+    levelEnd: 150,
     icon: '🌸',
-    customTiles: [
-      { name: 'Lotus Cameo', image: './Assets/themes/floral_harmony/tile_cameo_lotus.png', symbol: '🪷' },
-      { name: 'Rose Cameo', image: './Assets/themes/floral_harmony/tile_cameo_rose.png', symbol: '🌹' }
-    ]
+    customTiles: buildCustomTilesForTheme('floral_harmony')
   },
   {
     id: 'blooming_mandala',
@@ -51980,18 +52284,12 @@ const REALMS = [
     name: 'Blooming Mandala',
     subtitle: 'Circular Porcelain Cameos & Gold Wire',
     bgImage: './Assets/backgrounds/blooming_mandala_clean.png',
-    originalBgImage: './Assets/backgrounds/blooming_mandala.jpg',
     archetype: 'porcelain_cameo',
     audioPreset: 'birdsong',
-    levelStart: 311,
-    levelEnd: 341,
-    masterLevelStart: 311,
-    classicLevelStart: 326,
+    levelStart: 151,
+    levelEnd: 165,
     icon: '🏵️',
-    customTiles: [
-      { name: 'Porcelain Lotus', image: './Assets/themes/floral_harmony/tile_cameo_lotus.png', symbol: '🌸' },
-      { name: 'Gold Cameo', image: './Assets/themes/floral_harmony/tile_cameo_rose.png', symbol: '🏵️' }
-    ]
+    customTiles: buildCustomTilesForTheme('blooming_mandala')
   },
   {
     id: 'sacred_spiral',
@@ -51999,18 +52297,12 @@ const REALMS = [
     name: 'Sacred Spiral',
     subtitle: 'Golden Vine Orbits & Botanical Blooms',
     bgImage: './Assets/backgrounds/sacred_spiral_clean.png',
-    originalBgImage: './Assets/backgrounds/sacred_spiral.png',
     archetype: 'spiral_vine',
     audioPreset: 'bansuri_flute',
-    levelStart: 342,
-    levelEnd: 372,
-    masterLevelStart: 342,
-    classicLevelStart: 357,
+    levelStart: 166,
+    levelEnd: 180,
     icon: '🌿',
-    customTiles: [
-      { name: 'Golden Vine', image: './Assets/themes/whispering_pines/tile_leaf.png', symbol: '🌿' },
-      { name: 'Sacred Bloom', image: './Assets/themes/floral_harmony/tile_cameo_lotus.png', symbol: '🪷' }
-    ]
+    customTiles: buildCustomTilesForTheme('sacred_spiral')
   },
   {
     id: 'master_sanctuary',
@@ -52018,43 +52310,32 @@ const REALMS = [
     name: 'Master Sanctuary',
     subtitle: 'Carved Walnut Tray & Classic Botanicals',
     bgImage: './Assets/backgrounds/master_sanctuary_clean.png',
-    originalBgImage: './Assets/backgrounds/master_sanctuary.png',
     archetype: 'ivory_wood',
     audioPreset: 'meditation_gong',
-    levelStart: 373,
-    levelEnd: 403,
-    masterLevelStart: 373,
-    classicLevelStart: 388,
+    levelStart: 181,
+    levelEnd: 195,
     icon: '👑',
-    customTiles: [
-      { name: 'Carved Walnut', image: './Assets/themes/whispering_pines/tile_bark.png', symbol: '🪵' },
-      { name: 'Marble Inlay', image: './Assets/themes/spirit_altar/tile_marble_lotus.png', symbol: '🪷' }
-    ]
+    customTiles: buildCustomTilesForTheme('master_sanctuary')
   }
 ];
 
 class ThemeManager {
   /**
-   * Retrieves the active Realm definition for any level (1 - 403+)
+   * Retrieves the active Realm definition for any level (1 - 195)
    */
   static getRealmForLevel(levelNum = 1) {
     const safeLevel = Math.max(1, levelNum);
     const realmIdx = Math.floor((safeLevel - 1) / LEVELS_PER_REALM) % REALMS.length;
     const realm = REALMS[realmIdx];
     const levelInRealm = ((safeLevel - 1) % LEVELS_PER_REALM) + 1;
-    // Levels 1-15: Master Authentic Art Levels (featuring theme-specific tiles)
-    // Levels 16-31: Classic Mastery Levels (progressive architectural formations)
-    const isMasterArtLevel = levelInRealm <= MASTER_LEVELS_PER_REALM;
-    const masterLevelIndex = isMasterArtLevel ? levelInRealm : null;
-    const classicLevelIndex = !isMasterArtLevel ? (levelInRealm - MASTER_LEVELS_PER_REALM) : null;
 
     return {
       ...realm,
       currentLevel: safeLevel,
       levelInRealm,
-      isMasterArtLevel,
-      masterLevelIndex,
-      classicLevelIndex,
+      isMasterArtLevel: true, // In Realms mode, all 15 levels feature authentic dedicated art tiles
+      masterLevelIndex: levelInRealm,
+      classicLevelIndex: null,
       isFirstInRealm: levelInRealm === 1,
       isLastInRealm: levelInRealm === LEVELS_PER_REALM
     };
@@ -52362,22 +52643,23 @@ class GameManager {
       tileCount = getTileCountForLevel(levelNum);
     }
 
-    const K = (this.gameplayMode === 'tile_club') ? 3 : 2;
+    const isRealmsMode = (this.gameplayMode === 'realms');
+    const isTileClub = (this.gameplayMode === 'tile_club');
+    const K = isTileClub ? 3 : 2;
     const distinctFloraCount = Math.max(3, Math.floor(tileCount / K));
     const levelFlora = getTilesForLevel(levelNum, distinctFloraCount);
 
     const layout = VitaBoardGenerator.createLevelLayout(levelNum, tileCount);
     this.currentFormationName = VitaBoardGenerator.getFormationName(levelNum);
-    this.tiles = VitaBoardGenerator.generateSolvableBoard(layout, levelFlora, this.gameplayMode);
+    this.tiles = VitaBoardGenerator.generateSolvableBoard(layout, levelFlora, isTileClub ? 'tile_club' : 'vita');
 
     // Realm Campaign Metadata & Archetype assignment
-    this.activeRealm = ThemeManager.getRealmForLevel(levelNum);
-    const activeArch = (this.gameplayMode === 'realms') ? this.activeRealm.archetype : null;
+    this.activeRealm = isRealmsMode ? ThemeManager.getRealmForLevel(levelNum) : null;
+    const activeArch = (isRealmsMode && this.activeRealm) ? this.activeRealm.archetype : null;
 
-    // In Master Authentic Art Levels (levels 17-31 of each realm), apply the extracted mockup tile skins
-    if (this.gameplayMode === 'realms' && this.activeRealm && this.activeRealm.isMasterArtLevel && this.activeRealm.customTiles) {
+    // In Realms mode, apply the dedicated 16-tile custom artistic skins
+    if (isRealmsMode && this.activeRealm && this.activeRealm.customTiles && this.activeRealm.customTiles.length > 0) {
       const artTiles = this.activeRealm.customTiles;
-      // Pair or triad assignments
       const distinctFlora = Array.from(new Set(this.tiles.map(t => t.floraId)));
       const floraToArtMap = {};
       distinctFlora.forEach((fId, idx) => {
@@ -52388,9 +52670,12 @@ class GameManager {
         const art = floraToArtMap[t.floraId];
         if (art) {
           t.customImage = art.image;
+          t.thematicName = art.name;
+          t.thematicSymbol = art.symbol;
           if (t.floraData) {
             t.floraData.customImage = art.image;
             t.floraData.customName = art.name;
+            t.floraData.customSymbol = art.symbol;
           }
         }
       });
@@ -52403,11 +52688,11 @@ class GameManager {
       this.boardRenderer.setTiles(this.tiles);
     }
 
-    // Apply photorealistic realm background if in realms mode
+    // Apply photorealistic clean realm background if in realms mode
     if (typeof document !== 'undefined') {
       const boardContainer = document.querySelector('.board-container');
       if (boardContainer) {
-        if (this.gameplayMode === 'realms' && this.activeRealm) {
+        if (isRealmsMode && this.activeRealm) {
           boardContainer.classList.add('theme-realm-active');
           boardContainer.style.backgroundImage = `url('${this.activeRealm.bgImage}')`;
         } else {
@@ -53209,13 +53494,16 @@ window.addEventListener('load', () => {
         // 1. Update Mode Switcher buttons
         const btnVita = document.getElementById('btn-mode-vita');
         const btnTileClub = document.getElementById('btn-mode-tileclub');
+        const btnClassic = document.getElementById('btn-mode-classic');
         const btnRealms = document.getElementById('btn-mode-realms');
-        [btnVita, btnTileClub, btnRealms].forEach(b => { if (b) b.classList.remove('active'); });
+        [btnVita, btnTileClub, btnClassic, btnRealms].forEach(b => { if (b) b.classList.remove('active'); });
 
         if (state.gameplayMode === 'vita' && btnVita) {
             btnVita.classList.add('active');
         } else if (state.gameplayMode === 'tile_club' && btnTileClub) {
             btnTileClub.classList.add('active');
+        } else if (state.gameplayMode === 'classic' && btnClassic) {
+            btnClassic.classList.add('active');
         } else if (state.gameplayMode === 'realms' && btnRealms) {
             btnRealms.classList.add('active');
         }
@@ -53230,8 +53518,10 @@ window.addEventListener('load', () => {
         if (promptEl) {
             const formBadge = state.formationName ? ` · ${state.formationName}` : '';
             if (state.gameplayMode === 'realms') {
-                const realmName = state.activeRealm ? state.activeRealm.name : 'Secular Realm';
+                const realmName = state.activeRealm ? state.activeRealm.name : 'Thematic Realm';
                 promptEl.innerHTML = `<span>🗺️ ${realmName}${formBadge}</span>`;
+            } else if (state.gameplayMode === 'classic') {
+                promptEl.innerHTML = `<span>🏛️ Classic Solitaire${formBadge}</span>`;
             } else if (state.gameplayMode === 'vita') {
                 promptEl.innerHTML = `<span>✨ Match pairs (2)${formBadge}</span>`;
             } else {
@@ -53654,8 +53944,13 @@ window.addEventListener('load', () => {
     window.switchGameplayMode = (mode) => {
         if (mode === 'realms') {
             activeGameManager.setGameplayMode('realms');
-            window.showToastMessage("🗺️ 13 Secular Realms: 208 Levels with Tactile Skins & Photorealistic Backdrops!");
+            window.showToastMessage("🗺️ 13 Thematic Realms: 195 Levels with Dedicated 3D Artistic Tiles & Environmental Backdrops!");
             window.openRealmsBrowser();
+            return;
+        }
+        if (mode === 'classic') {
+            activeGameManager.setGameplayMode('classic');
+            window.showToastMessage("🏛️ Classic Campaign: 200 progressive architectural puzzles with educational flora!");
             return;
         }
         activeGameManager.setGameplayMode(mode);
@@ -53682,15 +53977,10 @@ window.addEventListener('load', () => {
                     <div class="realm-card-icon">${r.icon}</div>
                     <div class="realm-card-chapter">Chapter ${r.chapter}</div>
                     <div class="realm-card-title">${r.name}</div>
-                    <div class="realm-card-levels" style="margin-bottom: 6px;">31 Levels Total</div>
-                    <div style="display: flex; gap: 4px; width: 100%; justify-content: center;">
-                        <button class="c-btn" onclick="window.selectRealm('${r.id}', ${r.masterLevelStart})" style="padding: 4px 6px; font-size: 10px; flex: 1.1; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 700;">
-                            ✨ Master Art (1-15)
-                        </button>
-                        <button class="c-btn" onclick="window.selectRealm('${r.id}', ${r.classicLevelStart})" style="padding: 4px 6px; font-size: 10px; flex: 0.9;">
-                            Classic (16-31)
-                        </button>
-                    </div>
+                    <div class="realm-card-levels" style="margin-bottom: 8px; font-size: 11px; color: #c5a880;">15 Thematic Levels</div>
+                    <button class="c-btn" onclick="window.selectRealm('${r.id}', ${r.levelStart})" style="padding: 6px 8px; font-size: 11px; width: 100%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 700; border-radius: 8px;">
+                        ▶ Enter Realm
+                    </button>
                 </div>
             `;
         }).join('');

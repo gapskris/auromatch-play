@@ -381,6 +381,209 @@ export class VitaBoardGenerator {
     return VitaBoardGenerator._padToTarget(coords, targetCount);
   }
 
+  // 13. Mountain Ridge (Twin Peaks)
+  static _genMountainRidge(targetCount) {
+    const coords = [];
+    // Base foothills: 8 wide x 3 deep
+    for (let r = 0; r <= 3; r++) {
+      for (let c = 0; c <= 7; c++) coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+    }
+    // Twin Peaks on left (col 1, 2) and right (col 5, 6)
+    [1, 2, 5, 6].forEach(c => {
+      coords.push({ x: c * 1.0, y: 1.0, z: 1 });
+      coords.push({ x: c * 1.0, y: 2.0, z: 1 });
+    });
+    // Peak summits
+    [1.5, 5.5].forEach(c => {
+      coords.push({ x: c * 1.0, y: 1.5, z: 2 });
+      coords.push({ x: c * 1.0, y: 1.5, z: 3 });
+    });
+    return VitaBoardGenerator._padToTarget(coords, targetCount);
+  }
+
+  // 14. Sacred Trident (Trishula)
+  static _genTrident(targetCount) {
+    const coords = [];
+    // Base plinth
+    for (let c = 1; c <= 5; c++) coords.push({ x: c * 1.0, y: 5.0, z: 0 });
+    for (let c = 2; c <= 4; c++) coords.push({ x: c * 1.0, y: 4.0, z: 0 });
+    // Center shaft
+    for (let r = 0; r <= 3; r++) coords.push({ x: 3.0, y: r * 1.0, z: 0 });
+    // Left prong
+    for (let r = 0; r <= 2; r++) coords.push({ x: 1.0, y: r * 1.0, z: 0 });
+    // Right prong
+    for (let r = 0; r <= 2; r++) coords.push({ x: 5.0, y: r * 1.0, z: 0 });
+    // Connecting bottom curve
+    coords.push({ x: 2.0, y: 3.0, z: 0 });
+    coords.push({ x: 4.0, y: 3.0, z: 0 });
+    // Upper tiers on prongs
+    [1.0, 3.0, 5.0].forEach(c => {
+      coords.push({ x: c, y: 1.0, z: 1 });
+      coords.push({ x: c, y: 0.0, z: 1 });
+      coords.push({ x: c, y: 0.0, z: 2 });
+    });
+    return VitaBoardGenerator._padToTarget(coords, targetCount);
+  }
+
+  // 15. Crescent Moon (Chandra)
+  static _genCrescentMoon(targetCount) {
+    const coords = [];
+    const cx = 3.5, cy = 3.0;
+    for (let r = 0; r <= 6; r++) {
+      for (let c = 0; c <= 6; c++) {
+        const dOuter = Math.sqrt((c - cx) ** 2 + (r - cy) ** 2);
+        const dInner = Math.sqrt((c - (cx + 1.2)) ** 2 + (r - cy) ** 2);
+        if (dOuter <= 3.2 && dInner >= 1.8) {
+          coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+        }
+      }
+    }
+    // Arc body upper layer
+    for (let r = 1; r <= 5; r++) {
+      for (let c = 1; c <= 3; c++) {
+        coords.push({ x: c * 1.0 + 0.5, y: r * 1.0, z: 1 });
+      }
+    }
+    coords.push({ x: 2.0, y: 3.0, z: 2 });
+    coords.push({ x: 2.0, y: 3.0, z: 3 });
+    return VitaBoardGenerator._padToTarget(coords, targetCount);
+  }
+
+  // 16. Arrowhead Chevron
+  static _genArrowhead(targetCount) {
+    const coords = [];
+    // Pointed top at row 0, spreading out downwards
+    for (let r = 0; r <= 5; r++) {
+      const halfW = r;
+      for (let c = 3 - halfW; c <= 3 + halfW; c++) {
+        if (c >= 0 && c <= 6) {
+          // Hollow tail notch
+          if (r >= 3 && Math.abs(c - 3) <= (r - 3)) continue;
+          coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+        }
+      }
+    }
+    // Raised chevron core
+    for (let r = 1; r <= 3; r++) {
+      coords.push({ x: 3.0, y: r * 1.0, z: 1 });
+      coords.push({ x: 3.0 - (r * 0.5), y: r * 1.0, z: 1 });
+      coords.push({ x: 3.0 + (r * 0.5), y: r * 1.0, z: 1 });
+    }
+    coords.push({ x: 3.0, y: 1.0, z: 2 });
+    coords.push({ x: 3.0, y: 1.0, z: 3 });
+    return VitaBoardGenerator._padToTarget(coords, targetCount);
+  }
+
+  // 17. Amphora Vase (Kumbha)
+  static _genAmphora(targetCount) {
+    const coords = [];
+    // Rim
+    for (let c = 2; c <= 4; c++) coords.push({ x: c * 1.0, y: 0.0, z: 0 });
+    // Neck
+    coords.push({ x: 3.0, y: 1.0, z: 0 });
+    // Belly (wide)
+    for (let r = 2; r <= 4; r++) {
+      for (let c = 1; c <= 5; c++) coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+    }
+    // Handles
+    coords.push({ x: 0.0, y: 2.0, z: 0 });
+    coords.push({ x: 6.0, y: 2.0, z: 0 });
+    coords.push({ x: 0.0, y: 3.0, z: 0 });
+    coords.push({ x: 6.0, y: 3.0, z: 0 });
+    // Base
+    for (let c = 2; c <= 4; c++) coords.push({ x: c * 1.0, y: 5.0, z: 0 });
+    // Raised belly tiers
+    for (let r = 2; r <= 4; r++) {
+      for (let c = 2; c <= 4; c++) coords.push({ x: c * 1.0, y: r * 1.0, z: 1 });
+    }
+    coords.push({ x: 3.0, y: 3.0, z: 2 });
+    coords.push({ x: 3.0, y: 3.0, z: 3 });
+    return VitaBoardGenerator._padToTarget(coords, targetCount);
+  }
+
+  // 18. Hero's Shield (Kavacha)
+  static _genHeroShield(targetCount) {
+    const coords = [];
+    // Wide top curved down to point
+    for (let c = 0; c <= 6; c++) coords.push({ x: c * 1.0, y: 0.0, z: 0 });
+    for (let r = 1; r <= 2; r++) {
+      for (let c = 0; c <= 6; c++) coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+    }
+    for (let c = 1; c <= 5; c++) coords.push({ x: c * 1.0, y: 3.0, z: 0 });
+    for (let c = 2; c <= 4; c++) coords.push({ x: c * 1.0, y: 4.0, z: 0 });
+    coords.push({ x: 3.0, y: 5.0, z: 0 });
+    // Raised shield boss
+    for (let r = 1; r <= 3; r++) {
+      for (let c = 2; c <= 4; c++) coords.push({ x: c * 1.0, y: r * 1.0, z: 1 });
+    }
+    coords.push({ x: 3.0, y: 2.0, z: 2 });
+    coords.push({ x: 3.0, y: 2.0, z: 3 });
+    return VitaBoardGenerator._padToTarget(coords, targetCount);
+  }
+
+  // 19. Double Diamond (Yugma)
+  static _genDoubleDiamond(targetCount) {
+    const coords = [];
+    const centers = [2, 5];
+    centers.forEach(cx => {
+      for (let r = 0; r <= 4; r++) {
+        for (let c = cx - 2; c <= cx + 2; c++) {
+          if (Math.abs(c - cx) + Math.abs(r - 2) <= 2) {
+            coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+          }
+        }
+      }
+      coords.push({ x: cx * 1.0, y: 2.0, z: 1 });
+      coords.push({ x: cx * 1.0, y: 2.0, z: 2 });
+    });
+    return VitaBoardGenerator._padToTarget(coords, targetCount);
+  }
+
+  // 20. Spiral Vortex (Kundalini)
+  static _genSpiralVortex(targetCount) {
+    const coords = [];
+    // S-curve spiral arm
+    for (let c = 0; c <= 4; c++) coords.push({ x: c * 1.0, y: 0.0, z: 0 });
+    for (let r = 1; r <= 2; r++) coords.push({ x: 4.0, y: r * 1.0, z: 0 });
+    for (let c = 2; c <= 4; c++) coords.push({ x: c * 1.0, y: 2.0, z: 0 });
+    for (let r = 2; r <= 4; r++) coords.push({ x: 2.0, y: r * 1.0, z: 0 });
+    for (let c = 2; c <= 6; c++) coords.push({ x: c * 1.0, y: 4.0, z: 0 });
+    for (let r = 0; r <= 4; r++) coords.push({ x: 6.0, y: r * 1.0, z: 0 });
+    // Raised spiral center
+    coords.push({ x: 3.0, y: 2.0, z: 1 });
+    coords.push({ x: 3.0, y: 2.0, z: 2 });
+    coords.push({ x: 3.0, y: 2.0, z: 3 });
+    return VitaBoardGenerator._padToTarget(coords, targetCount);
+  }
+
+  // 21. Stupa Shrine (Chaitya)
+  static _genStupaShrine(targetCount) {
+    const coords = [];
+    // Square base plinth
+    for (let r = 4; r <= 5; r++) {
+      for (let c = 0; c <= 6; c++) coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+    }
+    // Stepped terrace
+    for (let r = 2; r <= 3; r++) {
+      for (let c = 1; c <= 5; c++) coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
+    }
+    // Cylindrical dome
+    for (let c = 2; c <= 4; c++) coords.push({ x: c * 1.0, y: 1.0, z: 0 });
+    coords.push({ x: 3.0, y: 0.0, z: 0 });
+    // Dome upper tiers
+    for (let c = 2; c <= 4; c++) {
+      coords.push({ x: c * 1.0, y: 2.0, z: 1 });
+      coords.push({ x: c * 1.0, y: 3.0, z: 1 });
+    }
+    coords.push({ x: 3.0, y: 1.0, z: 1 });
+    coords.push({ x: 3.0, y: 2.0, z: 2 });
+    coords.push({ x: 3.0, y: 1.0, z: 2 });
+    coords.push({ x: 3.0, y: 0.0, z: 1 });
+    coords.push({ x: 3.0, y: 0.0, z: 2 });
+    coords.push({ x: 3.0, y: 0.0, z: 3 });
+    return VitaBoardGenerator._padToTarget(coords, targetCount);
+  }
+
   static FORMATIONS = [
     { name: 'Pyramid (Shikhara)', generator: VitaBoardGenerator._genPyramid },
     { name: 'Twin Pillars (H-Gate)', generator: VitaBoardGenerator._genHGate },
@@ -393,7 +596,16 @@ export class VitaBoardGenerator {
     { name: 'Constellation Star', generator: VitaBoardGenerator._genStar },
     { name: 'Pagoda Gateway', generator: VitaBoardGenerator._genPagoda },
     { name: 'Sunburst (Surya)', generator: VitaBoardGenerator._genSunburst },
-    { name: 'Infinity Knot (Ananta)', generator: VitaBoardGenerator._genInfinity }
+    { name: 'Infinity Knot (Ananta)', generator: VitaBoardGenerator._genInfinity },
+    { name: 'Mountain Ridge (Twin Peaks)', generator: VitaBoardGenerator._genMountainRidge },
+    { name: 'Sacred Trident (Trishula)', generator: VitaBoardGenerator._genTrident },
+    { name: 'Crescent Moon (Chandra)', generator: VitaBoardGenerator._genCrescentMoon },
+    { name: 'Arrowhead Chevron', generator: VitaBoardGenerator._genArrowhead },
+    { name: 'Amphora Vase (Kumbha)', generator: VitaBoardGenerator._genAmphora },
+    { name: 'Hero Shield (Kavacha)', generator: VitaBoardGenerator._genHeroShield },
+    { name: 'Double Diamond (Yugma)', generator: VitaBoardGenerator._genDoubleDiamond },
+    { name: 'Spiral Vortex (Kundalini)', generator: VitaBoardGenerator._genSpiralVortex },
+    { name: 'Stupa Shrine (Chaitya)', generator: VitaBoardGenerator._genStupaShrine }
   ];
 
   static getFormationName(levelNum = 1) {

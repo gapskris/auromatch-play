@@ -1,10 +1,152 @@
-// ThemeManager: Manages the 13 Secular Realms Campaign (403 Total Levels)
-// Coordinates background wallpapers, authentic graphic tile skins, CSS tile material archetypes, and audio presets.
+// ThemeManager: Manages the 13 Secular Realms Campaign (195 Total Thematic Levels)
+// Coordinates clean background wallpapers, authentic 3D graphic tile skins, and audio presets.
 
-export const TOTAL_REALM_LEVELS = 403; // 13 Themes * 31 Levels (16 Standard + 15 Master Authentic Art)
-export const LEVELS_PER_REALM = 31;
-export const STANDARD_LEVELS_PER_REALM = 16;
-export const MASTER_LEVELS_PER_REALM = 15;
+export const TOTAL_REALM_LEVELS = 195; // 13 Themes * 15 Thematic Levels
+export const LEVELS_PER_REALM = 15;
+export const TOTAL_CLASSIC_LEVELS = 200; // Dedicated Classic Solitaire Campaign
+
+// 16 distinct emblems with symbolic labels for each theme
+const THEME_TILE_DEFS = {
+  whispering_pines: [
+    { name: "Emerald Leaf", symbol: "🍃" }, { name: "Pinecone", symbol: "🌲" },
+    { name: "Acorn", symbol: "🌰" }, { name: "Oak Leaf", symbol: "🍂" },
+    { name: "Fern Frond", symbol: "🌿" }, { name: "Forest Mushroom", symbol: "🍄" },
+    { name: "Cedar Bark", symbol: "🪵" }, { name: "Maple Wing", symbol: "🍁" },
+    { name: "Clover Sprout", symbol: "☘️" }, { name: "Wild Berry", symbol: "🫐" },
+    { name: "Woodland Owl", symbol: "🦉" }, { name: "Forest Deer", symbol: "🦌" },
+    { name: "Pine Needle", symbol: "🎋" }, { name: "Sunlit Sprout", symbol: "🌱" },
+    { name: "Tree of Life", symbol: "🌳" }, { name: "Forest Blossom", symbol: "🌸" }
+  ],
+  temple_of_lines: [
+    { name: "Blueprint Arch", symbol: "⛩️" }, { name: "Slate Dome", symbol: "🏛️" },
+    { name: "Torana Gate", symbol: "🛕" }, { name: "Zen Pillar", symbol: "🏛️" },
+    { name: "Sacred Triangle", symbol: "📐" }, { name: "Compass Rose", symbol: "🧭" },
+    { name: "Keystone", symbol: "🧱" }, { name: "Spiral Column", symbol: "🌀" },
+    { name: "Stepped Terrace", symbol: "🪜" }, { name: "Temple Bell", symbol: "🔔" },
+    { name: "Golden Caliper", symbol: "📏" }, { name: "Sanctuary Obelisk", symbol: "🗿" },
+    { name: "Lattice Grid", symbol: "🕸️" }, { name: "Zen Stone", symbol: "🪨" },
+    { name: "Balance Scale", symbol: "⚖️" }, { name: "Horizon Portal", symbol: "🪟" }
+  ],
+  biblios_wisdom: [
+    { name: "Gilded Owl", symbol: "🦉" }, { name: "Sunburst Tome", symbol: "☀️" },
+    { name: "Feather Quill", symbol: "🪶" }, { name: "Open Codex", symbol: "📖" },
+    { name: "Astrolabe", symbol: "🧭" }, { name: "Vintage Hourglass", symbol: "⏳" },
+    { name: "Laurel Wreath", symbol: "🌿" }, { name: "Celestial Globe", symbol: "🌐" },
+    { name: "Inkpot Scroll", symbol: "📜" }, { name: "Library Lamp", symbol: "🏮" },
+    { name: "Sealing Wax", symbol: "🏷️" }, { name: "Scholar Key", symbol: "🗝️" },
+    { name: "Radiant Star", symbol: "🌟" }, { name: "Illuminated Folio", symbol: "📑" },
+    { name: "Wisdom Crown", symbol: "👑" }, { name: "Looking Glass", symbol: "🔍" }
+  ],
+  celestial_starlight: [
+    { name: "Cosmic Star", symbol: "✨" }, { name: "Aquamarine Tablet", symbol: "💎" },
+    { name: "Crescent Moon", symbol: "🌙" }, { name: "Solar Crest", symbol: "☀️" },
+    { name: "Polaris Compass", symbol: "🧭" }, { name: "Comet Trail", symbol: "☄️" },
+    { name: "Saturn Ring", symbol: "🪐" }, { name: "Astral Orbit", symbol: "💫" },
+    { name: "Radiant Nova", symbol: "🌟" }, { name: "Starlight Crown", symbol: "👑" },
+    { name: "Crystal Prism", symbol: "🔮" }, { name: "Eclipse Ring", symbol: "⭕" },
+    { name: "Zodiac Rune", symbol: "♈" }, { name: "Zenith Spark", symbol: "⚡" },
+    { name: "Cosmic Bell", symbol: "🔔" }, { name: "Infinity Spiral", symbol: "♾️" }
+  ],
+  golden_nebula: [
+    { name: "Luminous Rune", symbol: "💫" }, { name: "Golden Tablet", symbol: "🌟" },
+    { name: "Solar Flare", symbol: "☀️" }, { name: "Nebula Spiral", symbol: "🌀" },
+    { name: "Gold Constellation", symbol: "✨" }, { name: "Supernova", symbol: "💥" },
+    { name: "Galaxy Disc", symbol: "🌌" }, { name: "Astral Gateway", symbol: "⛩️" },
+    { name: "Golden Lotus", symbol: "🪷" }, { name: "Radiant Phoenix", symbol: "🦅" },
+    { name: "Cosmic Eye", symbol: "👁️" }, { name: "Golden Sceptre", symbol: "🪄" },
+    { name: "Eclipse Sun", symbol: "🌕" }, { name: "Astral Hourglass", symbol: "⏳" },
+    { name: "Star Chime", symbol: "🔔" }, { name: "Celestial Crown", symbol: "👑" }
+  ],
+  spirit_altar: [
+    { name: "Marble Lotus", symbol: "🪷" }, { name: "Marble Rosette", symbol: "🏵️" },
+    { name: "Concentric Mandala", symbol: "💮" }, { name: "Bodhi Leaf", symbol: "🍃" },
+    { name: "Meditation Flame", symbol: "🔥" }, { name: "Bronze Chime", symbol: "🔔" },
+    { name: "Incense Censer", symbol: "🪔" }, { name: "Offering Bowl", symbol: "🥣" },
+    { name: "Sacred Conch", symbol: "🐚" }, { name: "Endless Knot", symbol: "♾️" },
+    { name: "White Jasmine", symbol: "🌼" }, { name: "Water Lily", symbol: "🪷" },
+    { name: "Golden Vessel", symbol: "🏺" }, { name: "Spiritual Halo", symbol: "⭕" },
+    { name: "Temple Camellia", symbol: "🌺" }, { name: "Serene Pearl", symbol: "⚪" }
+  ],
+  sacred_sanctuary: [
+    { name: "Chiseled Lotus", symbol: "🪷" }, { name: "Brass Rosette", symbol: "🏵️" },
+    { name: "Sanctuary Flame", symbol: "🔥" }, { name: "Golden Bell", symbol: "🔔" },
+    { name: "Temple Pillar", symbol: "🏛️" }, { name: "Incense Mist", symbol: "💨" },
+    { name: "Amber Jewel", symbol: "💎" }, { name: "Sacred Garland", symbol: "📿" },
+    { name: "Solar Disk", symbol: "☀️" }, { name: "Peace Dove", symbol: "🕊️" },
+    { name: "Temple Gateway", symbol: "⛩️" }, { name: "Vessel of Light", symbol: "🏺" },
+    { name: "Radiant Chime", symbol: "🎐" }, { name: "Aura Halo", symbol: "⭕" },
+    { name: "Golden Leaf", symbol: "🍂" }, { name: "Eternal Lamp", symbol: "🪔" }
+  ],
+  ocean_horizon: [
+    { name: "Azure Sea Glass", symbol: "🫧" }, { name: "Luminous Pearl", symbol: "⚪" },
+    { name: "Nautilus Shell", symbol: "🐚" }, { name: "Sea Star", symbol: "⭐" },
+    { name: "Ocean Wave", symbol: "🌊" }, { name: "Coral Branch", symbol: "🪸" },
+    { name: "Driftwood Tablet", symbol: "🪵" }, { name: "Dolphin Crest", symbol: "🐬" },
+    { name: "Tide Compass", symbol: "🧭" }, { name: "Deep Lagoon", symbol: "💧" },
+    { name: "Sea Anemone", symbol: "🌸" }, { name: "Ambergris Gem", symbol: "💎" },
+    { name: "Coastal Breeze", symbol: "💨" }, { name: "Lighthouse Lamp", symbol: "🏮" },
+    { name: "Seagrass Frond", symbol: "🌿" }, { name: "Sunken Coin", symbol: "🪙" }
+  ],
+  terracotta_earth: [
+    { name: "Tree of Life", symbol: "🌳" }, { name: "Terracotta Leaf", symbol: "🍂" },
+    { name: "Clay Amphora", symbol: "🏺" }, { name: "Deep Root", symbol: "🌱" },
+    { name: "Sun-Baked Brick", symbol: "🧱" }, { name: "Potter Wheel", symbol: "⚙️" },
+    { name: "River Pebble", symbol: "🪨" }, { name: "Earthy Wheat", symbol: "🌾" },
+    { name: "Hearth Flame", symbol: "🔥" }, { name: "Clay Basin", symbol: "🥣" },
+    { name: "Ancient Fossil", symbol: "🐚" }, { name: "Desert Bloom", symbol: "🌵" },
+    { name: "Sienna Sun", symbol: "☀️" }, { name: "Clay Tablet", symbol: "📜" },
+    { name: "Terra Cameo", symbol: "🏵️" }, { name: "Harvest Basket", symbol: "🧺" }
+  ],
+  floral_harmony: [
+    { name: "Lotus Cameo", symbol: "🪷" }, { name: "Rose Cameo", symbol: "🌹" },
+    { name: "Magnolia Blossom", symbol: "🌸" }, { name: "Orchid Sprig", symbol: "🌺" },
+    { name: "Cherry Petal", symbol: "🌸" }, { name: "Jasmine Garland", symbol: "🌼" },
+    { name: "Peony Crown", symbol: "🏵️" }, { name: "Tulip Cup", symbol: "🌷" },
+    { name: "Sunflower Crest", symbol: "🌻" }, { name: "Lavender Scent", symbol: "🪻" },
+    { name: "Iris Blade", symbol: "🌿" }, { name: "Blush Cameo", symbol: "💮" },
+    { name: "Garden Butterfly", symbol: "🦋" }, { name: "Honey Blossom", symbol: "🍯" },
+    { name: "Morning Dew", symbol: "💧" }, { name: "Cameo Brooch", symbol: "💎" }
+  ],
+  blooming_mandala: [
+    { name: "Porcelain Lotus", symbol: "🌸" }, { name: "Gold Cameo", symbol: "🏵️" },
+    { name: "Concentric Ring", symbol: "⭕" }, { name: "Radial Star", symbol: "✳️" },
+    { name: "Mandala Hub", symbol: "💮" }, { name: "Filigree Petal", symbol: "🪷" },
+    { name: "Sacred Wheel", symbol: "☸️" }, { name: "Porcelain Rose", symbol: "🌹" },
+    { name: "Gold Wire Crest", symbol: "⚜️" }, { name: "Sunburst Halo", symbol: "☀️" },
+    { name: "Lace Mandala", symbol: "🕸️" }, { name: "Imperial Brocade", symbol: "👑" },
+    { name: "Celestial Rosette", symbol: "🌟" }, { name: "Ivory Cameo", symbol: "🤍" },
+    { name: "Radiant Bloom", symbol: "🌺" }, { name: "Geometric Jewel", symbol: "💎" }
+  ],
+  sacred_spiral: [
+    { name: "Golden Vine", symbol: "🌿" }, { name: "Sacred Bloom", symbol: "🪷" },
+    { name: "Fibonacci Spiral", symbol: "🌀" }, { name: "Fern Sprout", symbol: "🌱" },
+    { name: "Spiral Shell", symbol: "🐚" }, { name: "Curled Tendril", symbol: "🌾" },
+    { name: "Helix Crest", symbol: "🧬" }, { name: "Emerald Jewel", symbol: "💎" },
+    { name: "Sunlit Canopy", symbol: "🌳" }, { name: "Verdant Clover", symbol: "🍀" },
+    { name: "Botanical Orbit", symbol: "💫" }, { name: "Forest Fern", symbol: "🌿" },
+    { name: "Twisting Branch", symbol: "🪵" }, { name: "Dewdrop Frond", symbol: "💧" },
+    { name: "Spiral Galaxy", symbol: "🌌" }, { name: "Verdant Crown", symbol: "👑" }
+  ],
+  master_sanctuary: [
+    { name: "Carved Walnut", symbol: "🪵" }, { name: "Marble Inlay", symbol: "🪷" },
+    { name: "Master Crown", symbol: "👑" }, { name: "Golden Key", symbol: "🗝️" },
+    { name: "Grand Chime", symbol: "🔔" }, { name: "Imperial Crest", symbol: "⚜️" },
+    { name: "Sanctuary Sceptre", symbol: "🪄" }, { name: "Royal Astrolabe", symbol: "🧭" },
+    { name: "Grand Hourglass", symbol: "⏳" }, { name: "Polished Cameo", symbol: "🏵️" },
+    { name: "Altar Vessel", symbol: "🏺" }, { name: "Diamond Star", symbol: "💎" },
+    { name: "Golden Laurel", symbol: "🌿" }, { name: "Master Codex", symbol: "📖" },
+    { name: "Shield of Honor", symbol: "🛡️" }, { name: "Radiant Sun", symbol: "☀️" }
+  ]
+};
+
+function buildCustomTilesForTheme(themeId) {
+  const defs = THEME_TILE_DEFS[themeId] || THEME_TILE_DEFS.whispering_pines;
+  return defs.map((d, idx) => ({
+    name: d.name,
+    image: `./Assets/themes/${themeId}/tile_${String(idx + 1).padStart(2, '0')}.png`,
+    symbol: d.symbol
+  }));
+}
 
 export const REALMS = [
   {
@@ -13,18 +155,12 @@ export const REALMS = [
     name: 'Whispering Pines',
     subtitle: 'Woodland Bark & Emerald Veins',
     bgImage: './Assets/backgrounds/whispering_pines_clean.png',
-    originalBgImage: './Assets/backgrounds/whispering_pines.png',
     archetype: 'bark_leaf',
     audioPreset: 'forest',
     levelStart: 1,
-    levelEnd: 31,
-    masterLevelStart: 1,
-    classicLevelStart: 16,
+    levelEnd: 15,
     icon: '🌲',
-    customTiles: [
-      { name: 'Emerald Leaf', image: './Assets/themes/whispering_pines/tile_leaf.png', symbol: '🍃' },
-      { name: 'Woodland Bark', image: './Assets/themes/whispering_pines/tile_bark.png', symbol: '🪵' }
-    ]
+    customTiles: buildCustomTilesForTheme('whispering_pines')
   },
   {
     id: 'temple_of_lines',
@@ -32,18 +168,12 @@ export const REALMS = [
     name: 'Temple of Lines',
     subtitle: 'Layered Slate & Blueprint Geometry',
     bgImage: './Assets/backgrounds/temple_of_lines_clean.png',
-    originalBgImage: './Assets/backgrounds/temple_of_lines.png',
     archetype: 'slate_zen',
     audioPreset: 'zen_stone',
-    levelStart: 32,
-    levelEnd: 62,
-    masterLevelStart: 32,
-    classicLevelStart: 47,
+    levelStart: 16,
+    levelEnd: 30,
     icon: '🏛️',
-    customTiles: [
-      { name: 'Blueprint Arch', image: './Assets/themes/temple_of_lines/tile_slate_arch.png', symbol: '⛩️' },
-      { name: 'Slate Dome', image: './Assets/themes/temple_of_lines/tile_slate_dome.png', symbol: '🏛️' }
-    ]
+    customTiles: buildCustomTilesForTheme('temple_of_lines')
   },
   {
     id: 'biblios_wisdom',
@@ -51,18 +181,12 @@ export const REALMS = [
     name: 'Biblios Wisdom',
     subtitle: 'Leather-Bound Tomes & Gilded Edges',
     bgImage: './Assets/backgrounds/biblios_wisdom_clean.png',
-    originalBgImage: './Assets/backgrounds/biblios_wisdom.png',
     archetype: 'leather_tome',
     audioPreset: 'parchment',
-    levelStart: 63,
-    levelEnd: 93,
-    masterLevelStart: 63,
-    classicLevelStart: 78,
+    levelStart: 31,
+    levelEnd: 45,
     icon: '📚',
-    customTiles: [
-      { name: 'Gilded Owl Tome', image: './Assets/themes/biblios_wisdom/tile_book_owl.png', symbol: '🦉' },
-      { name: 'Sunburst Tome', image: './Assets/themes/biblios_wisdom/tile_book_sun.png', symbol: '☀️' }
-    ]
+    customTiles: buildCustomTilesForTheme('biblios_wisdom')
   },
   {
     id: 'celestial_starlight',
@@ -70,18 +194,12 @@ export const REALMS = [
     name: 'Celestial Starlight',
     subtitle: 'Aquamarine Crystal & 24K Gold Bevels',
     bgImage: './Assets/backgrounds/celestial_starlight_clean.png',
-    originalBgImage: './Assets/backgrounds/celestial_starlight.jpg',
     archetype: 'cosmic_glass',
     audioPreset: 'crystal_bell',
-    levelStart: 94,
-    levelEnd: 124,
-    masterLevelStart: 94,
-    classicLevelStart: 109,
+    levelStart: 46,
+    levelEnd: 60,
     icon: '✨',
-    customTiles: [
-      { name: 'Cosmic Rune', image: './Assets/themes/golden_nebula/tile_cosmic_gold.png', symbol: '✨' },
-      { name: 'Aquamarine Tablet', image: './Assets/themes/golden_nebula/tile_cosmic_tablet.png', symbol: '💎' }
-    ]
+    customTiles: buildCustomTilesForTheme('celestial_starlight')
   },
   {
     id: 'golden_nebula',
@@ -89,18 +207,12 @@ export const REALMS = [
     name: 'Golden Nebula',
     subtitle: 'Obsidian Mirrors & Radiant Runes',
     bgImage: './Assets/backgrounds/golden_nebula_clean.png',
-    originalBgImage: './Assets/backgrounds/golden_nebula.png',
     archetype: 'gold_mantra',
     audioPreset: 'deep_drone',
-    levelStart: 125,
-    levelEnd: 155,
-    masterLevelStart: 125,
-    classicLevelStart: 140,
+    levelStart: 61,
+    levelEnd: 75,
     icon: '🌌',
-    customTiles: [
-      { name: 'Luminous Rune', image: './Assets/themes/golden_nebula/tile_cosmic_gold.png', symbol: '💫' },
-      { name: 'Golden Tablet', image: './Assets/themes/golden_nebula/tile_cosmic_tablet.png', symbol: '🌟' }
-    ]
+    customTiles: buildCustomTilesForTheme('golden_nebula')
   },
   {
     id: 'spirit_altar',
@@ -108,18 +220,12 @@ export const REALMS = [
     name: 'Spirit Altar',
     subtitle: 'Carrara Marble on Teak Wood',
     bgImage: './Assets/backgrounds/spirit_altar_clean.png',
-    originalBgImage: './Assets/backgrounds/spirit_altar.jpg',
     archetype: 'marble_altar',
     audioPreset: 'bronze_bell',
-    levelStart: 156,
-    levelEnd: 186,
-    masterLevelStart: 156,
-    classicLevelStart: 171,
+    levelStart: 76,
+    levelEnd: 90,
     icon: '🕯️',
-    customTiles: [
-      { name: 'Marble Lotus', image: './Assets/themes/spirit_altar/tile_marble_lotus.png', symbol: '🪷' },
-      { name: 'Marble Rosette', image: './Assets/themes/spirit_altar/tile_marble_rosette.png', symbol: '🏵️' }
-    ]
+    customTiles: buildCustomTilesForTheme('spirit_altar')
   },
   {
     id: 'sacred_sanctuary',
@@ -127,18 +233,12 @@ export const REALMS = [
     name: 'Sacred Sanctuary',
     subtitle: 'Chiseled Gold Lotus & Incense Mist',
     bgImage: './Assets/backgrounds/sacred_sanctuary_clean.png',
-    originalBgImage: './Assets/backgrounds/sacred_sanctuary.png',
     archetype: 'brass_lotus',
     audioPreset: 'singing_bowl',
-    levelStart: 187,
-    levelEnd: 217,
-    masterLevelStart: 187,
-    classicLevelStart: 202,
+    levelStart: 91,
+    levelEnd: 105,
     icon: '🪷',
-    customTiles: [
-      { name: 'Chiseled Lotus', image: './Assets/themes/spirit_altar/tile_marble_lotus.png', symbol: '🪷' },
-      { name: 'Brass Rosette', image: './Assets/themes/spirit_altar/tile_marble_rosette.png', symbol: '🏵️' }
-    ]
+    customTiles: buildCustomTilesForTheme('sacred_sanctuary')
   },
   {
     id: 'ocean_horizon',
@@ -146,18 +246,12 @@ export const REALMS = [
     name: 'Ocean Horizon',
     subtitle: 'Tumbled Seaglass & Luminous Pearls',
     bgImage: './Assets/backgrounds/ocean_horizon_clean.png',
-    originalBgImage: './Assets/backgrounds/ocean_horizon.png',
     archetype: 'seaglass',
     audioPreset: 'ocean_tide',
-    levelStart: 218,
-    levelEnd: 248,
-    masterLevelStart: 218,
-    classicLevelStart: 233,
+    levelStart: 106,
+    levelEnd: 120,
     icon: '🌊',
-    customTiles: [
-      { name: 'Azure Sea Glass', image: './Assets/themes/ocean_horizon/tile_seaglass_blue.png', symbol: '🫧' },
-      { name: 'Luminous Pearl', image: './Assets/themes/ocean_horizon/tile_pearl_white.png', symbol: '⚪' }
-    ]
+    customTiles: buildCustomTilesForTheme('ocean_horizon')
   },
   {
     id: 'terracotta_earth',
@@ -165,18 +259,12 @@ export const REALMS = [
     name: 'Terracotta Earth',
     subtitle: 'Red Earth Clay & Tree of Life',
     bgImage: './Assets/backgrounds/terracotta_earth_clean.png',
-    originalBgImage: './Assets/backgrounds/terracotta_earth.png',
     archetype: 'terracotta',
     audioPreset: 'clay_pot',
-    levelStart: 249,
-    levelEnd: 279,
-    masterLevelStart: 249,
-    classicLevelStart: 264,
+    levelStart: 121,
+    levelEnd: 135,
     icon: '🏺',
-    customTiles: [
-      { name: 'Tree of Life', image: './Assets/themes/terracotta_earth/tile_roots.png', symbol: '🌳' },
-      { name: 'Terracotta Leaf', image: './Assets/themes/terracotta_earth/tile_leaf.png', symbol: '🍂' }
-    ]
+    customTiles: buildCustomTilesForTheme('terracotta_earth')
   },
   {
     id: 'floral_harmony',
@@ -184,18 +272,12 @@ export const REALMS = [
     name: 'Floral Harmony',
     subtitle: 'Rose-Quartz Enamel Floral Cameos',
     bgImage: './Assets/backgrounds/floral_harmony_clean.png',
-    originalBgImage: './Assets/backgrounds/floral_harmony.png',
     archetype: 'enamel_cameo',
     audioPreset: 'quartz_bowl',
-    levelStart: 280,
-    levelEnd: 310,
-    masterLevelStart: 280,
-    classicLevelStart: 295,
+    levelStart: 136,
+    levelEnd: 150,
     icon: '🌸',
-    customTiles: [
-      { name: 'Lotus Cameo', image: './Assets/themes/floral_harmony/tile_cameo_lotus.png', symbol: '🪷' },
-      { name: 'Rose Cameo', image: './Assets/themes/floral_harmony/tile_cameo_rose.png', symbol: '🌹' }
-    ]
+    customTiles: buildCustomTilesForTheme('floral_harmony')
   },
   {
     id: 'blooming_mandala',
@@ -203,18 +285,12 @@ export const REALMS = [
     name: 'Blooming Mandala',
     subtitle: 'Circular Porcelain Cameos & Gold Wire',
     bgImage: './Assets/backgrounds/blooming_mandala_clean.png',
-    originalBgImage: './Assets/backgrounds/blooming_mandala.jpg',
     archetype: 'porcelain_cameo',
     audioPreset: 'birdsong',
-    levelStart: 311,
-    levelEnd: 341,
-    masterLevelStart: 311,
-    classicLevelStart: 326,
+    levelStart: 151,
+    levelEnd: 165,
     icon: '🏵️',
-    customTiles: [
-      { name: 'Porcelain Lotus', image: './Assets/themes/floral_harmony/tile_cameo_lotus.png', symbol: '🌸' },
-      { name: 'Gold Cameo', image: './Assets/themes/floral_harmony/tile_cameo_rose.png', symbol: '🏵️' }
-    ]
+    customTiles: buildCustomTilesForTheme('blooming_mandala')
   },
   {
     id: 'sacred_spiral',
@@ -222,18 +298,12 @@ export const REALMS = [
     name: 'Sacred Spiral',
     subtitle: 'Golden Vine Orbits & Botanical Blooms',
     bgImage: './Assets/backgrounds/sacred_spiral_clean.png',
-    originalBgImage: './Assets/backgrounds/sacred_spiral.png',
     archetype: 'spiral_vine',
     audioPreset: 'bansuri_flute',
-    levelStart: 342,
-    levelEnd: 372,
-    masterLevelStart: 342,
-    classicLevelStart: 357,
+    levelStart: 166,
+    levelEnd: 180,
     icon: '🌿',
-    customTiles: [
-      { name: 'Golden Vine', image: './Assets/themes/whispering_pines/tile_leaf.png', symbol: '🌿' },
-      { name: 'Sacred Bloom', image: './Assets/themes/floral_harmony/tile_cameo_lotus.png', symbol: '🪷' }
-    ]
+    customTiles: buildCustomTilesForTheme('sacred_spiral')
   },
   {
     id: 'master_sanctuary',
@@ -241,43 +311,32 @@ export const REALMS = [
     name: 'Master Sanctuary',
     subtitle: 'Carved Walnut Tray & Classic Botanicals',
     bgImage: './Assets/backgrounds/master_sanctuary_clean.png',
-    originalBgImage: './Assets/backgrounds/master_sanctuary.png',
     archetype: 'ivory_wood',
     audioPreset: 'meditation_gong',
-    levelStart: 373,
-    levelEnd: 403,
-    masterLevelStart: 373,
-    classicLevelStart: 388,
+    levelStart: 181,
+    levelEnd: 195,
     icon: '👑',
-    customTiles: [
-      { name: 'Carved Walnut', image: './Assets/themes/whispering_pines/tile_bark.png', symbol: '🪵' },
-      { name: 'Marble Inlay', image: './Assets/themes/spirit_altar/tile_marble_lotus.png', symbol: '🪷' }
-    ]
+    customTiles: buildCustomTilesForTheme('master_sanctuary')
   }
 ];
 
 export class ThemeManager {
   /**
-   * Retrieves the active Realm definition for any level (1 - 403+)
+   * Retrieves the active Realm definition for any level (1 - 195)
    */
   static getRealmForLevel(levelNum = 1) {
     const safeLevel = Math.max(1, levelNum);
     const realmIdx = Math.floor((safeLevel - 1) / LEVELS_PER_REALM) % REALMS.length;
     const realm = REALMS[realmIdx];
     const levelInRealm = ((safeLevel - 1) % LEVELS_PER_REALM) + 1;
-    // Levels 1-15: Master Authentic Art Levels (featuring theme-specific tiles)
-    // Levels 16-31: Classic Mastery Levels (progressive architectural formations)
-    const isMasterArtLevel = levelInRealm <= MASTER_LEVELS_PER_REALM;
-    const masterLevelIndex = isMasterArtLevel ? levelInRealm : null;
-    const classicLevelIndex = !isMasterArtLevel ? (levelInRealm - MASTER_LEVELS_PER_REALM) : null;
 
     return {
       ...realm,
       currentLevel: safeLevel,
       levelInRealm,
-      isMasterArtLevel,
-      masterLevelIndex,
-      classicLevelIndex,
+      isMasterArtLevel: true, // In Realms mode, all 15 levels feature authentic dedicated art tiles
+      masterLevelIndex: levelInRealm,
+      classicLevelIndex: null,
       isFirstInRealm: levelInRealm === 1,
       isLastInRealm: levelInRealm === LEVELS_PER_REALM
     };

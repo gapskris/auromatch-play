@@ -303,22 +303,23 @@ export class GameManager {
       tileCount = getTileCountForLevel(levelNum);
     }
 
-    const K = (this.gameplayMode === 'tile_club') ? 3 : 2;
+    const isRealmsMode = (this.gameplayMode === 'realms');
+    const isTileClub = (this.gameplayMode === 'tile_club');
+    const K = isTileClub ? 3 : 2;
     const distinctFloraCount = Math.max(3, Math.floor(tileCount / K));
     const levelFlora = getTilesForLevel(levelNum, distinctFloraCount);
 
     const layout = VitaBoardGenerator.createLevelLayout(levelNum, tileCount);
     this.currentFormationName = VitaBoardGenerator.getFormationName(levelNum);
-    this.tiles = VitaBoardGenerator.generateSolvableBoard(layout, levelFlora, this.gameplayMode);
+    this.tiles = VitaBoardGenerator.generateSolvableBoard(layout, levelFlora, isTileClub ? 'tile_club' : 'vita');
 
     // Realm Campaign Metadata & Archetype assignment
-    this.activeRealm = ThemeManager.getRealmForLevel(levelNum);
-    const activeArch = (this.gameplayMode === 'realms') ? this.activeRealm.archetype : null;
+    this.activeRealm = isRealmsMode ? ThemeManager.getRealmForLevel(levelNum) : null;
+    const activeArch = (isRealmsMode && this.activeRealm) ? this.activeRealm.archetype : null;
 
-    // In Master Authentic Art Levels (levels 17-31 of each realm), apply the extracted mockup tile skins
-    if (this.gameplayMode === 'realms' && this.activeRealm && this.activeRealm.isMasterArtLevel && this.activeRealm.customTiles) {
+    // In Realms mode, apply the dedicated 16-tile custom artistic skins
+    if (isRealmsMode && this.activeRealm && this.activeRealm.customTiles && this.activeRealm.customTiles.length > 0) {
       const artTiles = this.activeRealm.customTiles;
-      // Pair or triad assignments
       const distinctFlora = Array.from(new Set(this.tiles.map(t => t.floraId)));
       const floraToArtMap = {};
       distinctFlora.forEach((fId, idx) => {
@@ -329,9 +330,12 @@ export class GameManager {
         const art = floraToArtMap[t.floraId];
         if (art) {
           t.customImage = art.image;
+          t.thematicName = art.name;
+          t.thematicSymbol = art.symbol;
           if (t.floraData) {
             t.floraData.customImage = art.image;
             t.floraData.customName = art.name;
+            t.floraData.customSymbol = art.symbol;
           }
         }
       });
@@ -344,11 +348,11 @@ export class GameManager {
       this.boardRenderer.setTiles(this.tiles);
     }
 
-    // Apply photorealistic realm background if in realms mode
+    // Apply photorealistic clean realm background if in realms mode
     if (typeof document !== 'undefined') {
       const boardContainer = document.querySelector('.board-container');
       if (boardContainer) {
-        if (this.gameplayMode === 'realms' && this.activeRealm) {
+        if (isRealmsMode && this.activeRealm) {
           boardContainer.classList.add('theme-realm-active');
           boardContainer.style.backgroundImage = `url('${this.activeRealm.bgImage}')`;
         } else {

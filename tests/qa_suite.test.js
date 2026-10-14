@@ -616,8 +616,8 @@ describe("AuroMatch Vita Mahjong & Accessibility QA Suite", () => {
   });
 
   // TC-VM-17
-  test("TC-VM-17: 12 Thematic Architectural Formations (H-Gate Level 2, Lotus, Citadel, Pagoda) & 100% Solvability", () => {
-    assert.strictEqual(VitaBoardGenerator.FORMATIONS.length, 12, "Must offer 12 distinct sacred geometric and architectural formations");
+  test("TC-VM-17: 21 Thematic Architectural Formations (H-Gate Level 2, Lotus, Citadel, Pagoda, etc.) & 100% Solvability", () => {
+    assert.strictEqual(VitaBoardGenerator.FORMATIONS.length, 21, "Must offer 21 distinct sacred geometric and architectural formations");
 
     // 1. Level 2 explicitly matches the reference image: Twin Pillars (H-Gate)
     const level2Name = VitaBoardGenerator.getFormationName(2);
@@ -630,8 +630,8 @@ describe("AuroMatch Vita Mahjong & Accessibility QA Suite", () => {
     const maxZ = Math.max(...layoutL2.map(c => c.z));
     assert.ok(maxZ >= 3, "H-Gate formation must feature deep vertical stacking (at least z=3 / 4 layers deep)");
 
-    // 2. Test all 12 formations for 100% mathematical solvability
-    for (let lvl = 1; lvl <= 12; lvl++) {
+    // 2. Test all 21 formations for 100% mathematical solvability
+    for (let lvl = 1; lvl <= 21; lvl++) {
       const formName = VitaBoardGenerator.getFormationName(lvl);
       const count = (lvl === 1) ? 24 : 36;
       const layout = VitaBoardGenerator.createLevelLayout(lvl, count);
@@ -654,10 +654,10 @@ describe("AuroMatch Vita Mahjong & Accessibility QA Suite", () => {
   });
 
   // TC-VM-18
-  test("TC-VM-18: 13 Secular Realms Campaign (403 Levels: 16 Classic + 15 Master Art), Authentic Tile Skins & Zero Religious Monikers", () => {
+  test("TC-VM-18: 13 Secular Realms (195 Levels: 15 per realm with 16 3D Tile Skins) & Classic Mode (200 Levels)", () => {
     // 1. Verify 13 Realms catalog completeness
     assert.strictEqual(REALMS.length, 13, "Must feature exactly 13 secular realms");
-    assert.strictEqual(TOTAL_REALM_LEVELS, 403, "Total campaign levels must be exactly 403 levels (31 levels * 13 realms)");
+    assert.strictEqual(TOTAL_REALM_LEVELS, 195, "Total campaign levels must be exactly 195 levels (15 levels * 13 realms)");
 
     // 2. Strict secularization assertion: ZERO mentions of 'Ashram', 'Auroville', 'Samadhi', 'The Mother', 'Sri Aurobindo'
     const forbiddenKeywords = ['ashram', 'auroville', 'samadhi', 'mother', 'aurobindo'];
@@ -670,47 +670,53 @@ describe("AuroMatch Vita Mahjong & Accessibility QA Suite", () => {
       });
     });
 
-    // 3. Verify all 13 background images exist on disk
+    // 3. Verify all 13 clean background images exist on disk
     REALMS.forEach(r => {
       const imgPath = path.join(process.cwd(), r.bgImage.replace('./', ''));
       assert.ok(fs.existsSync(imgPath), `Background image for realm '${r.id}' must exist at ${imgPath}`);
     });
 
-    // 4. Test level-to-realm mapping across all 403 levels
+    // 4. Verify all 16 dedicated 3D artistic tiles exist on disk for all 13 realms (208 tiles)
+    REALMS.forEach(r => {
+      assert.strictEqual(r.customTiles.length, 16, `Realm '${r.id}' must provide exactly 16 dedicated artistic tiles`);
+      r.customTiles.forEach(t => {
+        const tilePath = path.join(process.cwd(), t.image.replace('./', ''));
+        assert.ok(fs.existsSync(tilePath), `Artistic tile '${t.name}' must exist at ${tilePath}`);
+      });
+    });
+
+    // 5. Test level-to-realm mapping across all 195 levels
     for (let lvl = 1; lvl <= TOTAL_REALM_LEVELS; lvl++) {
       const realmInfo = ThemeManager.getRealmForLevel(lvl);
       assert.ok(realmInfo, `Level ${lvl} must map to a valid realm`);
       assert.ok(realmInfo.chapter >= 1 && realmInfo.chapter <= 13, `Level ${lvl} must have valid chapter (1-13)`);
-      assert.ok(realmInfo.levelInRealm >= 1 && realmInfo.levelInRealm <= 31, `Level ${lvl} must have levelInRealm (1-31)`);
+      assert.ok(realmInfo.levelInRealm >= 1 && realmInfo.levelInRealm <= 15, `Level ${lvl} must have levelInRealm (1-15)`);
+      assert.strictEqual(realmInfo.isMasterArtLevel, true, `Level ${lvl} must feature authentic 3D tile art`);
       assert.ok(realmInfo.archetype, `Level ${lvl} must define a tactile tile archetype`);
-
-      if (realmInfo.levelInRealm <= 15) {
-        assert.strictEqual(realmInfo.isMasterArtLevel, true, `Level ${lvl} (levelInRealm ${realmInfo.levelInRealm}) must be flagged as isMasterArtLevel`);
-        assert.ok(realmInfo.masterLevelIndex >= 1 && realmInfo.masterLevelIndex <= 15, `Level ${lvl} must have masterLevelIndex (1-15)`);
-      } else {
-        assert.strictEqual(realmInfo.isMasterArtLevel, false);
-      }
     }
 
-    // 5. Test GameManager realms mode & Master Authentic Art tile injection
+    // 6. Test GameManager realms mode & 3D dedicated tile skin injection
     const gm = new GameManager();
     gm.setGameplayMode('realms');
     assert.strictEqual(gm.gameplayMode, 'realms');
 
-    // Test Level 1 (Whispering Pines - Master Art Level 1 with Leaf & Bark tiles)
+    // Test Level 1 (Whispering Pines - 16 dedicated 3D tiles)
     gm.loadLevel(1);
     assert.strictEqual(gm.activeRealm.id, 'whispering_pines');
     assert.strictEqual(gm.activeRealm.isMasterArtLevel, true);
-    assert.strictEqual(gm.activeRealm.masterLevelIndex, 1);
+    assert.strictEqual(gm.activeRealm.levelInRealm, 1);
 
-    // Verify tiles have authentic customImage skins applied
-    const tilesWithArt = gm.tiles.filter(t => t.customImage && (t.customImage.includes('tile_leaf') || t.customImage.includes('tile_bark')));
-    assert.strictEqual(tilesWithArt.length, gm.tiles.length, "All tiles in Master Art level must receive authentic mockup tile skins");
+    // Verify all tiles receive high-definition custom skins
+    const tilesWithArt = gm.tiles.filter(t => t.customImage && t.customImage.includes('Assets/themes/whispering_pines'));
+    assert.strictEqual(tilesWithArt.length, gm.tiles.length, "All tiles in realm level must receive dedicated artistic skins");
 
-    // Test Level 16 (Whispering Pines - Classic Mastery Level 1)
-    gm.loadLevel(16);
-    assert.strictEqual(gm.activeRealm.id, 'whispering_pines');
-    assert.strictEqual(gm.activeRealm.isMasterArtLevel, false);
+    // 7. Test GameManager Classic mode (Pure Mahjong Solitaire Campaign)
+    gm.setGameplayMode('classic');
+    assert.strictEqual(gm.gameplayMode, 'classic');
+    gm.loadLevel(2);
+    assert.strictEqual(gm.tiles.length, 36);
+    assert.strictEqual(gm.currentFormationName, 'Twin Pillars (H-Gate)');
+    assert.strictEqual(gm.activeRealm, null, "Classic mode must not activate thematic realm wallpaper");
 
     // Initial score check
     assert.strictEqual(typeof gm.player.score, 'number');

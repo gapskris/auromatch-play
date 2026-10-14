@@ -36,13 +36,16 @@ window.addEventListener('load', () => {
         // 1. Update Mode Switcher buttons
         const btnVita = document.getElementById('btn-mode-vita');
         const btnTileClub = document.getElementById('btn-mode-tileclub');
+        const btnClassic = document.getElementById('btn-mode-classic');
         const btnRealms = document.getElementById('btn-mode-realms');
-        [btnVita, btnTileClub, btnRealms].forEach(b => { if (b) b.classList.remove('active'); });
+        [btnVita, btnTileClub, btnClassic, btnRealms].forEach(b => { if (b) b.classList.remove('active'); });
 
         if (state.gameplayMode === 'vita' && btnVita) {
             btnVita.classList.add('active');
         } else if (state.gameplayMode === 'tile_club' && btnTileClub) {
             btnTileClub.classList.add('active');
+        } else if (state.gameplayMode === 'classic' && btnClassic) {
+            btnClassic.classList.add('active');
         } else if (state.gameplayMode === 'realms' && btnRealms) {
             btnRealms.classList.add('active');
         }
@@ -57,8 +60,10 @@ window.addEventListener('load', () => {
         if (promptEl) {
             const formBadge = state.formationName ? ` · ${state.formationName}` : '';
             if (state.gameplayMode === 'realms') {
-                const realmName = state.activeRealm ? state.activeRealm.name : 'Secular Realm';
+                const realmName = state.activeRealm ? state.activeRealm.name : 'Thematic Realm';
                 promptEl.innerHTML = `<span>🗺️ ${realmName}${formBadge}</span>`;
+            } else if (state.gameplayMode === 'classic') {
+                promptEl.innerHTML = `<span>🏛️ Classic Solitaire${formBadge}</span>`;
             } else if (state.gameplayMode === 'vita') {
                 promptEl.innerHTML = `<span>✨ Match pairs (2)${formBadge}</span>`;
             } else {
@@ -481,8 +486,13 @@ window.addEventListener('load', () => {
     window.switchGameplayMode = (mode) => {
         if (mode === 'realms') {
             activeGameManager.setGameplayMode('realms');
-            window.showToastMessage("🗺️ 13 Secular Realms: 208 Levels with Tactile Skins & Photorealistic Backdrops!");
+            window.showToastMessage("🗺️ 13 Thematic Realms: 195 Levels with Dedicated 3D Artistic Tiles & Environmental Backdrops!");
             window.openRealmsBrowser();
+            return;
+        }
+        if (mode === 'classic') {
+            activeGameManager.setGameplayMode('classic');
+            window.showToastMessage("🏛️ Classic Campaign: 200 progressive architectural puzzles with educational flora!");
             return;
         }
         activeGameManager.setGameplayMode(mode);
@@ -509,15 +519,10 @@ window.addEventListener('load', () => {
                     <div class="realm-card-icon">${r.icon}</div>
                     <div class="realm-card-chapter">Chapter ${r.chapter}</div>
                     <div class="realm-card-title">${r.name}</div>
-                    <div class="realm-card-levels" style="margin-bottom: 6px;">31 Levels Total</div>
-                    <div style="display: flex; gap: 4px; width: 100%; justify-content: center;">
-                        <button class="c-btn" onclick="window.selectRealm('${r.id}', ${r.masterLevelStart})" style="padding: 4px 6px; font-size: 10px; flex: 1.1; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 700;">
-                            ✨ Master Art (1-15)
-                        </button>
-                        <button class="c-btn" onclick="window.selectRealm('${r.id}', ${r.classicLevelStart})" style="padding: 4px 6px; font-size: 10px; flex: 0.9;">
-                            Classic (16-31)
-                        </button>
-                    </div>
+                    <div class="realm-card-levels" style="margin-bottom: 8px; font-size: 11px; color: #c5a880;">15 Thematic Levels</div>
+                    <button class="c-btn" onclick="window.selectRealm('${r.id}', ${r.levelStart})" style="padding: 6px 8px; font-size: 11px; width: 100%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 700; border-radius: 8px;">
+                        ▶ Enter Realm
+                    </button>
                 </div>
             `;
         }).join('');

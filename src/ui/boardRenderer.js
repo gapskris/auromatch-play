@@ -161,12 +161,9 @@ export class BoardRenderer {
       if (customImg) {
         el.classList.add('tile-authentic-art');
         el.innerHTML = `
-          <div class="tile-face tile-art-face" style="background-image: url('${customImg}'); background-size: cover; background-position: center;">
+          <div class="tile-face tile-art-face" style="background-image: url('${customImg}');">
             <div class="tile-art-glow"></div>
             ${bonusBadge}
-            <div class="tile-label-banner tile-art-label-banner">
-              <div class="tile-label" style="font-size: ${Math.max(7.5, dynFontSize * 0.9)}px; color: #ffffff; text-shadow: 0 1px 3px rgba(0,0,0,0.9); font-weight: 700;">${flora.commonName}</div>
-            </div>
           </div>
         `;
       } else {
