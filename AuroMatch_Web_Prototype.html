@@ -2708,12 +2708,13 @@ body {
                         <div style="font-size: 10px; opacity: 0.8; margin-top: 4px; line-height: 1.3;">Circadian raga tuned to current time of day</div>
                     </div>
 
-                    <!-- Audio Tuning Control (432Hz Pythagorean vs 440Hz Concert) -->
+                    <!-- Audio Tuning Control (432Hz Pythagorean vs 440Hz Concert vs Disable) -->
                     <div id="audio-tuning-ctrl" style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-current); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 8px;">
                         <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #c5a880; font-weight: 700;">Acoustic Tuning</div>
-                        <div style="display: flex; gap: 8px;">
-                            <button class="mode-btn active" id="btn-tune-432" onclick="window.setTuningBase(432)" style="flex: 1; font-size: 11px;">432 Hz Natural</button>
-                            <button class="mode-btn" id="btn-tune-440" onclick="window.setTuningBase(440)" style="flex: 1; font-size: 11px;">440 Hz Concert</button>
+                        <div style="display: flex; gap: 6px;">
+                            <button class="mode-btn active" id="btn-tune-432" onclick="window.setTuningBase(432)" style="flex: 1; font-size: 11px; padding: 6px 4px; text-align: center;">432 Hz Natural</button>
+                            <button class="mode-btn" id="btn-tune-440" onclick="window.setTuningBase(440)" style="flex: 1; font-size: 11px; padding: 6px 4px; text-align: center;">440 Hz Concert</button>
+                            <button class="mode-btn" id="btn-tune-off" onclick="window.setTuningBase('off')" style="flex: 0.9; font-size: 11px; padding: 6px 4px; text-align: center;" title="Disable acoustic tuning ambient drone">Disable</button>
                         </div>
                     </div>
 
@@ -49740,15 +49741,20 @@ function getActiveRagaScale() {
     }
 }
 
-function startDroneSynthesizer() {
-    const ctx = getAudioContext();
-    if (!ctx || !ragaDrone.gainNode) return;
-    
-    // Stop prior drones
+function stopDroneSynthesizer() {
     ragaDrone.oscillators.forEach(osc => {
         try { osc.stop(); osc.disconnect(); } catch(e){}
     });
     ragaDrone.oscillators = [];
+}
+
+function startDroneSynthesizer() {
+    stopDroneSynthesizer();
+    if (ragaDrone.disabled || ragaDrone.tuningBase === 0 || ragaDrone.tuningBase === 'off') {
+        return;
+    }
+    const ctx = getAudioContext();
+    if (!ctx || !ragaDrone.gainNode) return;
     
     const raga = getActiveRagaScale();
     const frequencies = [raga.base, raga.base * 1.5, raga.base * 2.0];
@@ -50014,6 +50020,13 @@ function addInstrumentDynamicLayer(instrument) {
 }
 
 function setTuningScale(tuningBase) {
+    if (tuningBase === 0 || tuningBase === 'off' || tuningBase === 'disable' || tuningBase === false) {
+        ragaDrone.disabled = true;
+        ragaDrone.tuningBase = 0;
+        stopDroneSynthesizer();
+        return;
+    }
+    ragaDrone.disabled = false;
     ragaDrone.tuningBase = (tuningBase === 440) ? 440 : 432;
     startDroneSynthesizer();
 }
@@ -53661,15 +53674,10 @@ window.addEventListener('load', () => {
         activeGameManager.setTuning(baseFreq);
         const b432 = document.getElementById('btn-tune-432');
         const b440 = document.getElementById('btn-tune-440');
-        if (b432 && b440) {
-            if (baseFreq === 432) {
-                b432.classList.add('active');
-                b440.classList.remove('active');
-            } else {
-                b440.classList.add('active');
-                b432.classList.remove('active');
-            }
-        }
+        const bOff = document.getElementById('btn-tune-off');
+        if (b432) b432.classList.toggle('active', baseFreq === 432);
+        if (b440) b440.classList.toggle('active', baseFreq === 440);
+        if (bOff) bOff.classList.toggle('active', baseFreq === 'off' || baseFreq === 0 || baseFreq === 'disable');
     };
     
     window.handleBeginJourneyClick = () => {
