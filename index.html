@@ -1280,6 +1280,34 @@ body {
     color: #0c4a6e !important;
 }
 
+/* Mixed Deck Archetype A: Burnished Walnut Wood Plaque */
+.archetype-walnut_wood {
+    background: linear-gradient(145deg, #fdf6ec 0%, #ecd9be 55%, #dfc49e 100%) !important;
+    border-color: #5c3317 !important;
+    box-shadow: 
+        inset 0 2px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -2px 0 rgba(92, 51, 23, 0.35),
+        0 4px 6px rgba(0, 0, 0, 0.3),
+        0 8px 0 #78350f,
+        0 12px 22px rgba(92, 51, 23, 0.45) !important;
+}
+.archetype-walnut_wood .tile-label { color: #3b1d08 !important; font-weight: 800; }
+.archetype-walnut_wood .tile-label-banner { background: rgba(92, 51, 23, 0.08) !important; }
+
+/* Mixed Deck Archetype B: Translucent Celadon Jade Tablet */
+.archetype-celadon_jade {
+    background: linear-gradient(145deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%) !important;
+    border-color: #166534 !important;
+    box-shadow: 
+        inset 0 2px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -2px 0 rgba(22, 101, 52, 0.3),
+        0 4px 6px rgba(0, 0, 0, 0.25),
+        0 8px 0 #15803d,
+        0 12px 22px rgba(22, 101, 52, 0.4) !important;
+}
+.archetype-celadon_jade .tile-label { color: #14532d !important; font-weight: 800; }
+.archetype-celadon_jade .tile-label-banner { background: rgba(22, 101, 52, 0.08) !important; }
+
 /* ==========================================================================
    13 Secular Realms Campaign - Tactile Tile Archetypes
    ========================================================================== */
@@ -1593,6 +1621,15 @@ body {
         0 22px 32px rgba(0, 0, 0, 0.5) !important;
 }
 
+/* Deep 3D Isometric Stack Shading (Layers 1-7) */
+.tile-element[data-z="1"] { box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 4px 6px rgba(0,0,0,0.25), 0 8px 0 #bfa075, 0 10px 16px rgba(0,0,0,0.3); }
+.tile-element[data-z="2"] { box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 5px 8px rgba(0,0,0,0.28), 0 11px 0 #b09167, 0 13px 20px rgba(0,0,0,0.34); }
+.tile-element[data-z="3"] { box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 6px 10px rgba(0,0,0,0.32), 0 14px 0 #9f8158, 0 16px 24px rgba(0,0,0,0.38); }
+.tile-element[data-z="4"] { box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 7px 12px rgba(0,0,0,0.36), 0 17px 0 #8f7249, 0 19px 28px rgba(0,0,0,0.42); }
+.tile-element[data-z="5"] { box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 8px 14px rgba(0,0,0,0.40), 0 20px 0 #7f633b, 0 22px 32px rgba(0,0,0,0.46); }
+.tile-element[data-z="6"] { box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 9px 16px rgba(0,0,0,0.45), 0 23px 0 #6e542c, 0 25px 36px rgba(0,0,0,0.50); }
+.tile-element[data-z="7"] { box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 10px 18px rgba(0,0,0,0.50), 0 26px 0 #5d451e, 0 28px 40px rgba(0,0,0,0.55); }
+
 /* High-Contrast Keyboard Accessibility Focus Ring */
 .tile-keyboard-focus {
     outline: 3px solid #38bdf8 !important;
@@ -1801,6 +1838,26 @@ body {
 .senior-view {
     --text-current: #ffffff !important;
     --border-current: rgba(255, 255, 255, 0.3) !important;
+}
+
+/* Focus IQ Badge in HUD (Brain Training Gamification) */
+.hud-iq-badge {
+    font-size: 11px;
+    font-weight: 800;
+    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    padding: 2px 8px;
+    border-radius: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    letter-spacing: 0.3px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.hud-iq-badge:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
 }
 
 /* Dual Mode Bar in HUD */
@@ -2626,6 +2683,7 @@ body {
                 <button class="hdr-btn" onclick="backToWelcome()">←</button>
                 <div class="hud-progression-bar">
                     <span class="hud-player-badge" id="header-player-badge" title="Player Name">👤 <span id="header-player-name">Seeker</span></span>
+                    <span class="hud-iq-badge" id="header-iq-badge" title="Focus IQ: Cognitive concentration and sharpness index">🧠 IQ: <span id="header-iq-count">80</span></span>
                     <span class="hud-rank-badge" id="header-rank-badge" data-full-title="🌱 Aspirant">🌱 Aspirant</span>
                     <span class="hud-level-indicator" id="header-level-indicator" title="Click to Jump to Level" style="cursor: pointer;" onclick="window.openLevelJumpModal()">Level 1 / 200</span>
                     <span class="hud-sparks-count" id="header-sparks-count">✨ 100</span>
@@ -50163,16 +50221,16 @@ class VitaBoardGenerator {
   static isTileFree(tile, activeTiles) {
     if (tile.isMatched) return false;
 
-    // 1. Upper layer occlusion check (z + 1)
+    // 1. Upper layer occlusion check (any tile at z > tile.z)
     for (const other of activeTiles) {
       if (other.id === tile.id || other.isMatched) continue;
 
-      if (other.z === tile.z + 1) {
+      if (other.z > tile.z) {
         const dx = Math.abs(other.x - tile.x);
         const dy = Math.abs(other.y - tile.y);
-        // Overlap bounding box [x - 0.9, x + 0.9] x [y - 0.9, y + 0.9]
-        if (dx < 0.9 && dy < 0.9) {
-          return false; // Covered from above
+        // Overlap bounding box [x - 0.88, x + 0.88] x [y - 0.88, y + 0.88]
+        if (dx < 0.88 && dy < 0.88) {
+          return false; // Covered from above by a higher tier tile
         }
       }
     }
@@ -50206,7 +50264,7 @@ class VitaBoardGenerator {
     return active.filter(t => this.isTileFree(t, active));
   }
 
-  // Multi-Tier Stacking Engine: Preserves 3 to 5 layers with true underneath occlusions and stable foundations
+  // Multi-Tier Stacking Engine: Preserves 3 to 7 layers with true underneath occlusions and stable foundations
   static _padToTarget(coords, targetCount) {
     if (coords.length === targetCount) return coords;
 
@@ -50215,7 +50273,8 @@ class VitaBoardGenerator {
       const result = [...coords];
       const set = new Set(result.map(c => `${c.x}_${c.y}_${c.z}`));
       let zTier = 1;
-      while (result.length < targetCount && zTier <= 5) {
+      const maxTier = targetCount >= 72 ? 7 : (targetCount >= 48 ? 5 : 3);
+      while (result.length < targetCount && zTier <= maxTier) {
         const currentLen = result.length;
         for (let i = 0; i < currentLen && result.length < targetCount; i++) {
           const base = result[i];
@@ -51513,16 +51572,16 @@ class BoardRenderer {
       const isFree = VitaBoardGenerator.isTileFree(tile, activeTiles);
       const isSelected = !!tile.isSelected;
 
-      // Isometric depth offset: dx = -2px, dy = -3px per layer
-      const isoDx = -(tile.z * 2);
-      const isoDy = -(tile.z * 3);
+      // Isometric depth offset: dx = -2.5px, dy = -3.5px per layer for rich 3D stacking
+      const isoDx = -(tile.z * 2.5);
+      const isoDy = -(tile.z * 3.5);
 
       const posX = offsetX + (tile.x - minX) * colSpacing + isoDx;
       const posY = offsetY + (tile.y - minY) * rowSpacing + isoDy;
 
       // Flora details & Archetype
       const flora = tile.floraData || getFloraById(tile.floraId);
-      const arch = this.options.activeArchetype || flora.archetype || 'ivory';
+      const arch = this.options.activeArchetype || tile.archetype || flora.archetype || 'ivory';
       const ribbonColor = domainRibbons[flora.domain] || '#c5a880';
 
       const el = document.createElement('div');
@@ -51532,6 +51591,7 @@ class BoardRenderer {
       el.id = tile.id;
       el.dataset.id = tile.id;
       el.dataset.archetype = arch;
+      el.dataset.z = `${tile.z}`;
       el.style.width = `${width}px`;
       el.style.height = `${height}px`;
       el.style.left = `${posX}px`;
@@ -52670,6 +52730,7 @@ class GameManager {
             currentLevel: Math.max(1, Math.min(TOTAL_LEVELS, parsed.currentLevel || 1)),
             sparks: typeof parsed.sparks === 'number' ? parsed.sparks : 100,
             score: typeof parsed.score === 'number' ? parsed.score : 0,
+            focusIQ: typeof parsed.focusIQ === 'number' ? parsed.focusIQ : (80 + Math.min(120, ((parsed.currentLevel || 1) - 1) * 2)),
             isNewUser: parsed.currentLevel === 1 && !parsed.hasProgress
           };
           if (state.name) {
@@ -52679,7 +52740,8 @@ class GameManager {
                 name: state.name,
                 currentLevel: state.currentLevel,
                 sparks: state.sparks,
-                score: state.score
+                score: state.score,
+                focusIQ: state.focusIQ
               };
               this.saveProfilesMap(profiles);
             }
@@ -52690,7 +52752,7 @@ class GameManager {
     } catch (e) {
       console.warn('Failed to load player state:', e);
     }
-    return { name: '', currentLevel: 1, sparks: 100, score: 0, isNewUser: true };
+    return { name: '', currentLevel: 1, sparks: 100, score: 0, focusIQ: 80, isNewUser: true };
   }
 
   savePlayerState() {
@@ -52701,6 +52763,7 @@ class GameManager {
           currentLevel: this.player.currentLevel,
           sparks: this.player.sparks,
           score: this.player.score || 0,
+          focusIQ: this.player.focusIQ || 80,
           hasProgress: this.player.currentLevel > 1 || this.player.sparks !== 100 || (this.player.score || 0) > 0
         }));
 
@@ -52711,7 +52774,8 @@ class GameManager {
             avatar: this.player.avatar || '🦉',
             currentLevel: this.player.currentLevel,
             sparks: this.player.sparks,
-            score: this.player.score || 0
+            score: this.player.score || 0,
+            focusIQ: this.player.focusIQ || 80
           };
           this.saveProfilesMap(profiles);
         }
@@ -52903,6 +52967,25 @@ class GameManager {
             };
           }
         }
+      });
+    } else {
+      // In standard modes (Pairs, Tile Club, Classic): Apply the multi-material mixed deck!
+      // ~75% Classic Cream Ivory Tablet, ~15% Burnished Walnut Wood, ~10% Celadon Jade Tablet
+      const distinctFlora = Array.from(new Set(this.tiles.map(t => t.floraId)));
+      const floraToMaterialMap = {};
+      distinctFlora.forEach((fId, idx) => {
+        const ratio = (idx + 1) / distinctFlora.length;
+        if (ratio > 0.88) {
+          floraToMaterialMap[fId] = 'celadon_jade'; // Translucent Celadon Jade
+        } else if (ratio > 0.72) {
+          floraToMaterialMap[fId] = 'walnut_wood';  // Burnished Walnut Wood
+        } else {
+          floraToMaterialMap[fId] = 'ivory';         // Classic Ivory Tablet
+        }
+      });
+
+      this.tiles.forEach(t => {
+        t.archetype = floraToMaterialMap[t.floraId] || 'ivory';
       });
     }
 
@@ -53381,6 +53464,10 @@ class GameManager {
       if (cleanSolve) earnedScore += 500;
       this.player.score = (this.player.score || 0) + earnedScore;
 
+      // Cognitive Focus IQ advancement (+2 base, +3 on clean solve)
+      const iqBonus = cleanSolve ? 3 : 2;
+      this.player.focusIQ = (this.player.focusIQ || 80) + iqBonus;
+
       this.player.sparks += earnedSparks;
       this.savePlayerState();
 
@@ -53395,6 +53482,7 @@ class GameManager {
           rankPromoted,
           oldRank,
           newRank,
+          focusIQ: this.player.focusIQ,
           totalSparks: this.player.sparks
         });
       }
@@ -53422,6 +53510,7 @@ class GameManager {
         formationName: this.currentFormationName || VitaBoardGenerator.getFormationName(this.player.currentLevel),
         sparks: this.player.sparks,
         score: this.player.score || 0,
+        focusIQ: this.player.focusIQ || 80,
         activeRealm: (this.gameplayMode === 'realms') ? (this.activeRealm || ThemeManager.getRealmForLevel(this.player.currentLevel)) : null,
         rank: this.getRank(),
         isNewUser: !!this.player.isNewUser,
@@ -53884,6 +53973,11 @@ window.addEventListener('load', () => {
         const scoreCount = document.getElementById('header-score-count');
         if (scoreCount) {
             scoreCount.innerText = `${(state.score || 0).toLocaleString()}`;
+        }
+
+        const iqCount = document.getElementById('header-iq-count');
+        if (iqCount && typeof state.focusIQ === 'number') {
+            iqCount.innerText = `${state.focusIQ}`;
         }
 
         // Action bar Hint badge affordance (dims when < 20 sparks)
