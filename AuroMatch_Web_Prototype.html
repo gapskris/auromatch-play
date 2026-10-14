@@ -1502,13 +1502,22 @@ body {
     transition: transform 0.15s ease, filter 0.15s ease;
 }
 
+.tile-element.tile-authentic-art.tile-blocked .tile-art-img {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4)) brightness(0.64) saturate(0.72) contrast(0.95);
+}
+
+.tile-element.tile-authentic-art.tile-free:hover .tile-art-img {
+    filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.55)) brightness(1.10);
+    transform: translateY(-2px);
+}
+
 .tile-element.tile-authentic-art.tile-selected .tile-art-img {
-    filter: drop-shadow(0 0 12px #fbbf24) brightness(1.22);
-    transform: translateY(-5px) scale(1.05);
+    filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.95)) brightness(1.25);
+    transform: translateY(-6px) scale(1.06);
 }
 
 .tile-element.tile-authentic-art.tile-hint-aura .tile-art-img {
-    filter: drop-shadow(0 0 14px #38bdf8) brightness(1.25);
+    filter: drop-shadow(0 0 16px #38bdf8) brightness(1.25);
     animation: tilePulseHint 1.2s infinite ease-in-out;
 }
 
@@ -2048,8 +2057,8 @@ body {
 
     .board-container {
         width: 100%;
-        max-width: 820px;
-        height: 570px;
+        max-width: 880px;
+        height: 600px;
         position: relative;
     }
 }
@@ -51266,11 +51275,16 @@ class BoardRenderer {
     if (!this.container) return;
     this.container.innerHTML = '';
 
+    const isRealmsMode = (this.options.gameplayMode === 'realms');
+
     const containerW = (this.container && this.container.clientWidth > 100)
       ? this.container.clientWidth
       : (typeof window !== 'undefined' && window.innerWidth < 768 ? window.innerWidth - 24 : null);
 
-    const { width, height, fontSize, iconSize } = this.getTileDimensions(containerW);
+    const containerH = (this.container && this.container.clientHeight > 100)
+      ? this.container.clientHeight
+      : (typeof window !== 'undefined' && window.innerHeight ? Math.floor(window.innerHeight * 0.65) : 560);
+
     const activeTiles = this.tiles.filter(t => !t.isMatched);
 
     // Compute bounding coordinate bounds for dynamic centering
@@ -51286,18 +51300,72 @@ class BoardRenderer {
       minX = 0; maxX = 5; minY = 0; maxY = 3;
     }
 
-    const colSpacing = width * 0.85;
-    const rowSpacing = height * 0.85;
-    const boardTotalW = (maxX - minX + 1) * colSpacing;
-    const boardTotalH = (maxY - minY + 1) * rowSpacing;
+    const colSpan = Math.max(1, maxX - minX + 1);
+    const rowSpan = Math.max(1, maxY - minY + 1);
 
-    let offsetX = 20;
-    if (this.container && this.container.clientWidth > boardTotalW) {
-      offsetX = Math.max(10, Math.floor((this.container.clientWidth - boardTotalW) / 2));
+    let width = 68;
+    let height = 88;
+    let fontSize = 13;
+    let iconSize = 22;
+
+    if (containerW && containerW > 100) {
+      const availW = Math.max(300, containerW - 20);
+      const availH = Math.max(380, containerH - 30);
+      const aspect = isRealmsMode ? 1.125 : 1.294;
+      const spacingFactor = isRealmsMode ? 0.86 : 0.85;
+
+      const colDenominator = 1 + (colSpan - 1) * spacingFactor;
+      const rowDenominator = 1 + (rowSpan - 1) * spacingFactor;
+
+      const maxWFromWidth = (availW * 0.90) / colDenominator;
+      const maxHFromHeight = (availH * 0.88) / rowDenominator;
+      const maxWFromHeight = maxHFromHeight / aspect;
+
+      let targetW = Math.floor(Math.min(maxWFromWidth, maxWFromHeight));
+
+      if (isRealmsMode) {
+        // Luxury Squircle: dynamic scaling up to 115px on desktop, min 48px on mobile
+        const isMobile = containerW < 480;
+        const minAllowed = isMobile ? 48 : 60;
+        const maxAllowed = isMobile ? 84 : 115;
+        targetW = Math.max(minAllowed, Math.min(maxAllowed, targetW));
+      } else if (this.options.seniorView) {
+        const isMobile = containerW < 480;
+        const minAllowed = isMobile ? 52 : 72;
+        const maxAllowed = isMobile ? 88 : 110;
+        targetW = Math.max(minAllowed, Math.min(maxAllowed, targetW));
+      } else {
+        const isMobile = containerW < 480;
+        const minAllowed = isMobile ? 44 : 56;
+        const maxAllowed = isMobile ? 76 : 96;
+        targetW = Math.max(minAllowed, Math.min(maxAllowed, targetW));
+      }
+
+      width = targetW;
+      height = Math.round(width * aspect);
+      fontSize = Math.max(10, Math.round(width * 0.19));
+      iconSize = Math.max(18, Math.round(width * 0.35));
+    } else {
+      const baseDims = this.getTileDimensions();
+      width = baseDims.width;
+      height = baseDims.height;
+      fontSize = baseDims.fontSize;
+      iconSize = baseDims.iconSize;
     }
-    let offsetY = 20;
-    if (this.container && this.container.clientHeight > boardTotalH) {
-      offsetY = Math.max(15, Math.floor((this.container.clientHeight - boardTotalH) / 2));
+
+    const spacingFactor = isRealmsMode ? 0.86 : 0.85;
+    const colSpacing = Math.round(width * spacingFactor);
+    const rowSpacing = Math.round(height * spacingFactor);
+    const boardTotalW = (maxX - minX) * colSpacing + width;
+    const boardTotalH = (maxY - minY) * rowSpacing + height;
+
+    let offsetX = 10;
+    if (containerW && containerW > boardTotalW) {
+      offsetX = Math.max(10, Math.floor((containerW - boardTotalW) / 2));
+    }
+    let offsetY = 15;
+    if (containerH && containerH > boardTotalH) {
+      offsetY = Math.max(12, Math.floor((containerH - boardTotalH) / 2));
     }
 
     const domainRibbons = {
