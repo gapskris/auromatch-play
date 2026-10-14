@@ -51414,17 +51414,18 @@ class BoardRenderer {
         // Luxury Squircle: dynamic scaling up to 130px on desktop
         const isMobile = containerW < 480;
         const minAllowed = isMobile ? 48 : 64;
-        const maxAllowed = isMobile ? (isTileClubMode ? 82 : 90) : (isTileClubMode ? 112 : 130);
+        const maxAllowed = isMobile ? (isTileClubMode ? 82 : 90) : (isTileClubMode ? 114 : 130);
         targetW = Math.max(minAllowed, Math.min(maxAllowed, targetW));
       } else if (this.options.seniorView) {
         const isMobile = containerW < 480;
         const minAllowed = isMobile ? 54 : 76;
-        const maxAllowed = isMobile ? (isTileClubMode ? 84 : 94) : (isTileClubMode ? 108 : 126);
+        const maxAllowed = isMobile ? (isTileClubMode ? 86 : 96) : (isTileClubMode ? 114 : 130);
         targetW = Math.max(minAllowed, Math.min(maxAllowed, targetW));
       } else {
+        // Tabs 1 (Pairs), 2 (Tile Club), 3 (Classic): full dynamic expansion up to 130px on desktop!
         const isMobile = containerW < 480;
         const minAllowed = isMobile ? 44 : 58;
-        const maxAllowed = isMobile ? (isTileClubMode ? 74 : 84) : (isTileClubMode ? 100 : 120);
+        const maxAllowed = isMobile ? (isTileClubMode ? 80 : 90) : (isTileClubMode ? 114 : 130);
         targetW = Math.max(minAllowed, Math.min(maxAllowed, targetW));
       }
 
