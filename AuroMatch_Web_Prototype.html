@@ -52681,7 +52681,7 @@ class ThemeManager {
 
 const TOTAL_LEVELS = 520;
 const TOTAL_PAIRS_LEVELS = 200;
-const TOTAL_CLASSIC_LEVELS = 200;
+
 
 const RANKS = [
   { name: 'Aspirant', symbol: '🌱', minLevel: 1, maxLevel: 25 },
@@ -54509,7 +54509,7 @@ window.addEventListener('load', () => {
         });
     };
 
-    window.submitPlayerName = () => {
+    window.submitPlayerName = (andBegin = true) => {
         const input = document.getElementById('player-name-input');
         const enteredName = (input ? input.value : '').trim() || 'Seeker';
         const profile = activeGameManager.switchPlayer(enteredName, activeSelectedAvatar);
@@ -54517,9 +54517,13 @@ window.addEventListener('load', () => {
 
         const rank = activeGameManager.getRank();
         if (profile.isNewUser) {
-            window.showToastMessage(`✨ Welcome, ${activeSelectedAvatar} ${enteredName}! New profile ready at Level 1`);
+            window.showToastMessage(`✨ Welcome, ${activeSelectedAvatar} ${enteredName}! Beginning Level 1`);
         } else {
-            window.showToastMessage(`✨ Welcome back, ${activeSelectedAvatar} ${enteredName}! Resuming Level ${profile.currentLevel} (${rank.symbol} ${rank.name})`);
+            window.showToastMessage(`✨ Welcome back, ${activeSelectedAvatar} ${enteredName}! Continuing at Level ${profile.currentLevel} (${rank.symbol} ${rank.name})`);
+        }
+
+        if (andBegin) {
+            window.beginDirectJourney();
         }
     };
 
