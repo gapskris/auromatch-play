@@ -1953,10 +1953,54 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(180deg, rgba(4, 24, 18, 0.48) 0%, rgba(4, 24, 18, 0.35) 50%, rgba(4, 24, 18, 0.58) 100%);
+    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.35) 100%);
     border-radius: 16px;
     pointer-events: none;
     z-index: 1;
+}
+
+/* Archetype specific action bar styling in Realms mode matching doc images */
+.gameplay-action-bar[data-realm-archetype="terracotta"] .action-btn-circle {
+    background: linear-gradient(145deg, #7c3a21, #431b0c);
+    border: 2px solid #ea580c;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3), 0 4px 8px rgba(0, 0, 0, 0.6), 0 0 12px rgba(234, 88, 12, 0.4);
+    color: #ffedd5;
+}
+.gameplay-action-bar[data-realm-archetype="bark_leaf"] .action-btn-circle {
+    background: linear-gradient(145deg, #1b4332, #081c15);
+    border: 2px solid #52b788;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3), 0 4px 8px rgba(0, 0, 0, 0.6), 0 0 12px rgba(82, 183, 136, 0.4);
+    color: #d8f3dc;
+}
+.gameplay-action-bar[data-realm-archetype="slate_zen"] .action-btn-circle {
+    background: linear-gradient(145deg, #334155, #0f172a);
+    border: 2px solid #94a3b8;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3), 0 4px 8px rgba(0, 0, 0, 0.6), 0 0 12px rgba(148, 163, 184, 0.4);
+    color: #f1f5f9;
+}
+.gameplay-action-bar[data-realm-archetype="leather_tome"] .action-btn-circle {
+    background: linear-gradient(145deg, #582f0e, #331800);
+    border: 2px solid #d4af37;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3), 0 4px 8px rgba(0, 0, 0, 0.6), 0 0 12px rgba(212, 175, 55, 0.4);
+    color: #fefae0;
+}
+.gameplay-action-bar[data-realm-archetype="cosmic_glass"] .action-btn-circle {
+    background: linear-gradient(145deg, #0e7490, #082f49);
+    border: 2px solid #38bdf8;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4), 0 4px 8px rgba(0, 0, 0, 0.6), 0 0 14px rgba(56, 189, 248, 0.5);
+    color: #e0f2fe;
+}
+.gameplay-action-bar[data-realm-archetype="gold_mantra"] .action-btn-circle {
+    background: linear-gradient(145deg, #78350f, #291205);
+    border: 2px solid #fbbf24;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35), 0 4px 8px rgba(0, 0, 0, 0.6), 0 0 14px rgba(251, 191, 36, 0.5);
+    color: #fef3c7;
+}
+.gameplay-action-bar[data-realm-archetype="marble_altar"] .action-btn-circle {
+    background: linear-gradient(145deg, #f8fafc, #cbd5e1);
+    border: 2px solid #d97706;
+    box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.9), 0 4px 8px rgba(0, 0, 0, 0.5), 0 0 12px rgba(217, 119, 6, 0.4);
+    color: #1e293b;
 }
 
 /* Realms Browser Modal Styles */
@@ -53244,10 +53288,20 @@ class GameManager {
       if (boardContainer) {
         if (isRealmsMode && this.activeRealm) {
           boardContainer.classList.add('theme-realm-active');
+          boardContainer.setAttribute('data-realm-archetype', activeArch || '');
           boardContainer.style.backgroundImage = `url('${this.activeRealm.bgImage}')`;
+          const actBar = document.querySelector('.gameplay-action-bar');
+          if (actBar) {
+            actBar.setAttribute('data-realm-archetype', activeArch || '');
+          }
         } else {
           boardContainer.classList.remove('theme-realm-active');
+          boardContainer.removeAttribute('data-realm-archetype');
           boardContainer.style.backgroundImage = '';
+          const actBar = document.querySelector('.gameplay-action-bar');
+          if (actBar) {
+            actBar.removeAttribute('data-realm-archetype');
+          }
         }
       }
     }
@@ -53262,7 +53316,11 @@ class GameManager {
   setGameplayMode(mode) {
     if (this.gameplayMode === mode) return;
     this.gameplayMode = mode;
-    this.startNewStage(this.tiles.length || 36);
+    if (mode === 'realms') {
+      this.startNewStage(1);
+    } else {
+      this.startNewStage(this.player.currentLevel || 1);
+    }
   }
 
   toggleSeniorView(forcedValue = null) {
