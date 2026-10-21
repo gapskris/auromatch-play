@@ -2284,6 +2284,16 @@ body {
     #field-guide-col, #status-prahar-col {
         display: none !important;
     }
+
+    /* RC-A fix: drawer buttons / backdrop exist in HTML but must be invisible on mobile.
+       Without this they render as full-width white blocks stealing ~90px of vertical space. */
+    .drawer-toggle-left,
+    .drawer-toggle-right,
+    .drawer-backdrop,
+    .drawer-close-btn {
+        display: none !important;
+    }
+
     .game-desktop-grid {
         display: flex;
         flex-direction: column;
@@ -2295,6 +2305,13 @@ body {
         display: flex;
         flex-direction: column;
         height: 100%;
+    }
+
+    /* RC-B fix: remove the min-height:480px floor from the base .board-container rule
+       on mobile so JS reads the real rendered height, not the CSS minimum. */
+    .board-container {
+        min-height: 0 !important;
+        padding: 4px 0 6px 0 !important;
     }
 }
 
@@ -51648,9 +51665,13 @@ class BoardRenderer {
     const colDenominator = 1 + (colSpan - 1) * spacingFactor;
     const rowDenominator = 1 + (rowSpan - 1) * spacingFactor;
 
-    // Target 90% - 94% coverage of the container
-    const maxWFromWidth = (availW * 0.94) / colDenominator;
-    const maxHFromHeight = (availH * 0.91) / rowDenominator;
+    // Target coverage: 98% of width on mobile (tiny screens need every pixel),
+    // 94% on tablet/desktop for aesthetic breathing room.
+    // RC-F fix: mobile gets 98% so rawFitW from width dimension is maximised.
+    const widthCoverage = isMobile ? 0.98 : 0.94;
+    const heightCoverage = isMobile ? 0.94 : 0.91;
+    const maxWFromWidth = (availW * widthCoverage) / colDenominator;
+    const maxHFromHeight = (availH * heightCoverage) / rowDenominator;
     const maxWFromHeight = maxHFromHeight / aspect;
 
     // Raw geometric fit to fill 90%+ container space
@@ -51659,9 +51680,14 @@ class BoardRenderer {
     // Dynamic width bounds across viewports (Pairs, Tile Club, Classic, Realms)
     let minAllowed, maxAllowed;
     if (isMobile) {
-      // Mobile Viewport (< 480px): Expand to fill 90%-94% screen width (~64px-74px)
+      // Mobile Viewport (< 480px): Expand to fill 90%-94% screen width
+      // RC-D fix: raise Tile Club cap 70->76 (tray deduction in availH already limits size)
+      // RC-E fix: Realms gets separate cap 86px to offset squarer aspect ratio (1.125 vs 1.294)
       minAllowed = isSenior ? 50 : 44;
-      maxAllowed = isSenior ? 88 : (isTileClubMode ? 70 : 80);
+      maxAllowed = isSenior ? 92
+        : (isTileClubMode ? 76
+        : (isRealmsMode  ? 86
+        : 80));
     } else if (isTablet) {
       // Tablet Viewport (480px - 1023px): Expand to fill 90%+ of board area (~86px-110px)
       minAllowed = isSenior ? 66 : 58;
@@ -51700,6 +51726,13 @@ class BoardRenderer {
     const maxBottom = isTileClubMode ? (containerH - 95) : (containerH - 12);
     if (offsetY + boardTotalH > maxBottom) {
       offsetY = Math.max(6, maxBottom - boardTotalH);
+    }
+
+    // RC-C fix: on mobile, cap top padding so tiles never sink into the lower half.
+    // Centering formula amplifies any containerH overestimation on small screens.
+    // Clamp to 12% of containerH (e.g. max ~60px on a 500px board area).
+    if (isMobile) {
+      offsetY = Math.max(8, Math.min(offsetY, Math.floor(containerH * 0.12)));
     }
 
     return {
