@@ -5429,6 +5429,96 @@ body {
 
 
 
+
+/* ==========================================================================
+   User Requirement 2: 2-Tile Radiant Match Glow & Settle Physics
+   ========================================================================== */
+.tile-matching-glow {
+    animation: tileRadiantMatchGlow 0.35s cubic-bezier(0.2, 0.9, 0.3, 1) forwards !important;
+    z-index: 1000 !important;
+}
+
+@keyframes tileRadiantMatchGlow {
+    0% {
+        transform: scale(1);
+        filter: brightness(1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    }
+    35% {
+        transform: scale(1.10);
+        filter: brightness(1.4) saturate(1.2);
+        box-shadow: 0 0 28px 8px rgba(251, 191, 36, 0.95), inset 0 0 16px rgba(255, 255, 255, 0.9);
+    }
+    70% {
+        transform: scale(1.08);
+        filter: brightness(1.3);
+        box-shadow: 0 0 24px 6px rgba(245, 158, 11, 0.8), inset 0 0 12px rgba(255, 255, 255, 0.7);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 0;
+        filter: brightness(1.6);
+        box-shadow: 0 0 36px 12px rgba(255, 255, 255, 0.95);
+    }
+}
+
+.tile-settle {
+    animation: tileSettlePhysics 0.22s cubic-bezier(0.25, 1.3, 0.5, 1) !important;
+}
+
+@keyframes tileSettlePhysics {
+    0% { transform: translateY(-2px) scale(1.02); }
+    60% { transform: translateY(1px) scale(0.99); }
+    100% { transform: translateY(0) scale(1); }
+}
+
+/* Sequential Realm Card Locked & Unlocked states */
+.realm-card-item.locked {
+    filter: grayscale(85%) brightness(0.65);
+    opacity: 0.75;
+    position: relative;
+    border: 1px dashed rgba(255, 255, 255, 0.2) !important;
+}
+
+.realm-card-item.locked .realm-card-thumb {
+    filter: blur(2px);
+}
+
+.realm-card-lock-badge {
+    position: absolute;
+    top: 36px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.85);
+    border: 1px solid rgba(255, 215, 0, 0.5);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 11px;
+    color: #ffd700;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.8);
+    z-index: 10;
+}
+
+.realm-progress-bar-bg {
+    width: 100%;
+    height: 6px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 3px;
+    overflow: hidden;
+    margin: 4px 0 8px 0;
+}
+
+.realm-progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f59e0b, #10b981);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
 </style>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -53120,6 +53210,97 @@ function getAudioEngineState() {
   };
 }
 
+
+/**
+ * Combo Match Procedural Chime: Scales along a Pythagorean harmonic arpeggio based on 432 Hz tuning.
+ * Combo 1: Root Tone (518.4 Hz / C5)
+ * Combo 2: Major Third (648.0 Hz / E5)
+ * Combo 3: Perfect Fifth (777.6 Hz / G5)
+ * Combo 4: Octave (1036.8 Hz / High C6)
+ * Combo 5+: Harmonic Serenity Wash (Chord + Shimmer)
+ */
+function playComboMatchChime(comboCount = 1) {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    unlockAudioContext();
+
+    const now = ctx.currentTime;
+    const is432 = (ragaDrone.tuningBase === 432);
+    const root = is432 ? 518.4 : 528.0;
+
+    // Arpeggio frequency ratios: Root (1.0), Major Third (1.25), Fifth (1.5), Octave (2.0), 9th (2.25)
+    const steps = [1.0, 1.25, 1.50, 2.0, 2.25];
+    const stepIdx = Math.min(Math.max(0, comboCount - 1), steps.length - 1);
+    const freq = root * steps[stepIdx];
+
+    // Primary resonant sine chime
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = (comboCount >= 4) ? 'triangle' : 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+
+    const baseVol = Math.min(0.28, 0.16 + (comboCount * 0.02));
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.linearRampToValueAtTime(baseVol, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + (comboCount >= 3 ? 0.55 : 0.40));
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.60);
+
+    // If combo >= 3, add secondary harmonic overtone
+    if (comboCount >= 3) {
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(freq * 1.5, now);
+        gain2.gain.setValueAtTime(0.001, now);
+        gain2.gain.linearRampToValueAtTime(baseVol * 0.4, now + 0.03);
+        gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(now);
+        osc2.stop(now + 0.50);
+        setTimeout(() => {
+            try { osc2.disconnect(); gain2.disconnect(); } catch(e){}
+        }, 550);
+    }
+
+    setTimeout(() => {
+        try { osc.disconnect(); gain.disconnect(); } catch(e){}
+    }, 650);
+}
+
+/**
+ * Tile Settling Sound: Subtle tactile micro-drop when newly unblocked tiles settle
+ */
+function playTileSettleSound() {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(220, now);
+    osc.frequency.exponentialRampToValueAtTime(140, now + 0.035);
+
+    gain.gain.setValueAtTime(0.04, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.045);
+
+    setTimeout(() => {
+        try { osc.disconnect(); gain.disconnect(); } catch(e){}
+    }, 100);
+}
+
 // --- Board Generator ---
 // Guaranteed Solvability Engine & Vita Mahjong 3D Stacking Models
 // Pure mathematical reverse-construction generation ensuring 100% solvability without deadlocks.
@@ -55255,16 +55436,16 @@ function renderConstellationCalendar(gridId, svgId) {
 
 
 // --- Theme Manager ---
-// ThemeManager: Manages the 13 Secular Realms Campaign (195 Total Thematic Levels)
-// Coordinates clean background wallpapers, authentic 3D graphic tile skins, and audio presets.
+// ThemeManager: Manages the 20 Secular Realms Grand Campaign (1,000 Total Thematic Levels)
+// Coordinates clean background wallpapers, authentic 3D tactile tile skins, and audio presets.
 
-const TOTAL_REALM_LEVELS = 195; // 13 Themes * 15 Thematic Levels
-const LEVELS_PER_REALM = 15;
+const TOTAL_REALM_LEVELS = 1000; // 20 Themes * 50 Levels per Theme
+const LEVELS_PER_REALM = 50;
 const TOTAL_CLASSIC_LEVELS = 200; // Dedicated Classic Solitaire Campaign
 
 // 16 distinct emblems with symbolic labels for each theme
 const THEME_TILE_DEFS = {
-  whispering_pines: [
+  "whispering_pines": [
     { name: "Rough Bark", symbol: "🪵" },
     { name: "Growth Rings", symbol: "🪵" },
     { name: "Burl Grain", symbol: "🪵" },
@@ -55280,9 +55461,9 @@ const THEME_TILE_DEFS = {
     { name: "Golden Sunlit Leaf", symbol: "✨" },
     { name: "Golden Tree of Life", symbol: "🌟" },
     { name: "Mossy Bark Slab", symbol: "🍃" },
-    { name: "Autumn Oak Leaf", symbol: "🍂" }
+    { name: "Autumn Oak Leaf", symbol: "🍂" },
   ],
-  temple_of_lines: [
+  "temple_of_lines": [
     { name: "Louver Slats", symbol: "🏛️" },
     { name: "Concentric Squares", symbol: "⏹️" },
     { name: "Linear Fluting", symbol: "🏛️" },
@@ -55298,77 +55479,117 @@ const THEME_TILE_DEFS = {
     { name: "Gilded Inlay Slate", symbol: "✨" },
     { name: "Amber Sunbeam Slate", symbol: "☀️" },
     { name: "White Marble Inset", symbol: "◽" },
-    { name: "Moss Patina Slate", symbol: "🍃" }
+    { name: "Moss Patina Slate", symbol: "🍃" },
   ],
-  biblios_wisdom: [
-    { name: "Burgundy Leather Tome", symbol: "📕" },
+  "biblios_wisdom": [
+    { name: "Burgundy Tome", symbol: "📕" },
     { name: "Navy Gilded Spine", symbol: "📘" },
     { name: "Forest Green Ledger", symbol: "📗" },
-    { name: "Embossed Calfskin Book", symbol: "📙" },
-    { name: "Golden Feather Quill", symbol: "🪶" },
-    { name: "Faceted Crystal Inkwell", symbol: "🖋️" },
-    { name: "Sacred Tied Scroll", symbol: "📜" },
-    { name: "Vintage Reading Glasses", symbol: "👓" },
+    { name: "Calfskin Book", symbol: "📙" },
+    { name: "Golden Quill", symbol: "🪶" },
+    { name: "Crystal Inkwell", symbol: "🖋️" },
+    { name: "Tied Scroll", symbol: "📜" },
+    { name: "Reading Glasses", symbol: "👓" },
     { name: "Glowing Oil Lamp", symbol: "🪔" },
-    { name: "Library Pendulum Clock", symbol: "🕰️" },
-    { name: "Open Sanskrit Codex", symbol: "📖" },
-    { name: "Gilded Tassel Bookmark", symbol: "🔖" },
-    { name: "Illuminated Savitri Tome", symbol: "🌟" },
-    { name: "Golden Tree of Wisdom", symbol: "🌳" },
-    { name: "Florentine Marbled Folio", symbol: "📑" },
-    { name: "Golden Lotus Seal Book", symbol: "🪷" }
+    { name: "Pendulum Clock", symbol: "🕰️" },
+    { name: "Open Codex", symbol: "📖" },
+    { name: "Tassel Bookmark", symbol: "🔖" },
+    { name: "Illuminated Folio", symbol: "🌟" },
+    { name: "Tree of Wisdom", symbol: "🌳" },
+    { name: "Marbled Folio", symbol: "📑" },
+    { name: "Golden Lotus Book", symbol: "🪷" },
   ],
-  celestial_starlight: [
-    { name: "Cosmic Star", symbol: "✨" }, { name: "Aquamarine Tablet", symbol: "💎" },
-    { name: "Crescent Moon", symbol: "🌙" }, { name: "Solar Crest", symbol: "☀️" },
-    { name: "Polaris Compass", symbol: "🧭" }, { name: "Comet Trail", symbol: "☄️" },
-    { name: "Saturn Ring", symbol: "🪐" }, { name: "Astral Orbit", symbol: "💫" },
-    { name: "Radiant Nova", symbol: "🌟" }, { name: "Starlight Crown", symbol: "👑" },
-    { name: "Crystal Prism", symbol: "🔮" }, { name: "Eclipse Ring", symbol: "⭕" },
-    { name: "Zodiac Rune", symbol: "♈" }, { name: "Zenith Spark", symbol: "⚡" },
-    { name: "Cosmic Bell", symbol: "🔔" }, { name: "Infinity Spiral", symbol: "♾️" }
+  "celestial_starlight": [
+    { name: "Cosmic Star", symbol: "✨" },
+    { name: "Aquamarine Tablet", symbol: "💎" },
+    { name: "Crescent Moon", symbol: "🌙" },
+    { name: "Solar Crest", symbol: "☀️" },
+    { name: "Polaris Compass", symbol: "🧭" },
+    { name: "Comet Trail", symbol: "☄️" },
+    { name: "Saturn Ring", symbol: "🪐" },
+    { name: "Astral Orbit", symbol: "💫" },
+    { name: "Radiant Nova", symbol: "🌟" },
+    { name: "Starlight Crown", symbol: "👑" },
+    { name: "Crystal Prism", symbol: "🔮" },
+    { name: "Eclipse Ring", symbol: "⭕" },
+    { name: "Zodiac Rune", symbol: "♈" },
+    { name: "Zenith Spark", symbol: "⚡" },
+    { name: "Cosmic Bell", symbol: "🔔" },
+    { name: "Infinity Spiral", symbol: "♾️" },
   ],
-  golden_nebula: [
-    { name: "Luminous Rune", symbol: "💫" }, { name: "Golden Tablet", symbol: "🌟" },
-    { name: "Solar Flare", symbol: "☀️" }, { name: "Nebula Spiral", symbol: "🌀" },
-    { name: "Gold Constellation", symbol: "✨" }, { name: "Supernova", symbol: "💥" },
-    { name: "Galaxy Disc", symbol: "🌌" }, { name: "Astral Gateway", symbol: "⛩️" },
-    { name: "Golden Lotus", symbol: "🪷" }, { name: "Radiant Phoenix", symbol: "🦅" },
-    { name: "Cosmic Eye", symbol: "👁️" }, { name: "Golden Sceptre", symbol: "🪄" },
-    { name: "Eclipse Sun", symbol: "🌕" }, { name: "Astral Hourglass", symbol: "⏳" },
-    { name: "Star Chime", symbol: "🔔" }, { name: "Celestial Crown", symbol: "👑" }
+  "golden_nebula": [
+    { name: "Luminous Rune", symbol: "💫" },
+    { name: "Golden Tablet", symbol: "🌟" },
+    { name: "Solar Flare", symbol: "☀️" },
+    { name: "Nebula Spiral", symbol: "🌀" },
+    { name: "Gold Constellation", symbol: "✨" },
+    { name: "Supernova", symbol: "💥" },
+    { name: "Galaxy Disc", symbol: "🌌" },
+    { name: "Astral Gateway", symbol: "⛩️" },
+    { name: "Golden Lotus", symbol: "🪷" },
+    { name: "Radiant Phoenix", symbol: "🦅" },
+    { name: "Cosmic Eye", symbol: "👁️" },
+    { name: "Golden Sceptre", symbol: "🪄" },
+    { name: "Eclipse Sun", symbol: "🌕" },
+    { name: "Astral Hourglass", symbol: "⏳" },
+    { name: "Star Chime", symbol: "🔔" },
+    { name: "Celestial Crown", symbol: "👑" },
   ],
-  spirit_altar: [
-    { name: "Marble Lotus", symbol: "🪷" }, { name: "Marble Rosette", symbol: "🏵️" },
-    { name: "Concentric Mandala", symbol: "💮" }, { name: "Bodhi Leaf", symbol: "🍃" },
-    { name: "Meditation Flame", symbol: "🔥" }, { name: "Bronze Chime", symbol: "🔔" },
-    { name: "Incense Censer", symbol: "🪔" }, { name: "Offering Bowl", symbol: "🥣" },
-    { name: "Sacred Conch", symbol: "🐚" }, { name: "Endless Knot", symbol: "♾️" },
-    { name: "White Jasmine", symbol: "🌼" }, { name: "Water Lily", symbol: "🪷" },
-    { name: "Golden Vessel", symbol: "🏺" }, { name: "Spiritual Halo", symbol: "⭕" },
-    { name: "Temple Camellia", symbol: "🌺" }, { name: "Serene Pearl", symbol: "⚪" }
+  "spirit_altar": [
+    { name: "Marble Lotus", symbol: "🪷" },
+    { name: "Marble Rosette", symbol: "🏵️" },
+    { name: "Concentric Mandala", symbol: "💮" },
+    { name: "Bodhi Leaf", symbol: "🍃" },
+    { name: "Meditation Flame", symbol: "🔥" },
+    { name: "Bronze Chime", symbol: "🔔" },
+    { name: "Incense Censer", symbol: "🪔" },
+    { name: "Offering Bowl", symbol: "🥣" },
+    { name: "Sacred Conch", symbol: "🐚" },
+    { name: "Endless Knot", symbol: "♾️" },
+    { name: "White Jasmine", symbol: "🌼" },
+    { name: "Water Lily", symbol: "🪷" },
+    { name: "Golden Vessel", symbol: "🏺" },
+    { name: "Spiritual Halo", symbol: "⭕" },
+    { name: "Temple Camellia", symbol: "🌺" },
+    { name: "Serene Pearl", symbol: "🤍" },
   ],
-  sacred_sanctuary: [
-    { name: "Chiseled Lotus", symbol: "🪷" }, { name: "Brass Rosette", symbol: "🏵️" },
-    { name: "Sanctuary Flame", symbol: "🔥" }, { name: "Golden Bell", symbol: "🔔" },
-    { name: "Temple Pillar", symbol: "🏛️" }, { name: "Incense Mist", symbol: "💨" },
-    { name: "Amber Jewel", symbol: "💎" }, { name: "Sacred Garland", symbol: "📿" },
-    { name: "Solar Disk", symbol: "☀️" }, { name: "Peace Dove", symbol: "🕊️" },
-    { name: "Temple Gateway", symbol: "⛩️" }, { name: "Vessel of Light", symbol: "🏺" },
-    { name: "Radiant Chime", symbol: "🎐" }, { name: "Aura Halo", symbol: "⭕" },
-    { name: "Golden Leaf", symbol: "🍂" }, { name: "Eternal Lamp", symbol: "🪔" }
+  "sacred_sanctuary": [
+    { name: "Chiseled Lotus", symbol: "🪷" },
+    { name: "Brass Rosette", symbol: "🏵️" },
+    { name: "Sanctuary Flame", symbol: "🔥" },
+    { name: "Golden Bell", symbol: "🔔" },
+    { name: "Temple Pillar", symbol: "🏛️" },
+    { name: "Incense Mist", symbol: "💨" },
+    { name: "Amber Jewel", symbol: "💎" },
+    { name: "Sacred Garland", symbol: "📿" },
+    { name: "Solar Disk", symbol: "☀️" },
+    { name: "Peace Dove", symbol: "🕊️" },
+    { name: "Temple Gateway", symbol: "⛩️" },
+    { name: "Vessel of Light", symbol: "🏺" },
+    { name: "Radiant Chime", symbol: "🎐" },
+    { name: "Aura Halo", symbol: "⭕" },
+    { name: "Golden Leaf", symbol: "🍂" },
+    { name: "Eternal Lamp", symbol: "🪔" },
   ],
-  ocean_horizon: [
-    { name: "Azure Sea Glass", symbol: "🫧" }, { name: "Luminous Pearl", symbol: "⚪" },
-    { name: "Nautilus Shell", symbol: "🐚" }, { name: "Sea Star", symbol: "⭐" },
-    { name: "Ocean Wave", symbol: "🌊" }, { name: "Coral Branch", symbol: "🪸" },
-    { name: "Driftwood Tablet", symbol: "🪵" }, { name: "Dolphin Crest", symbol: "🐬" },
-    { name: "Tide Compass", symbol: "🧭" }, { name: "Deep Lagoon", symbol: "💧" },
-    { name: "Sea Anemone", symbol: "🌸" }, { name: "Ambergris Gem", symbol: "💎" },
-    { name: "Coastal Breeze", symbol: "💨" }, { name: "Lighthouse Lamp", symbol: "🏮" },
-    { name: "Seagrass Frond", symbol: "🌿" }, { name: "Sunken Coin", symbol: "🪙" }
+  "ocean_horizon": [
+    { name: "Azure Bubble", symbol: "🫧" },
+    { name: "Luminous Pearl", symbol: "⚪" },
+    { name: "Nautilus Shell", symbol: "🐚" },
+    { name: "Sea Star", symbol: "⭐" },
+    { name: "Ocean Wave", symbol: "🌊" },
+    { name: "Coral Branch", symbol: "🪸" },
+    { name: "Driftwood Tablet", symbol: "🪵" },
+    { name: "Dolphin Crest", symbol: "🐬" },
+    { name: "Tide Compass", symbol: "🧭" },
+    { name: "Deep Lagoon", symbol: "💧" },
+    { name: "Sea Anemone", symbol: "🌸" },
+    { name: "Ambergris Gem", symbol: "💎" },
+    { name: "Coastal Breeze", symbol: "💨" },
+    { name: "Lighthouse Lamp", symbol: "🏮" },
+    { name: "Seagrass Frond", symbol: "🌿" },
+    { name: "Sunken Coin", symbol: "🪙" },
   ],
-  terracotta_earth: [
+  "terracotta_earth": [
     { name: "Tree of Life", symbol: "🌳" },
     { name: "Banyan Spray", symbol: "🍃" },
     { name: "Five-Leaf Fan", symbol: "🌿" },
@@ -55384,56 +55605,206 @@ const THEME_TILE_DEFS = {
     { name: "Golden Tree", symbol: "✨" },
     { name: "Luminous Leaf", symbol: "🌟" },
     { name: "Radiant Triquetra", symbol: "💫" },
-    { name: "Moss Patina Leaf", symbol: "🍃" }
+    { name: "Moss Patina Leaf", symbol: "🍃" },
   ],
-  floral_harmony: [
-    { name: "Lotus Cameo", symbol: "🪷" }, { name: "Rose Cameo", symbol: "🌹" },
-    { name: "Magnolia Blossom", symbol: "🌸" }, { name: "Orchid Sprig", symbol: "🌺" },
-    { name: "Cherry Petal", symbol: "🌸" }, { name: "Jasmine Garland", symbol: "🌼" },
-    { name: "Peony Crown", symbol: "🏵️" }, { name: "Tulip Cup", symbol: "🌷" },
-    { name: "Sunflower Crest", symbol: "🌻" }, { name: "Lavender Scent", symbol: "🪻" },
-    { name: "Iris Blade", symbol: "🌿" }, { name: "Blush Cameo", symbol: "💮" },
-    { name: "Garden Butterfly", symbol: "🦋" }, { name: "Honey Blossom", symbol: "🍯" },
-    { name: "Morning Dew", symbol: "💧" }, { name: "Cameo Brooch", symbol: "💎" }
+  "floral_harmony": [
+    { name: "Lotus Cameo", symbol: "🪷" },
+    { name: "Rose Cameo", symbol: "🌹" },
+    { name: "Magnolia Blossom", symbol: "🌸" },
+    { name: "Orchid Sprig", symbol: "🌺" },
+    { name: "Peony Crown", symbol: "🏵️" },
+    { name: "Jasmine Garland", symbol: "🌼" },
+    { name: "Tulip Cup", symbol: "🌷" },
+    { name: "Sunflower Crest", symbol: "🌻" },
+    { name: "Lavender Scent", symbol: "🪻" },
+    { name: "Iris Blade", symbol: "🌿" },
+    { name: "Blush Cameo", symbol: "💮" },
+    { name: "Garden Butterfly", symbol: "🦋" },
+    { name: "Honey Blossom", symbol: "🍯" },
+    { name: "Morning Dew", symbol: "💧" },
+    { name: "Cameo Brooch", symbol: "💎" },
+    { name: "Pearl Petal", symbol: "🤍" },
   ],
-  blooming_mandala: [
-    { name: "Porcelain Lotus", symbol: "🌸" }, { name: "Gold Cameo", symbol: "🏵️" },
-    { name: "Concentric Ring", symbol: "⭕" }, { name: "Radial Star", symbol: "✳️" },
-    { name: "Mandala Hub", symbol: "💮" }, { name: "Filigree Petal", symbol: "🪷" },
-    { name: "Sacred Wheel", symbol: "☸️" }, { name: "Porcelain Rose", symbol: "🌹" },
-    { name: "Gold Wire Crest", symbol: "⚜️" }, { name: "Sunburst Halo", symbol: "☀️" },
-    { name: "Lace Mandala", symbol: "🕸️" }, { name: "Imperial Brocade", symbol: "👑" },
-    { name: "Celestial Rosette", symbol: "🌟" }, { name: "Ivory Cameo", symbol: "🤍" },
-    { name: "Radiant Bloom", symbol: "🌺" }, { name: "Geometric Jewel", symbol: "💎" }
+  "blooming_mandala": [
+    { name: "Porcelain Lotus", symbol: "🌸" },
+    { name: "Gold Cameo", symbol: "🏵️" },
+    { name: "Concentric Ring", symbol: "⭕" },
+    { name: "Radial Star", symbol: "✳️" },
+    { name: "Mandala Hub", symbol: "💮" },
+    { name: "Filigree Petal", symbol: "🪷" },
+    { name: "Sacred Wheel", symbol: "☸️" },
+    { name: "Porcelain Rose", symbol: "🌹" },
+    { name: "Gold Wire Crest", symbol: "⚜️" },
+    { name: "Sunburst Halo", symbol: "☀️" },
+    { name: "Lace Mandala", symbol: "🕸️" },
+    { name: "Imperial Brocade", symbol: "👑" },
+    { name: "Celestial Rosette", symbol: "🌟" },
+    { name: "Ivory Cameo", symbol: "🤍" },
+    { name: "Radiant Bloom", symbol: "🌺" },
+    { name: "Geometric Jewel", symbol: "💎" },
   ],
-  sacred_spiral: [
-    { name: "Golden Vine", symbol: "🌿" }, { name: "Sacred Bloom", symbol: "🪷" },
-    { name: "Fibonacci Spiral", symbol: "🌀" }, { name: "Fern Sprout", symbol: "🌱" },
-    { name: "Spiral Shell", symbol: "🐚" }, { name: "Curled Tendril", symbol: "🌾" },
-    { name: "Helix Crest", symbol: "🧬" }, { name: "Emerald Jewel", symbol: "💎" },
-    { name: "Sunlit Canopy", symbol: "🌳" }, { name: "Verdant Clover", symbol: "🍀" },
-    { name: "Botanical Orbit", symbol: "💫" }, { name: "Forest Fern", symbol: "🌿" },
-    { name: "Twisting Branch", symbol: "🪵" }, { name: "Dewdrop Frond", symbol: "💧" },
-    { name: "Spiral Galaxy", symbol: "🌌" }, { name: "Verdant Crown", symbol: "👑" }
+  "sacred_spiral": [
+    { name: "Golden Vine", symbol: "🌿" },
+    { name: "Sacred Bloom", symbol: "🪷" },
+    { name: "Fibonacci Spiral", symbol: "🌀" },
+    { name: "Fern Sprout", symbol: "🌱" },
+    { name: "Spiral Shell", symbol: "🐚" },
+    { name: "Curled Tendril", symbol: "🌾" },
+    { name: "Helix Crest", symbol: "🧬" },
+    { name: "Emerald Jewel", symbol: "💎" },
+    { name: "Sunlit Canopy", symbol: "🌳" },
+    { name: "Verdant Clover", symbol: "🍀" },
+    { name: "Botanical Orbit", symbol: "💫" },
+    { name: "Forest Fern", symbol: "🌿" },
+    { name: "Twisting Branch", symbol: "🪵" },
+    { name: "Dewdrop Frond", symbol: "💧" },
+    { name: "Spiral Galaxy", symbol: "🌌" },
+    { name: "Verdant Crown", symbol: "👑" },
   ],
-  master_sanctuary: [
-    { name: "Inlaid Golden Lotus", symbol: "🪷" },
-    { name: "Inlaid Jasmine Spray", symbol: "🌸" },
-    { name: "Inlaid Golden Rose", symbol: "🌹" },
-    { name: "Inlaid Frangipani", symbol: "🌼" },
-    { name: "Carved Mother's Symbol", symbol: "🏵️" },
-    { name: "Carved Ascent Triangle", symbol: "🔺" },
-    { name: "Carved Teak Sunburst", symbol: "☀️" },
-    { name: "Flame of Aspiration", symbol: "🔥" },
-    { name: "Hammered Brass Incense", symbol: "🏺" },
-    { name: "Sacred Temple Bell", symbol: "🔔" },
-    { name: "Glowing Brass Diya", symbol: "🪔" },
-    { name: "Sacred Conch Pedestal", symbol: "🐚" },
-    { name: "Radiant Golden Lotus", symbol: "✨" },
-    { name: "Luminous Diamond Crystal", symbol: "💎" },
-    { name: "White Jade Blessing", symbol: "🤍" },
-    { name: "Rose Quartz Cameo", symbol: "💮" }
-  ]
+  "master_sanctuary": [
+    { name: "Carved Walnut", symbol: "🪵" },
+    { name: "Marble Inlay", symbol: "🪷" },
+    { name: "Master Crown", symbol: "👑" },
+    { name: "Golden Key", symbol: "🗝️" },
+    { name: "Grand Chime", symbol: "🔔" },
+    { name: "Imperial Crest", symbol: "⚜️" },
+    { name: "Sanctuary Sceptre", symbol: "🪄" },
+    { name: "Royal Astrolabe", symbol: "🧭" },
+    { name: "Grand Hourglass", symbol: "⏳" },
+    { name: "Polished Cameo", symbol: "🏵️" },
+    { name: "Altar Vessel", symbol: "🏺" },
+    { name: "Diamond Star", symbol: "💎" },
+    { name: "Golden Laurel", symbol: "🌿" },
+    { name: "Master Codex", symbol: "📖" },
+    { name: "Shield of Honor", symbol: "🛡️" },
+    { name: "Radiant Sun", symbol: "☀️" },
+  ],
+  "lotus_pond": [
+    { name: "Sunlit Lotus", symbol: "🪷" },
+    { name: "Water Lily Petal", symbol: "🌸" },
+    { name: "Floating Lilypad", symbol: "🍃" },
+    { name: "River Pebble", symbol: "🪨" },
+    { name: "Koi Fish", symbol: "🐟" },
+    { name: "Bamboo Slat", symbol: "🎋" },
+    { name: "Clear Dewdrop", symbol: "💧" },
+    { name: "Dragonfly Wing", symbol: "🪰" },
+    { name: "Reed Frond", symbol: "🌾" },
+    { name: "Spring Water", symbol: "🌊" },
+    { name: "Willow Branch", symbol: "🌿" },
+    { name: "Lotus Seedpod", symbol: "🌰" },
+    { name: "Radiant Lotus Core", symbol: "✨" },
+    { name: "Golden Water Lily", symbol: "🌟" },
+    { name: "Jade Lilypad", symbol: "🍀" },
+    { name: "Sunset Reflection", symbol: "🌅" },
+  ],
+  "granite_monolith": [
+    { name: "Granite Peak", symbol: "🏔️" },
+    { name: "Mountain Ridge", symbol: "⛰️" },
+    { name: "Chiseled Stone", symbol: "🪨" },
+    { name: "Alpine Cloud", symbol: "☁️" },
+    { name: "Ice Crystal", symbol: "❄️" },
+    { name: "Glacial Stream", symbol: "💧" },
+    { name: "Pine Needle", symbol: "🌲" },
+    { name: "Falcon Crest", symbol: "🦅" },
+    { name: "Stone Cairn", symbol: "🗿" },
+    { name: "Monolith Pillar", symbol: "🏛️" },
+    { name: "High Altitude Sun", symbol: "☀️" },
+    { name: "Mountain Bell", symbol: "🔔" },
+    { name: "Gilded Summit", symbol: "✨" },
+    { name: "Radiant Peak", symbol: "🌟" },
+    { name: "Silver Lichen Stone", symbol: "◽" },
+    { name: "Zenith Compass", symbol: "🧭" },
+  ],
+  "sandalwood_amber": [
+    { name: "Sandalwood Fan", symbol: "🪭" },
+    { name: "Amber Resin Drop", symbol: "💎" },
+    { name: "Incense Smoke", symbol: "💨" },
+    { name: "Carved Rosette", symbol: "🏵️" },
+    { name: "Honeycomb Cell", symbol: "🍯" },
+    { name: "Aspiration Flame", symbol: "🔥" },
+    { name: "Spiced Clove", symbol: "🌰" },
+    { name: "Carved Elephant", symbol: "🐘" },
+    { name: "Teak Box Clasp", symbol: "🗝️" },
+    { name: "Scented Garland", symbol: "📿" },
+    { name: "Amber Sunburst", symbol: "☀️" },
+    { name: "Offering Urn", symbol: "🏺" },
+    { name: "Glowing Amber Relic", symbol: "✨" },
+    { name: "Luminous Sandal Seal", symbol: "🌟" },
+    { name: "Golden Grain", symbol: "🌾" },
+    { name: "Royal Diadem", symbol: "👑" },
+  ],
+  "obsidian_vault": [
+    { name: "Obsidian Mirror", symbol: "🪞" },
+    { name: "Midnight Star", symbol: "⭐" },
+    { name: "Astrolabe Gear", symbol: "⚙️" },
+    { name: "Celestial Telescope", symbol: "🔭" },
+    { name: "Crescent Moon", symbol: "🌙" },
+    { name: "Nebula Core", symbol: "🌀" },
+    { name: "Prismatic Shard", symbol: "💎" },
+    { name: "Eclipse Ring", symbol: "⭕" },
+    { name: "Comet Trail", symbol: "☄️" },
+    { name: "Planetary Ring", symbol: "🪐" },
+    { name: "Starlight Ray", symbol: "⚡" },
+    { name: "Cosmic Compass", symbol: "🧭" },
+    { name: "Radiant Obsidian Star", symbol: "✨" },
+    { name: "Platinum Nova", symbol: "🌟" },
+    { name: "Deep Sky Void", symbol: "🌌" },
+    { name: "Infinite Knot", symbol: "♾️" },
+  ],
+  "golden_harvest": [
+    { name: "Wheat Sheaf", symbol: "🌾" },
+    { name: "Woven Rattan Knot", symbol: "🧺" },
+    { name: "Harvest Sun", symbol: "☀️" },
+    { name: "Clay Grain Pot", symbol: "🏺" },
+    { name: "Golden Corn", symbol: "🌽" },
+    { name: "Earthen Sickle", symbol: "🌙" },
+    { name: "Golden Sprout", symbol: "🌱" },
+    { name: "Honey Comb", symbol: "🍯" },
+    { name: "Field Poppy", symbol: "🌺" },
+    { name: "Bountiful Basket", symbol: "🧺" },
+    { name: "Sunlit Millstone", symbol: "⚙️" },
+    { name: "Harvest Bread", symbol: "🍞" },
+    { name: "Radiant Golden Ear", symbol: "✨" },
+    { name: "Luminous Grain Wheel", symbol: "🌟" },
+    { name: "Straw Crown", symbol: "👑" },
+    { name: "Autumn Clover", symbol: "🍀" },
+  ],
+  "opal_aurora": [
+    { name: "Fire Opal", symbol: "💎" },
+    { name: "Aurora Wave", symbol: "🌌" },
+    { name: "Pearlescent Shell", symbol: "⚪" },
+    { name: "Prismatic Prism", symbol: "🔮" },
+    { name: "Luminous Butterfly", symbol: "🦋" },
+    { name: "Iridescent Feather", symbol: "🪶" },
+    { name: "Northern Star", symbol: "⭐" },
+    { name: "Violet Crystal", symbol: "💜" },
+    { name: "Rainbow Arc", symbol: "🌈" },
+    { name: "Celestial Veil", symbol: "✨" },
+    { name: "Polar Glow", symbol: "❄️" },
+    { name: "Spectral Swan", symbol: "🦢" },
+    { name: "Pulsing Opal Core", symbol: "🌟" },
+    { name: "Radiant Aurora Crown", symbol: "👑" },
+    { name: "Iridescent Lotus", symbol: "🪷" },
+    { name: "Astral Halo", symbol: "⭕" },
+  ],
+  "bodhi_grove": [
+    { name: "Bodhi Leaf", symbol: "🍃" },
+    { name: "Sacred Bodhi Tree", symbol: "🌳" },
+    { name: "White Jade Tablet", symbol: "🤍" },
+    { name: "Enlightenment Flame", symbol: "🔥" },
+    { name: "Lotus Seat", symbol: "🪷" },
+    { name: "Wheel of Dharma", symbol: "☸️" },
+    { name: "Golden Bell", symbol: "🔔" },
+    { name: "Meditation Urn", symbol: "🏺" },
+    { name: "Sunburst Halo", symbol: "☀️" },
+    { name: "Sacred Thread", symbol: "📿" },
+    { name: "Radiant Deer", symbol: "🦌" },
+    { name: "Peace Crane", symbol: "🕊️" },
+    { name: "Golden Bodhi Master", symbol: "✨" },
+    { name: "Supreme Sun Star", symbol: "🌟" },
+    { name: "Jade Lotus Emblem", symbol: "🏵️" },
+    { name: "Universal Crown", symbol: "👑" },
+  ],
 };
 
 function buildCustomTilesForTheme(themeId) {
@@ -55451,19 +55822,65 @@ const REALMS = [
     chapter: 1,
     name: 'Service Tree Sanctuary',
     subtitle: 'Psychic Aspiration · Service Tree Canopy',
-    mockupImage: './Assets/backgrounds/service_tree_theme.png',
-    bgImage: './Assets/backgrounds/service_tree_theme.png',
+    mockupImage: './Assets/backgrounds/whispering_pines.png',
+    bgImage: './Assets/backgrounds/whispering_pines_clean.png',
     archetype: 'bark_leaf',
     audioPreset: 'forest',
     levelStart: 1,
-    levelEnd: 15,
+    levelEnd: 50,
     icon: '🌲',
     levelNames: [
-      'Aspiration', 'Receptivity', 'Faith', 'Surrender',
-      'Trust', 'Sincerity', 'Peace', 'Joy',
-      'Silent Canopy', 'Deep Anchor Roots', 'Sunlit Foliage', 'Inner Bark',
-      'Pure Sap Flow', 'Golden Blossom', 'Psychic Realization'
-    ],
+      "Aspiration",
+      "Receptivity",
+      "Faith",
+      "Surrender",
+      "Trust",
+      "Sincerity",
+      "Peace",
+      "Joy",
+      "Silent Canopy",
+      "Anchor Roots",
+      "Sunlit Foliage",
+      "Inner Bark",
+      "Sap Flow",
+      "Golden Blossom",
+      "Psychic Center",
+      "Forest Breeze",
+      "Morning Dew",
+      "Cedar Whispers",
+      "Pines Harmony",
+      "Lichen Stone",
+      "Verdant Glade",
+      "Emerald Canopy",
+      "Deep Woodland",
+      "Sunbeam Pathway",
+      "Rooted Strength",
+      "Spring Sprout",
+      "Birch Grove",
+      "Ancient Timber",
+      "Serene Arbor",
+      "Green Sanctum",
+      "Mossy Pathway",
+      "Quiet Grove",
+      "Pinecone Hearth",
+      "Gentle Rain",
+      "Dappled Shade",
+      "Forest Solitude",
+      "Whispering Frond",
+      "Woodland Trail",
+      "Clear Stream",
+      "Golden Dawn",
+      "Canopy Arch",
+      "Pines Symphony",
+      "Spiritual Grove",
+      "Living Wood",
+      "Verdant Peace",
+      "Sacred Canopy",
+      "Ancient Sentinel",
+      "Psychic Dawn",
+      "Sanctuary Core",
+      "Service Tree Realization"
+],
     customTiles: buildCustomTilesForTheme('whispering_pines')
   },
   {
@@ -55471,19 +55888,65 @@ const REALMS = [
     chapter: 2,
     name: 'Golconde Modernist Slate',
     subtitle: 'Modernist Harmony · Minimalist Slate',
-    mockupImage: './Assets/backgrounds/golconde_slate.png',
-    bgImage: './Assets/backgrounds/golconde_slate.png',
+    mockupImage: './Assets/backgrounds/temple_of_lines.png',
+    bgImage: './Assets/backgrounds/temple_of_lines_clean.png',
     archetype: 'slate_zen',
     audioPreset: 'zen_stone',
-    levelStart: 16,
-    levelEnd: 30,
+    levelStart: 51,
+    levelEnd: 100,
     icon: '🏛️',
     levelNames: [
-      'Symmetry', 'Silence', 'Light', 'Utility',
-      'Cleanliness', 'Harmony', 'Perfection', 'Peace',
-      'Monolithic Louvers', 'Indirect Sun Angles', 'Zen Corridors', 'Lily Reflection Pond',
-      'Polished Stone', 'Exposed Concrete', 'Architectural Caliper'
-    ],
+      "Symmetry",
+      "Silence",
+      "Light",
+      "Utility",
+      "Cleanliness",
+      "Harmony",
+      "Perfection",
+      "Peace",
+      "Monolithic Louvers",
+      "Sun Angles",
+      "Zen Corridors",
+      "Lily Pond",
+      "Polished Stone",
+      "Exposed Slate",
+      "Architectural Line",
+      "Geometric Order",
+      "Shadow Grille",
+      "Aero Louver",
+      "Balance Point",
+      "Quiet Portico",
+      "Cantilever Beam",
+      "Slate Threshold",
+      "Minimalist Cube",
+      "Linear Axis",
+      "Concrete Matrix",
+      "Zen Terrace",
+      "Golden Proportion",
+      "Zen Basin",
+      "Modernist Vault",
+      "Harmonic Ratio",
+      "Pure Plane",
+      "Louvered Dusk",
+      "Reflecting Surface",
+      "Structured Stillness",
+      "Modernist Void",
+      "Acoustic Silence",
+      "Zen Garden Walk",
+      "Slate Pillar",
+      "Clean Horizon",
+      "Modernist Purity",
+      "Chiseled Balance",
+      "Pure Geometry",
+      "Quiet Rhythm",
+      "Linear Echo",
+      "Modernist Sanctuary",
+      "Monolith Wall",
+      "Geometric Dawn",
+      "Slate Mastery",
+      "Architectural Apex",
+      "Perfection of Line"
+],
     customTiles: buildCustomTilesForTheme('temple_of_lines')
   },
   {
@@ -55491,229 +55954,1198 @@ const REALMS = [
     chapter: 3,
     name: 'SABDA Wisdom Library',
     subtitle: 'Concentration of Wisdom · Antique Tomes & Gilt',
-    mockupImage: './Assets/backgrounds/ashram_library.png',
-    bgImage: './Assets/backgrounds/ashram_library.png',
+    mockupImage: './Assets/backgrounds/biblios_wisdom.png',
+    bgImage: './Assets/backgrounds/biblios_wisdom_clean.png',
     archetype: 'leather_tome',
     audioPreset: 'parchment',
-    levelStart: 31,
-    levelEnd: 45,
+    levelStart: 101,
+    levelEnd: 150,
     icon: '📚',
     levelNames: [
-      'The Life Divine', 'Savitri', 'Synthesis of Yoga', 'Divine Surrender',
-      'Letters on Yoga', 'On Education', 'Words of Light', 'Essays on the Gita',
-      'Gilded Owl', 'Feather Quill', 'Open Codex', 'Celestial Astrolabe',
-      'Vintage Hourglass', 'Illuminated Folio', 'Wisdom Crown'
-    ],
+      "Life Divine",
+      "Synthesis",
+      "Illumination",
+      "Inner Knowledge",
+      "Divine Surrender",
+      "Higher Mind",
+      "Words of Light",
+      "Essays of Truth",
+      "Gilded Owl",
+      "Feather Quill",
+      "Open Codex",
+      "Celestial Astrolabe",
+      "Hourglass",
+      "Illuminated Verse",
+      "Wisdom Crown",
+      "Teak Bookcase",
+      "Sanskrit Stanza",
+      "Leather Tome",
+      "Ancient Folio",
+      "Scriptorium",
+      "Scripture Chamber",
+      "Luminous Scroll",
+      "Golden Margins",
+      "Ink of Truth",
+      "Vellum Sheet",
+      "Library Alcove",
+      "Vaulted Teak",
+      "Archival Solitude",
+      "Deep Inquiry",
+      "Bound Wisdom",
+      "Eternal Verse",
+      "Philosopher Desk",
+      "Concentration Chamber",
+      "Silent Reader",
+      "Gilded Calligraphy",
+      "Cosmic Dialectic",
+      "Mind of Light",
+      "Scholarly Lamp",
+      "Rare Manuscript",
+      "Book of Aspiration",
+      "Wisdom Pillar",
+      "Inscribed Tablet",
+      "Codex of Peace",
+      "Archive of Silence",
+      "Teak Gallery",
+      "Luminous Chapter",
+      "Eternal Knowledge",
+      "Crown of Wisdom",
+      "Master Scriptorium",
+      "SABDA Realization"
+],
     customTiles: buildCustomTilesForTheme('biblios_wisdom')
   },
   {
     id: 'celestial_starlight',
     chapter: 4,
-    name: 'Golden Aura Glass Stack',
-    subtitle: 'Luminous Glass · Refractive Crystal',
-    mockupImage: './Assets/backgrounds/golden_aura_stack.png',
-    bgImage: './Assets/backgrounds/golden_aura_stack.png',
+    name: 'Aquamarine Celestial Glass',
+    subtitle: 'Luminous Glass · Refractive Crystal & Gold',
+    mockupImage: './Assets/backgrounds/celestial_starlight.png',
+    bgImage: './Assets/backgrounds/celestial_starlight_clean.png',
     archetype: 'cosmic_glass',
     audioPreset: 'crystal_bell',
-    levelStart: 46,
-    levelEnd: 60,
+    levelStart: 151,
+    levelEnd: 200,
     icon: '✨',
     levelNames: [
-      'Cosmic Star', 'Aquamarine Prism', 'Crescent Moon', 'Solar Corona',
-      'Polaris Navigation', 'Comet Trail', 'Saturn Rings', 'Astral Orbit',
-      'Radiant Nova', 'Starlight Crown', 'Crystal Merkaba', 'Eclipse Ring',
-      'Zodiac Rune', 'Zenith Spark', 'Transcendental Light'
-    ],
+      "Cosmic Star",
+      "Aquamarine Prism",
+      "Crescent Moon",
+      "Solar Corona",
+      "Polaris Compass",
+      "Comet Tail",
+      "Saturn Rings",
+      "Astral Orbit",
+      "Radiant Nova",
+      "Starlight Crown",
+      "Crystal Merkaba",
+      "Eclipse Halo",
+      "Zodiac Sign",
+      "Zenith Spark",
+      "Transcendental Light",
+      "Refractive Glass",
+      "Cyan Core",
+      "Golden Bevel",
+      "Prismatic Shard",
+      "Astral Beacon",
+      "Starlight Ray",
+      "Cosmic Dust",
+      "Deep Orbit",
+      "Celestial Lens",
+      "Astral Meridian",
+      "Stellar Mirror",
+      "Luminous Zenith",
+      "Aquamarine Sphere",
+      "Cosmic Nebula",
+      "Starlight Cascade",
+      "Supercluster",
+      "Gleaming Prism",
+      "Solar Flare",
+      "Celestial Compass",
+      "Vibrant Ray",
+      "Astral Sanctuary",
+      "Infinite Cosmos",
+      "Stellar Echo",
+      "Planetary Arc",
+      "Glacial Starlight",
+      "Refractive Wave",
+      "Cosmic Halo",
+      "Astral Portal",
+      "Golden Constellation",
+      "Celestial Harmony",
+      "Starlight Monolith",
+      "Cosmic Dawn",
+      "Prismatic Apex",
+      "Transcendence",
+      "Eternal Starlight"
+],
     customTiles: buildCustomTilesForTheme('celestial_starlight')
   },
   {
     id: 'golden_nebula',
     chapter: 5,
-    name: 'Golden Nebula Cosmic Stack',
-    subtitle: 'Molten Amber · Obsidian Stellar Forge',
-    mockupImage: './Assets/backgrounds/golden_aura_stack.jpg',
-    bgImage: './Assets/backgrounds/golden_aura_stack.jpg',
+    name: 'Molten Amber Nebula',
+    subtitle: 'Honey-Amber Resin · Obsidian Stellar Forge',
+    mockupImage: './Assets/backgrounds/golden_nebula.png',
+    bgImage: './Assets/backgrounds/golden_nebula_clean.png',
     archetype: 'gold_mantra',
     audioPreset: 'deep_drone',
-    levelStart: 61,
-    levelEnd: 75,
+    levelStart: 201,
+    levelEnd: 250,
     icon: '🌌',
     levelNames: [
-      'Solar Eclipse Corona', 'Radiant Sunburst', 'Amber Meteorite', 'Concentric Orbits',
-      'Sri Yantra Lines', 'Metatron Cube', 'Torus Field', 'Flower of Life',
-      'Orion Constellation', 'Nebula Vortex', 'Amber Crystal Sphere', 'Celestial Phoenix',
-      'Molten Gold Core', 'Golden Lotus Heart', 'Supreme Starlight'
-    ],
+      "Solar Eclipse",
+      "Radiant Sunburst",
+      "Amber Meteorite",
+      "Concentric Orbits",
+      "Sacred Lines",
+      "Metatron Cube",
+      "Torus Field",
+      "Flower of Life",
+      "Orion Stars",
+      "Nebula Vortex",
+      "Amber Sphere",
+      "Celestial Phoenix",
+      "Molten Gold Core",
+      "Lotus Heart",
+      "Supreme Radiance",
+      "Obsidian Slab",
+      "Amber Resin",
+      "Golden Flare",
+      "Stellar Forge",
+      "Cosmic Fusion",
+      "Honey Corona",
+      "Deep Nebula",
+      "Astral Ring",
+      "Golden Dust",
+      "Plasma Stream",
+      "Solar Filament",
+      "Amber Chime",
+      "Celestial Crucible",
+      "Stellar Nursery",
+      "Molten Filament",
+      "Nebular Halo",
+      "Golden Core",
+      "Astral Pulse",
+      "Magnetic Wave",
+      "Starlight Crucible",
+      "Amber Horizon",
+      "Golden Vortex",
+      "Obsidian Spark",
+      "Radiant Matrix",
+      "Solar Forge",
+      "Celestial Crown",
+      "Golden Filament",
+      "Nebular Dawn",
+      "Amber Infinity",
+      "Cosmic Flare",
+      "Golden Genesis",
+      "Stellar Apex",
+      "Supreme Forge",
+      "Molten Zenith",
+      "Nebular Mastery"
+],
     customTiles: buildCustomTilesForTheme('golden_nebula')
   },
   {
     id: 'spirit_altar',
     chapter: 6,
     name: 'Brass Altar & Sacred Flame',
-    subtitle: 'Hammered Brass · Sacred Flame Offering',
-    mockupImage: './Assets/backgrounds/brass_altar_game.png',
-    bgImage: './Assets/backgrounds/brass_altar_game.png',
+    subtitle: 'Hammered Antique Brass · Sacred Offering',
+    mockupImage: './Assets/backgrounds/spirit_altar.png',
+    bgImage: './Assets/backgrounds/spirit_altar_clean.png',
     archetype: 'marble_altar',
     audioPreset: 'bronze_bell',
-    levelStart: 76,
-    levelEnd: 90,
+    levelStart: 251,
+    levelEnd: 300,
     icon: '🕯️',
     levelNames: [
-      'White Marble Slab', 'Incense Burner', 'Flame of Offering', 'Brass Censer',
-      'Consecration Smoke', 'Agni Fire', 'Sacred Camphor', 'Altar Lamp',
-      'Temple Bell', 'Brass Platter', 'Sandalwood Paste', 'Sacred Ash',
-      'Pure Aspiration', 'Surrender Hearth', 'Eternal Flame'
-    ],
+      "White Marble",
+      "Incense Burner",
+      "Flame of Offering",
+      "Brass Censer",
+      "Consecration Smoke",
+      "Aspiration Fire",
+      "Sacred Camphor",
+      "Altar Lamp",
+      "Temple Bell",
+      "Brass Platter",
+      "Sandalwood Paste",
+      "Sacred Ash",
+      "Pure Aspiration",
+      "Surrender Hearth",
+      "Eternal Flame",
+      "Bronze Diya",
+      "Hammered Urn",
+      "Marble Basin",
+      "Consecrated Petal",
+      "Fragrant Smoke",
+      "Altar Stone",
+      "Sacred Wick",
+      "Offering Chalice",
+      "Bronze Halo",
+      "Altar Scriptorium",
+      "Temple Threshold",
+      "Incense Trail",
+      "Sanctuary Bell",
+      "Inner Flame",
+      "Consecrated Hearth",
+      "Bronze Petal",
+      "Marble Inlay",
+      "Aspiration Pillar",
+      "Sacred Resonator",
+      "Altar Veil",
+      "Temple Gong",
+      "Pure Consecration",
+      "Sacred Embers",
+      "Bronze Lantern",
+      "Offering Table",
+      "Flame of Light",
+      "Incense Bower",
+      "Sanctuary Hearth",
+      "Eternal Lamp",
+      "Sacred Platform",
+      "Altar Zenith",
+      "Flame of Peace",
+      "Golden Camphor",
+      "Temple Altar Apex",
+      "Sacred Flame Realization"
+],
     customTiles: buildCustomTilesForTheme('spirit_altar')
   },
   {
     id: 'sacred_sanctuary',
     chapter: 7,
-    name: 'Sacred Altar Shrine',
-    subtitle: 'Carved Teak Altar · Chiseled Brass Lotus',
-    mockupImage: './Assets/backgrounds/brass_altar_game.jpg',
-    bgImage: './Assets/backgrounds/brass_altar_game.jpg',
+    name: 'Sacred Teak Shrine',
+    subtitle: 'Dark Teak Wood · Chiseled Brass Lotus Medallions',
+    mockupImage: './Assets/backgrounds/sacred_sanctuary.png',
+    bgImage: './Assets/backgrounds/sacred_sanctuary_clean.png',
     archetype: 'brass_lotus',
     audioPreset: 'singing_bowl',
-    levelStart: 91,
-    levelEnd: 105,
+    levelStart: 301,
+    levelEnd: 350,
     icon: '🪷',
     levelNames: [
-      'Dark Teak Altar', 'Brass Lotus Cameo', 'Singing Bowl', 'Incense Mist',
-      'Sacred Garland', 'Diya Glow', 'Chiseled Pedestal', 'Conch Reverberation',
-      'Meditation Cushion', 'Temple Pillar', 'Silent Vigil', 'Sacred Offering',
-      'Devotional Heart', 'Inner Chamber', 'Divine Grace'
-    ],
+      "Dark Teak Altar",
+      "Brass Lotus",
+      "Singing Bowl",
+      "Incense Mist",
+      "Sacred Garland",
+      "Diya Glow",
+      "Chiseled Pedestal",
+      "Conch Echo",
+      "Meditation Cushion",
+      "Temple Pillar",
+      "Silent Vigil",
+      "Sacred Offering",
+      "Devotional Heart",
+      "Inner Chamber",
+      "Divine Grace",
+      "Teak Lattice",
+      "Brass Medallion",
+      "Carved Cornice",
+      "Shrine Door",
+      "Sanctuary Lantern",
+      "Sacred Drapery",
+      "Teak Threshold",
+      "Brass Finial",
+      "Sanctuary Bench",
+      "Floral Rosette",
+      "Shrine Bell",
+      "Temple Vault",
+      "Silent Portico",
+      "Carved Teak Column",
+      "Shrine Basin",
+      "Golden Garland",
+      "Incense Wisp",
+      "Sacred Aisle",
+      "Devotional Hearth",
+      "Carved Archway",
+      "Teak Balustrade",
+      "Brass Diya Stand",
+      "Sanctuary Terrace",
+      "Shrine Solitude",
+      "Quiet Courtyard",
+      "Carved Medallion",
+      "Sacred Teak Arch",
+      "Shrine Light",
+      "Inner Sanctum Walk",
+      "Teak Sanctuary Apex",
+      "Shrine Awakening",
+      "Peace of the Teak",
+      "Sacred Chamber",
+      "Shrine Realization",
+      "Eternal Teak Shrine"
+],
     customTiles: buildCustomTilesForTheme('sacred_sanctuary')
   },
   {
     id: 'ocean_horizon',
     chapter: 8,
-    name: 'Pondicherry Coastline Ocean',
-    subtitle: 'The Infinite Ocean · Seaglass & Pearls',
-    mockupImage: './Assets/backgrounds/coastline_theme.png',
-    bgImage: './Assets/backgrounds/coastline_theme.png',
+    name: 'Coromandel Coastline',
+    subtitle: 'The Infinite Ocean · Seaglass & Pearlescent Shell',
+    mockupImage: './Assets/backgrounds/ocean_horizon.png',
+    bgImage: './Assets/backgrounds/ocean_horizon_clean.png',
     archetype: 'seaglass',
     audioPreset: 'ocean_tide',
-    levelStart: 106,
-    levelEnd: 120,
+    levelStart: 351,
+    levelEnd: 400,
     icon: '🌊',
     levelNames: [
-      'Vastness', 'Quietude', 'Depth', 'Calm',
-      'Tide', 'Wave', 'Flow', 'Reflection',
-      'Frosted Seaglass', 'Promenade Rocks', 'Mother of Pearl', 'Nautilus Spiral',
-      'Horizon Light', 'Ocean Beacon', 'Infinite Silence'
-    ],
+      "Vastness",
+      "Quietude",
+      "Depth",
+      "Calm",
+      "Tide",
+      "Wave",
+      "Flow",
+      "Reflection",
+      "Frosted Seaglass",
+      "Promenade Rocks",
+      "Pearlescent Shell",
+      "Nautilus Spiral",
+      "Horizon Light",
+      "Ocean Beacon",
+      "Infinite Silence",
+      "Seaside Dawn",
+      "Granite Boulders",
+      "Salty Mist",
+      "Foaming Crest",
+      "Aquamarine Tide",
+      "Coastal Twilight",
+      "Coral Garden",
+      "Marine Horizon",
+      "Ocean Breeze",
+      "Promenade Walk",
+      "Pastel Dusk",
+      "Deep Swell",
+      "Shell Harbor",
+      "Tidal Solitude",
+      "Shoreline Rhythm",
+      "Sea Spray",
+      "Infinite Blue",
+      "Oceanic Stillness",
+      "Granite Pier",
+      "Tidepool Gem",
+      "Azure Calm",
+      "Coastal Lighthouse",
+      "Seaglass Pebble",
+      "Dusk Horizon",
+      "Rolling Breaker",
+      "Pacific Calm",
+      "Marine Sanctuary",
+      "Oceanic Peace",
+      "Promenade Beacon",
+      "Deep Trench",
+      "Vast Ocean Horizon",
+      "Tide Harmony",
+      "Endless Sea",
+      "Oceanic Apex",
+      "Coromandel Realization"
+],
     customTiles: buildCustomTilesForTheme('ocean_horizon')
   },
   {
     id: 'terracotta_earth',
     chapter: 9,
-    name: 'Ancient Banyan Tree',
-    subtitle: 'Unified Consciousness · Terracotta Clay',
-    mockupImage: './Assets/backgrounds/banyan_tree_theme.png',
-    bgImage: './Assets/backgrounds/banyan_tree_theme.png',
+    name: 'Ancient Terracotta Banyan',
+    subtitle: 'Unified Ground · Baked Terracotta Clay',
+    mockupImage: './Assets/backgrounds/terracotta_earth.png',
+    bgImage: './Assets/backgrounds/terracotta_earth_clean.png',
     archetype: 'terracotta',
     audioPreset: 'clay_pot',
-    levelStart: 121,
-    levelEnd: 135,
+    levelStart: 401,
+    levelEnd: 450,
     icon: '🏺',
     levelNames: [
-      'Harmony', 'Peace', 'Brotherhood', 'Collaboration',
-      'Goodwill', 'Sympathy', 'Oneness', 'Tree of Life',
-      'Aerial Roots', 'Vast Canopy', 'Triquetra Knot', 'Ancient Soil',
-      'Sprouting Seedling', 'Emerald Moss Patina', 'Unified Presence'
-    ],
+      "Harmony",
+      "Peace",
+      "Brotherhood",
+      "Collaboration",
+      "Goodwill",
+      "Sympathy",
+      "Oneness",
+      "Tree of Life",
+      "Aerial Roots",
+      "Vast Canopy",
+      "Triquetra Knot",
+      "Ancient Soil",
+      "Sprouting Seedling",
+      "Emerald Patina",
+      "Unified Presence",
+      "Sun-Baked Clay",
+      "Red Terracotta",
+      "Potter Wheel",
+      "Earth Basin",
+      "Clay Tablet",
+      "Deep Roots",
+      "Earthy Warmth",
+      "Ancient Grove",
+      "Terracotta Pillar",
+      "Root Lattice",
+      "Clay Amphora",
+      "Living Banyan",
+      "Earth Sanctuary",
+      "Soil of Unity",
+      "Carved Clay Tile",
+      "Red Ochre Soil",
+      "Banyan Shade",
+      "Terracotta Fleur",
+      "Grounded Peace",
+      "Clay Vessel",
+      "Ancient Trunk",
+      "Lichen on Clay",
+      "Terracotta Hearth",
+      "Banyan Courtyard",
+      "Clay Sunburst",
+      "Rooted Harmony",
+      "Porous Clay",
+      "Earthen Sanctum",
+      "Terracotta Archway",
+      "Living Soil",
+      "Ancient Wisdom Tree",
+      "Terracotta Apex",
+      "Eternal Roots",
+      "Master Terracotta",
+      "Banyan Realization"
+],
     customTiles: buildCustomTilesForTheme('terracotta_earth')
   },
   {
     id: 'floral_harmony',
     chapter: 10,
-    name: 'Twelve Petal Gardens',
-    subtitle: 'Twelve Sacred Virtues · Concentric Gardens',
-    mockupImage: './Assets/backgrounds/matrimandir_petals.png',
-    bgImage: './Assets/backgrounds/matrimandir_petals.png',
+    name: 'Twelve Sacred Petals',
+    subtitle: 'Concentric Virtues · Botanical Porcelain & Quartz',
+    mockupImage: './Assets/backgrounds/floral_harmony.png',
+    bgImage: './Assets/backgrounds/floral_harmony_clean.png',
     archetype: 'enamel_cameo',
     audioPreset: 'quartz_bowl',
-    levelStart: 136,
-    levelEnd: 150,
+    levelStart: 451,
+    levelEnd: 500,
     icon: '🌸',
     levelNames: [
-      'Sincerity', 'Humility', 'Gratitude', 'Perseverance',
-      'Aspiration', 'Receptivity', 'Progress', 'Courage',
-      'Goodness', 'Generosity', 'Equality', 'Peace',
-      'Harmony', 'Perfection', 'Supreme Grace'
-    ],
+      "Sincerity",
+      "Humility",
+      "Gratitude",
+      "Perseverance",
+      "Aspiration",
+      "Receptivity",
+      "Progress",
+      "Courage",
+      "Goodness",
+      "Generosity",
+      "Equality",
+      "Peace",
+      "Harmony",
+      "Perfection",
+      "Supreme Grace",
+      "Rose Quartz Cameo",
+      "Blush Petal",
+      "Concentric Walk",
+      "Magnolia Spray",
+      "Orchid Terrace",
+      "Floral Aisle",
+      "Jasmine Bower",
+      "Lavender Breeze",
+      "Iris Crest",
+      "Botanical Crown",
+      "Garden Harmony",
+      "Fragrant Bloom",
+      "Cameo Brooch",
+      "Petal Circle",
+      "Enamel Blossom",
+      "Dewy Morning",
+      "Porcelain Cameo",
+      "Floral Medallion",
+      "Twelve Virtues Walk",
+      "Petal Sanctuary",
+      "Sacred Blossom",
+      "Radiant Cameo",
+      "Garden of Peace",
+      "Rose Petal Path",
+      "Quartz Basin",
+      "Floral Aspiration",
+      "Harmonic Bloom",
+      "Concentric Petals",
+      "Virtue of Truth",
+      "Blossom Arch",
+      "Garden Apex",
+      "Petal Realization",
+      "Crown of Flowers",
+      "Twelve Petals Sanctuary",
+      "Eternal Floral Harmony"
+],
     customTiles: buildCustomTilesForTheme('floral_harmony')
   },
   {
     id: 'blooming_mandala',
     chapter: 11,
-    name: 'Blooming Mandala Garden',
-    subtitle: 'Concentric Harmony · Enameled Porcelain',
+    name: 'Enameled Porcelain Mandala',
+    subtitle: 'Concentric Harmony · High-Gloss Porcelain & Gold Wire',
     mockupImage: './Assets/backgrounds/blooming_mandala.png',
-    bgImage: './Assets/backgrounds/blooming_mandala.png',
+    bgImage: './Assets/backgrounds/blooming_mandala_clean.png',
     archetype: 'porcelain_cameo',
     audioPreset: 'birdsong',
-    levelStart: 151,
-    levelEnd: 165,
+    levelStart: 501,
+    levelEnd: 550,
     icon: '🏵️',
     levelNames: [
-      'Central Crystal', 'Inner Ring', 'Twelve Petals', 'Concentric Blossom',
-      'Golden Axis', 'Watercolor Bloom', 'Floral Pathway', 'Sacred Orbit',
-      'Porcelain Rosette', 'Lapis Inlay', 'Radiant Aureole', 'Petal Symmetry',
-      'Geometric Dance', 'Celestial Bloom', 'Integral Mandala'
-    ],
+      "Central Crystal",
+      "Inner Ring",
+      "Twelve Petals",
+      "Concentric Blossom",
+      "Golden Axis",
+      "Watercolor Bloom",
+      "Floral Pathway",
+      "Sacred Orbit",
+      "Porcelain Rosette",
+      "Lapis Inlay",
+      "Radiant Aureole",
+      "Petal Symmetry",
+      "Geometric Dance",
+      "Celestial Bloom",
+      "Integral Mandala",
+      "Ivory Porcelain",
+      "Gold Wire Clasp",
+      "High-Gloss Glaze",
+      "Ceramic Lotus",
+      "Mandala Core",
+      "Radial Filigree",
+      "Enamel Crest",
+      "Porcelain Wheel",
+      "Gilded Rosette",
+      "Circular Solitude",
+      "Ceramic Basin",
+      "Mandala Terrace",
+      "Ivory Cameo Ring",
+      "Concentric Calm",
+      "Enamel Petal",
+      "Gold Wire Symmetry",
+      "Porcelain Medallion",
+      "Mandala Center",
+      "Ceramic Mandala Walk",
+      "Radial Harmony",
+      "Enamel Rosette",
+      "Gold Wire Lace",
+      "Porcelain Bloom",
+      "Mandala Solitude",
+      "Celestial Porcelain",
+      "Concentric Apex",
+      "Radial Balance",
+      "Ivory Harmony",
+      "Enamel Lotus",
+      "Sacred Porcelain Wheel",
+      "Mandala Crown",
+      "Porcelain Mastery",
+      "Concentric Realization",
+      "Mandala Apex",
+      "Eternal Porcelain Mandala"
+],
     customTiles: buildCustomTilesForTheme('blooming_mandala')
   },
   {
     id: 'sacred_spiral',
     chapter: 12,
     name: 'Sacred Spiral Mandala',
-    subtitle: 'Golden Evolutionary Ascent · Sacred Geometry',
-    mockupImage: './Assets/backgrounds/blooming_mandala.jpg',
-    bgImage: './Assets/backgrounds/blooming_mandala.jpg',
+    subtitle: 'Evolutionary Ascent · Imperial Jade & Bronze Filigree',
+    mockupImage: './Assets/backgrounds/sacred_spiral.png',
+    bgImage: './Assets/backgrounds/sacred_spiral_clean.png',
     archetype: 'spiral_vine',
     audioPreset: 'bansuri_flute',
-    levelStart: 166,
-    levelEnd: 180,
+    levelStart: 551,
+    levelEnd: 600,
     icon: '🌿',
     levelNames: [
-      'Golden Ratio Spiral', 'Vine of Ascent', 'Sacred Vortex', 'Evolutionary Curve',
-      'Fibonacci Coil', 'Celestial Swirl', 'Dynamic Spiral', 'Center of Force',
-      'Ascending Helix', 'Spiral Orbit', 'Golden Filigree', 'Transformation Gyre',
-      'Cosmic Evolution', 'Radiant Core', 'Crown of Ascent'
-    ],
+      "Golden Spiral",
+      "Vine of Ascent",
+      "Sacred Vortex",
+      "Evolutionary Curve",
+      "Fibonacci Coil",
+      "Celestial Swirl",
+      "Dynamic Spiral",
+      "Center of Force",
+      "Ascending Helix",
+      "Spiral Orbit",
+      "Golden Filigree",
+      "Transformation Gyre",
+      "Cosmic Evolution",
+      "Radiant Core",
+      "Crown of Ascent",
+      "Jade Helix",
+      "Bronze Filigree",
+      "Curling Tendril",
+      "Verdant Gyre",
+      "Spiral Path",
+      "Emerald Coil",
+      "Botanical Vortex",
+      "Nautilus Curve",
+      "Ascending Vine",
+      "Spiral Sanctuary",
+      "Jade Medallion",
+      "Evolutionary Spiral",
+      "Dynamic Helix",
+      "Bronze Vine",
+      "Spiral Chamber",
+      "Jade Sprout",
+      "Coiled Serenity",
+      "Spiral Horizon",
+      "Ascent Wheel",
+      "Jade Rosette",
+      "Botanical Ascent",
+      "Spiral Meditation",
+      "Verdant Vortex",
+      "Golden Helix Path",
+      "Ascending Gyre",
+      "Jade Spiral Apex",
+      "Spiral Harmony",
+      "Evolutionary Crest",
+      "Verdant Spiral Walk",
+      "Sacred Gyre",
+      "Spiral Ascent Crown",
+      "Jade Transformation",
+      "Evolutionary Mastery",
+      "Spiral Realization",
+      "Eternal Sacred Spiral"
+],
     customTiles: buildCustomTilesForTheme('sacred_spiral')
   },
   {
     id: 'master_sanctuary',
     chapter: 13,
-    name: 'Flower Garden Sanctuary',
-    subtitle: 'Divine Presence · Flower Garden & White Marble',
-    mockupImage: './Assets/backgrounds/auromatch_ui_mockup.png',
-    bgImage: './Assets/backgrounds/auromatch_ui_mockup.png',
+    name: 'White Marble Master Shrine',
+    subtitle: 'Divine Presence · Thassos White Marble & Inlaid 24K Gold',
+    mockupImage: './Assets/backgrounds/master_sanctuary.png',
+    bgImage: './Assets/backgrounds/master_sanctuary_clean.png',
     archetype: 'ivory_wood',
     audioPreset: 'meditation_gong',
-    levelStart: 181,
-    levelEnd: 195,
+    levelStart: 601,
+    levelEnd: 650,
     icon: '👑',
     levelNames: [
-      'Lotus (Divine Presence)', 'Jasmine (Purity)', 'Rose (Love for the Divine)', 'Hibiscus (Divine Power)',
-      'Tulsi (Devotion)', 'Marigold (Abundance)', 'Zinnia (Endurance)', 'Periwinkle (Peace in the Vital)',
-      'White Marble Platform', 'Floral Garland', 'Ancient Canopy', 'Golden Ray',
-      'Fragrant Jasmine Spray', 'Divine Blessing', 'Supreme Peace'
-    ],
+      "White Marble Platform",
+      "Floral Garland",
+      "Ancient Canopy",
+      "Golden Ray",
+      "Jasmine Spray",
+      "Divine Blessing",
+      "Supreme Peace",
+      "Inner Silence",
+      "Purity of Light",
+      "Gilded Inlay",
+      "Thassos Slab",
+      "Master Pillar",
+      "Sanctuary Threshold",
+      "Sacred Reflection",
+      "White Petal Walk",
+      "Marble Courtyard",
+      "Gold Leaf Filigree",
+      "Carved Teak Arch",
+      "Sanctuary Basin",
+      "Offering Platter",
+      "Eternal Presence",
+      "Quiet Portico",
+      "Inlaid Lotus",
+      "Sacred Radiance",
+      "Master Gallery",
+      "Chiseled Marble",
+      "Golden Diya Stand",
+      "Peace of the Shrine",
+      "Inner Court",
+      "White Rose Inlay",
+      "Pure Marble Arch",
+      "Sanctuary Corridor",
+      "Golden Sunbeam",
+      "Master Hearth",
+      "Marble Scriptorium",
+      "Spiritual Throne",
+      "Inlaid Jasmine",
+      "Sanctuary Apex",
+      "Golden Chime",
+      "White Marble Dome",
+      "Master Balustrade",
+      "Courtyard of Peace",
+      "Gilded Petal Walk",
+      "Sacred Marble Monolith",
+      "Eternal Blessing",
+      "Master Crown",
+      "Presence of Peace",
+      "Supreme Sanctuary",
+      "Shrine Realization",
+      "Master Shrine Apex"
+],
     customTiles: buildCustomTilesForTheme('master_sanctuary')
-  }
+  },
+  {
+    id: 'lotus_pond',
+    chapter: 14,
+    name: 'Sunlit Lotus Pond',
+    subtitle: 'River Quartz & Bamboo · Serene Water Lily Basin',
+    mockupImage: './Assets/backgrounds/lotus_pond.png',
+    bgImage: './Assets/backgrounds/lotus_pond_clean.png',
+    archetype: 'slate_zen',
+    audioPreset: 'zen_stone',
+    levelStart: 651,
+    levelEnd: 700,
+    icon: '🪷',
+    levelNames: [
+      "Sunlit Lotus",
+      "Water Lily Basin",
+      "Clear Reflection",
+      "Floating Pad",
+      "River Quartz",
+      "Bamboo Terrace",
+      "Quiet Ripples",
+      "Koi Glade",
+      "Dewdrop on Leaf",
+      "Reed Bank",
+      "Willow Frond",
+      "Serene Waterway",
+      "Pond Threshold",
+      "Spring Stream",
+      "Lotus Blossom",
+      "Bamboo Pier",
+      "Quartz Pebble",
+      "Morning Mist",
+      "Lilypad Mosaic",
+      "Water Reflection",
+      "Dragonfly Flight",
+      "Gentle Ripple",
+      "Sunlit Surface",
+      "Emerald Lilypad",
+      "Quartz Basin",
+      "Water Garden",
+      "Lotus Root",
+      "Bamboo Slat Walk",
+      "Quiet Pond",
+      "Shimmering Water",
+      "Water Lily Scent",
+      "Bamboo Flute Walk",
+      "Pond Solitude",
+      "Floating Bloom",
+      "Pebble Shore",
+      "Clear Spring",
+      "Lily Terrace",
+      "Lotus Stamen",
+      "Sunbeam on Water",
+      "Serene Basin",
+      "Water Lily Dawn",
+      "Reflective Calm",
+      "Emerald Stream",
+      "Lotus Harmony",
+      "Bamboo Bridge",
+      "Sunlit Pond Apex",
+      "Water Lily Peace",
+      "Pond Realization",
+      "Lotus Sanctuary",
+      "Sunlit Lotus Pond Realization"
+],
+    customTiles: buildCustomTilesForTheme('lotus_pond')
+  },
+  {
+    id: 'granite_monolith',
+    chapter: 15,
+    name: 'Himalayan Granite Monolith',
+    subtitle: 'Rough-Hewn Silver Granite · High Mountain Silence',
+    mockupImage: './Assets/backgrounds/granite_monolith.png',
+    bgImage: './Assets/backgrounds/granite_monolith_clean.png',
+    archetype: 'slate_zen',
+    audioPreset: 'zen_stone',
+    levelStart: 701,
+    levelEnd: 750,
+    icon: '🏔️',
+    levelNames: [
+      "Granite Monolith",
+      "Himalayan Ridge",
+      "Chiseled Stone",
+      "Alpine Cloud",
+      "Glacial Stream",
+      "Mountain Solitude",
+      "High Altitude Sun",
+      "Falcon Crest",
+      "Stone Cairn",
+      "Monolith Pillar",
+      "Mountain Bell",
+      "Silver Lichen",
+      "Snowline Quiet",
+      "Granite Threshold",
+      "Highland Wind",
+      "Speckled Stone",
+      "Chiseled Ridge",
+      "Alpine Pass",
+      "Glacial Blue",
+      "Monolith Face",
+      "Granite Terrace",
+      "Mountain Dawn",
+      "Eternal Granite",
+      "Highland Cairn",
+      "Silver Mist",
+      "Rock Plateau",
+      "Chiseled Steps",
+      "Alpine Stillness",
+      "Granite Pillar",
+      "Mountain Aspiration",
+      "Stone Sanctuary",
+      "Granite Slab",
+      "High Altitude Calm",
+      "Monolith Wall",
+      "Alpine Horizon",
+      "Granite Crest",
+      "Chiseled Peak",
+      "Rock Scriptorium",
+      "Mountain Echo",
+      "Glacial Crystal",
+      "Granite Spire",
+      "Highland Peace",
+      "Monolith Tower",
+      "Summit of Silence",
+      "Granite Strength",
+      "Alpine Monolith Apex",
+      "Mountain Mastery",
+      "Granite Realization",
+      "Himalayan Summit",
+      "Eternal Granite Monolith"
+],
+    customTiles: buildCustomTilesForTheme('granite_monolith')
+  },
+  {
+    id: 'sandalwood_amber',
+    chapter: 16,
+    name: 'Royal Sandalwood & Amber',
+    subtitle: 'Fragrant Seasoned Sandalwood · Warm Amber Incense',
+    mockupImage: './Assets/backgrounds/sandalwood_amber.png',
+    bgImage: './Assets/backgrounds/sandalwood_amber_clean.png',
+    archetype: 'leather_tome',
+    audioPreset: 'parchment',
+    levelStart: 751,
+    levelEnd: 800,
+    icon: '🪵',
+    levelNames: [
+      "Sandalwood Fan",
+      "Amber Resin",
+      "Fragrant Smoke",
+      "Carved Rosette",
+      "Honeycomb Cell",
+      "Aspiration Flame",
+      "Spiced Clove",
+      "Carved Elephant",
+      "Teak Clasp",
+      "Scented Garland",
+      "Amber Sunburst",
+      "Offering Urn",
+      "Glowing Relic",
+      "Luminous Sandal Seal",
+      "Royal Diadem",
+      "Sandalwood Box",
+      "Amber Bead",
+      "Fragrant Hearth",
+      "Seasoned Timber",
+      "Sandal Paste",
+      "Golden Amber Drop",
+      "Carved Lattice",
+      "Royal Incense",
+      "Sandalwood Aisle",
+      "Amber Glow",
+      "Fragrant Sanctum",
+      "Warm Honeycomb",
+      "Carved Medallion",
+      "Sandalwood Pillar",
+      "Amber Scent",
+      "Golden Resinite",
+      "Sandalwood Screen",
+      "Royal Offering",
+      "Incense Wisp",
+      "Amber Chalice",
+      "Fragrant Solitude",
+      "Carved Timber Arch",
+      "Amber Horizon",
+      "Sandalwood Chamber",
+      "Spiced Smoke",
+      "Warm Amber Light",
+      "Sandalwood Terrace",
+      "Royal Hearth",
+      "Amber Petal",
+      "Fragrant Aspiration",
+      "Sandalwood Harmony",
+      "Amber Sanctuary Apex",
+      "Sandalwood Realization",
+      "Royal Amber Masterpiece",
+      "Eternal Sandalwood"
+],
+    customTiles: buildCustomTilesForTheme('sandalwood_amber')
+  },
+  {
+    id: 'obsidian_vault',
+    chapter: 17,
+    name: 'Obsidian Observatory',
+    subtitle: 'Jet-Black Mirror Obsidian · Platinum Astral Mapping',
+    mockupImage: './Assets/backgrounds/obsidian_vault.png',
+    bgImage: './Assets/backgrounds/obsidian_vault_clean.png',
+    archetype: 'cosmic_glass',
+    audioPreset: 'crystal_bell',
+    levelStart: 801,
+    levelEnd: 850,
+    icon: '🔭',
+    levelNames: [
+      "Obsidian Mirror",
+      "Midnight Star",
+      "Astrolabe Gear",
+      "Celestial Telescope",
+      "Crescent Moon",
+      "Nebula Core",
+      "Prismatic Shard",
+      "Eclipse Ring",
+      "Comet Trail",
+      "Planetary Ring",
+      "Starlight Ray",
+      "Cosmic Compass",
+      "Radiant Star",
+      "Platinum Nova",
+      "Deep Sky Void",
+      "Jet Obsidian",
+      "Observatory Dome",
+      "Star Chart",
+      "Platinum Armillary",
+      "Cosmic Horizon",
+      "Midnight Glass",
+      "Stellar Transit",
+      "Obsidian Slab",
+      "Celestial Axis",
+      "Astral Reticle",
+      "Midnight Solitude",
+      "Deep Sky Lens",
+      "Starlight Reflector",
+      "Obsidian Basin",
+      "Platinum Constellation",
+      "Cosmic Vault",
+      "Observatory Pier",
+      "Star Meridian",
+      "Obsidian Core",
+      "Astral Sphere",
+      "Midnight Silence",
+      "Celestial Astrolabe",
+      "Obsidian Terrace",
+      "Starlight Calibration",
+      "Platinum Ring",
+      "Deep Space Mirror",
+      "Cosmic Zenith",
+      "Astral Observatory",
+      "Obsidian Apex",
+      "Midnight Nova",
+      "Stellar Cartography",
+      "Platinum Starlight",
+      "Obsidian Realization",
+      "Master Observatory",
+      "Eternal Obsidian Vault"
+],
+    customTiles: buildCustomTilesForTheme('obsidian_vault')
+  },
+  {
+    id: 'golden_harvest',
+    chapter: 18,
+    name: 'Golden Harvest & Woven Rattan',
+    subtitle: 'Woven Golden Rattan · Sun-Dried Clay & Wheat Grains',
+    mockupImage: './Assets/backgrounds/golden_harvest.png',
+    bgImage: './Assets/backgrounds/golden_harvest_clean.png',
+    archetype: 'terracotta',
+    audioPreset: 'clay_pot',
+    levelStart: 851,
+    levelEnd: 900,
+    icon: '🌾',
+    levelNames: [
+      "Wheat Sheaf",
+      "Woven Rattan",
+      "Harvest Sun",
+      "Grain Pot",
+      "Golden Corn",
+      "Earthen Sickle",
+      "Golden Sprout",
+      "Honey Comb",
+      "Field Poppy",
+      "Bountiful Basket",
+      "Sunlit Millstone",
+      "Harvest Bread",
+      "Radiant Ear",
+      "Grain Wheel",
+      "Straw Crown",
+      "Rattan Weave",
+      "Sun-Dried Clay",
+      "Golden Stalks",
+      "Threshing Floor",
+      "Autumn Breeze",
+      "Harvest Wagon",
+      "Earthen Granary",
+      "Woven Lattice",
+      "Golden Field",
+      "Rattan Basket",
+      "Sunlit Sheaf",
+      "Harvest Hearth",
+      "Barley Grain",
+      "Clay Amphora of Corn",
+      "Rattan Canopy",
+      "Golden Chaff",
+      "Autumn Solitude",
+      "Harvest Moon",
+      "Field Meadow",
+      "Woven Straw Mat",
+      "Grain Storage",
+      "Golden Stubble",
+      "Harvest Horizon",
+      "Rattan Terrace",
+      "Sunlit Barn",
+      "Golden Ear of Wheat",
+      "Harvest Solstice",
+      "Bountiful Field",
+      "Woven Harmony",
+      "Harvest Abundance",
+      "Golden Sheaf Apex",
+      "Rattan Mastery",
+      "Harvest Realization",
+      "Golden Harvest Masterpiece",
+      "Eternal Harvest"
+],
+    customTiles: buildCustomTilesForTheme('golden_harvest')
+  },
+  {
+    id: 'opal_aurora',
+    chapter: 19,
+    name: 'Iridescent Opal & Aurora',
+    subtitle: 'Fire Opal Gemstone · Northern Lights & Rose-Gold',
+    mockupImage: './Assets/backgrounds/opal_aurora.png',
+    bgImage: './Assets/backgrounds/opal_aurora_clean.png',
+    archetype: 'enamel_cameo',
+    audioPreset: 'quartz_bowl',
+    levelStart: 901,
+    levelEnd: 950,
+    icon: '💎',
+    levelNames: [
+      "Fire Opal",
+      "Aurora Wave",
+      "Pearlescent Shell",
+      "Prismatic Shard",
+      "Luminous Butterfly",
+      "Iridescent Feather",
+      "Northern Star",
+      "Violet Crystal",
+      "Rainbow Arc",
+      "Celestial Veil",
+      "Polar Glow",
+      "Spectral Swan",
+      "Pulsing Opal",
+      "Aurora Crown",
+      "Iridescent Lotus",
+      "Rose-Gold Bezel",
+      "Opal Flashes",
+      "Curtain of Light",
+      "Aurora Borealis",
+      "Prismatic Reflection",
+      "Iridescent Shell",
+      "Northern Radiance",
+      "Fire Opal Tablet",
+      "Aurora Horizon",
+      "Rose-Gold Filigree",
+      "Luminous Mist",
+      "Spectral Glow",
+      "Iridescent Shimmer",
+      "Polar Twilight",
+      "Opaline Gem",
+      "Aurora Veil",
+      "Celestial Shimmer",
+      "Rainbow Prism",
+      "Rose-Gold Clasp",
+      "Polar Night",
+      "Iridescent Wave",
+      "Aurora Cascade",
+      "Opal Fire",
+      "Northern Glow",
+      "Celestial Opal",
+      "Aurora Solitude",
+      "Iridescent Aura",
+      "Rose-Gold Cameo",
+      "Polar Aurora Walk",
+      "Spectral Lotus",
+      "Opal Apex",
+      "Aurora Mastery",
+      "Iridescent Realization",
+      "Supreme Opal Crown",
+      "Eternal Opal Aurora"
+],
+    customTiles: buildCustomTilesForTheme('opal_aurora')
+  },
+  {
+    id: 'bodhi_grove',
+    chapter: 20,
+    name: 'Sacred Bodhi Grove',
+    subtitle: 'Gilded Pipal Wood · White Jade & Universal Light',
+    mockupImage: './Assets/backgrounds/bodhi_grove.png',
+    bgImage: './Assets/backgrounds/bodhi_grove_clean.png',
+    archetype: 'ivory_wood',
+    audioPreset: 'meditation_gong',
+    levelStart: 951,
+    levelEnd: 1000,
+    icon: '🌳',
+    levelNames: [
+      "Bodhi Leaf",
+      "Sacred Bodhi Tree",
+      "White Jade Tablet",
+      "Enlightenment Flame",
+      "Lotus Seat",
+      "Wheel of Truth",
+      "Golden Bell",
+      "Meditation Urn",
+      "Sunburst Halo",
+      "Sacred Thread",
+      "Radiant Deer",
+      "Peace Crane",
+      "Golden Bodhi Master",
+      "Supreme Sun Star",
+      "Jade Lotus",
+      "Gilded Pipal Wood",
+      "Universal Light",
+      "Canopy of Awakening",
+      "White Jade Pillar",
+      "Golden Leaves",
+      "Tree of Enlightenment",
+      "Sacred Grove",
+      "Lotus Dais",
+      "Bodhi Terrace",
+      "Ancient Roots",
+      "Spiritual Radiance",
+      "Enlightenment Courtyard",
+      "Universal Peace",
+      "Golden Canopy",
+      "White Jade Floor",
+      "Bodhi Whispers",
+      "Sacred Arbor",
+      "Golden Bell Tower",
+      "Sunlit Bodhi Walk",
+      "Seat of Stillness",
+      "Lotus Meditation",
+      "Enlightenment Dawn",
+      "Gilded Trunk",
+      "Universal Halo",
+      "Bodhi Sanctuary",
+      "White Jade Rosette",
+      "Tree of Life Core",
+      "Sacred Grove Solitude",
+      "Enlightenment Path",
+      "Golden Leaf Rain",
+      "Bodhi Monolith",
+      "Universal Crown",
+      "Supreme Enlightenment",
+      "Grand Finale Awakening",
+      "Bodhi Grove Realization"
+],
+    customTiles: buildCustomTilesForTheme('bodhi_grove')
+  },
+
 ];
 
 class ThemeManager {
   /**
-   * Retrieves the active Realm definition for any level (1 - 195)
+   * Retrieves the active Realm definition for any level (1 - 1000)
    */
   static getRealmForLevel(levelNum = 1) {
-    const safeLevel = Math.max(1, levelNum);
+    const safeLevel = Math.max(1, Math.min(TOTAL_REALM_LEVELS, levelNum));
     const realmIdx = Math.floor((safeLevel - 1) / LEVELS_PER_REALM) % REALMS.length;
     const realm = REALMS[realmIdx];
     const levelInRealm = ((safeLevel - 1) % LEVELS_PER_REALM) + 1;
@@ -55726,7 +57158,7 @@ class ThemeManager {
       currentLevel: safeLevel,
       levelInRealm,
       levelName,
-      isMasterArtLevel: true, // In Realms mode, all 15 levels feature authentic dedicated art tiles
+      isMasterArtLevel: true, // In Realms mode, all 50 levels feature authentic dedicated art tiles
       masterLevelIndex: levelInRealm,
       classicLevelIndex: null,
       isFirstInRealm: levelInRealm === 1,
@@ -55735,10 +57167,44 @@ class ThemeManager {
   }
 
   /**
-   * Returns list of all 13 secular realms for the visual Realm Browser carousel
+   * Returns list of all 20 secular realms for the visual Realm Browser carousel
    */
   static getAllRealms() {
     return REALMS;
+  }
+
+  /**
+   * Check if a specific realm is unlocked based on player's highest completed/current level
+   * Chapter 1 is always unlocked. Chapter N is unlocked if player has reached or passed levelStart.
+   */
+  static isRealmUnlocked(realmId, playerCurrentLevel = 1) {
+    const realm = REALMS.find(r => r.id === realmId);
+    if (!realm) return false;
+    if (realm.chapter === 1) return true;
+    return playerCurrentLevel >= realm.levelStart;
+  }
+
+  /**
+   * Returns progression statistics for a realm:
+   * { completedLevels, totalLevels: 50, percent, isCompleted }
+   */
+  static getRealmProgress(realmId, playerCurrentLevel = 1) {
+    const realm = REALMS.find(r => r.id === realmId);
+    if (!realm) return { completedLevels: 0, totalLevels: 50, percent: 0, isCompleted: false };
+    
+    if (playerCurrentLevel <= realm.levelStart) {
+      return { completedLevels: 0, totalLevels: 50, percent: 0, isCompleted: false };
+    }
+    if (playerCurrentLevel > realm.levelEnd) {
+      return { completedLevels: 50, totalLevels: 50, percent: 100, isCompleted: true };
+    }
+    const completed = playerCurrentLevel - realm.levelStart;
+    return {
+      completedLevels: completed,
+      totalLevels: 50,
+      percent: Math.round((completed / 50) * 100),
+      isCompleted: false
+    };
   }
 }
 
@@ -55790,6 +57256,29 @@ function getTileCountForLevel(levelNum) {
   return 108;                            // Levels 261-520+: 108 tiles (Grand Citadel)
 }
 
+/**
+ * 4-Tier Stacking Difficulty Curve for 50 Levels per Theme:
+ * Tier 1: Levels 1–5 (Zen Ease): 24–36 tiles (12–18 pairs), 1–2 layers, high free-edge ratio.
+ * Tier 2: Levels 6–20 (Moderate Flow): 48–64 tiles, 3 layers.
+ * Tier 3: Levels 21–40 (Strategic Hard): 72–96 tiles, 4–5 layers.
+ * Tier 4: Levels 41–50 (Master Monolith): 100–108 tiles, 5–6 layers.
+ */
+function getRealmTileCount(levelNum) {
+  const levelInRealm = ((levelNum - 1) % 50) + 1;
+  if (levelInRealm <= 2) return 24;      // Level 1-2: 24 tiles (12 pairs, peaceful start)
+  if (levelInRealm <= 4) return 30;      // Level 3-4: 30 tiles (15 pairs)
+  if (levelInRealm <= 5) return 36;      // Level 5: 36 tiles (18 pairs)
+  if (levelInRealm <= 10) return 48;     // Level 6-10: 48 tiles (24 pairs, 3 layers)
+  if (levelInRealm <= 15) return 56;     // Level 11-15: 56 tiles (28 pairs)
+  if (levelInRealm <= 20) return 64;     // Level 16-20: 64 tiles (32 pairs)
+  if (levelInRealm <= 28) return 72;     // Level 21-28: 72 tiles (36 pairs, 4-5 layers)
+  if (levelInRealm <= 34) return 84;     // Level 29-34: 84 tiles (42 pairs)
+  if (levelInRealm <= 40) return 96;     // Level 35-40: 96 tiles (48 pairs)
+  if (levelInRealm <= 45) return 102;    // Level 41-45: 102 tiles (51 pairs)
+  return 108;                            // Level 46-50: 108 tiles (54 pairs, Master Monolith)
+}
+
+
 class GameManager {
   constructor(options = {}) {
     this.gameplayMode = options.gameplayMode || 'vita'; // 'vita' | 'tile_club'
@@ -55803,6 +57292,8 @@ class GameManager {
     // Player progression state (Sparks Economy & 520 Levels)
     this.player = this.loadPlayerState();
     this.hintsUsedInStage = 0;
+    this.lastMatchTime = 0;
+    this.comboCount = 0;
 
     // State collections
     this.tiles = [];
@@ -56044,11 +57535,10 @@ class GameManager {
       }
     }
 
-    if (!tileCount) {
-      tileCount = getTileCountForLevel(levelNum);
-    }
-
     const isRealmsMode = (this.gameplayMode === 'realms');
+    if (!tileCount) {
+      tileCount = isRealmsMode ? getRealmTileCount(levelNum) : getTileCountForLevel(levelNum);
+    }
     const isTileClub = (this.gameplayMode === 'tile_club');
     const K = isTileClub ? 3 : 2;
     const distinctFloraCount = Math.max(3, Math.floor(tileCount / K));
@@ -56324,8 +57814,19 @@ class GameManager {
 
       const flora = firstTile.floraData || getFloraById(firstTile.floraId);
 
-      // Award score (+100 base score)
-      this.player.score = (this.player.score || 0) + 100;
+      // Track Procedural Combo Chain
+      const nowMatchTime = Date.now();
+      if (this.lastMatchTime && (nowMatchTime - this.lastMatchTime <= 2800)) {
+        this.comboCount = (this.comboCount || 1) + 1;
+      } else {
+        this.comboCount = 1;
+      }
+      this.lastMatchTime = nowMatchTime;
+
+      // Award score (+100 base score * combo multiplier)
+      const comboMult = Math.min(3, 1 + (this.comboCount - 1) * 0.25);
+      const earnedPts = Math.round(100 * comboMult);
+      this.player.score = (this.player.score || 0) + earnedPts;
 
       // Award bonus sparks for Golden Relic archetypes (+10 Sparks!)
       if (flora && flora.archetype === 'golden_relic') {
@@ -56344,10 +57845,17 @@ class GameManager {
         tiles: [firstTile, tile]
       });
 
-      // Visual Kinetic Convergence Smash & Stardust Dissolution
+      // Visual 2-Tile Radiant Glow & Kinetic Convergence Smash
       if (typeof document !== 'undefined') {
         const el1 = document.getElementById(firstTile.id);
         const el2 = document.getElementById(tile.id);
+        if (el1) el1.classList.add('tile-matching-glow');
+        if (el2) el2.classList.add('tile-matching-glow');
+
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+          try { navigator.vibrate(25); } catch(e){}
+        }
+
         if (el1 && el2) {
           triggerTileConvergenceSmash(el1, el2);
         } else {
@@ -56356,8 +57864,28 @@ class GameManager {
         }
       }
 
+      // Procedural Web Audio API combo pitch arpeggio & smash whoosh
+      playComboMatchChime(this.comboCount);
       playTileSmashWhoosh();
       playAshramMeditationGong();
+
+      // Physical Tile Settling Physics for newly unblocked tiles
+      if (typeof document !== 'undefined') {
+        const activeRemaining = this.tiles.filter(t => !t.isMatched);
+        const newlyPlayable = activeRemaining.filter(t => VitaBoardGenerator.isTileFree(t, activeRemaining));
+        if (newlyPlayable.length > 0) {
+          setTimeout(() => {
+            playTileSettleSound();
+            newlyPlayable.forEach(nt => {
+              const el = document.getElementById(nt.id);
+              if (el) {
+                el.classList.add('tile-settle');
+                setTimeout(() => el.classList.remove('tile-settle'), 260);
+              }
+            });
+          }, 180);
+        }
+      }
 
       if (this.onMatchSuccess) {
         this.onMatchSuccess({
@@ -56584,6 +58112,14 @@ class GameManager {
       }
 
       const completedLevel = this.player.currentLevel;
+      // Sequential Chapter Unlock check for 20 Themes (every 50 levels)
+      const isChapterComplete = (this.gameplayMode === 'realms') && (completedLevel % 50 === 0);
+      const completedChapterNum = Math.floor((completedLevel - 1) / 50) + 1;
+      const nextChapterNum = completedChapterNum + 1;
+      if (isChapterComplete) {
+        this.player.highestUnlockedRealm = Math.max(this.player.highestUnlockedRealm || 1, nextChapterNum);
+      }
+
       const isMilestone = (completedLevel % 10 === 0);
       if (isMilestone) {
         earnedSparks += 20; // +20 extra sparks bonus on Sanctuary Milestone levels (Total +30!)
@@ -57440,20 +58976,42 @@ window.addEventListener('load', () => {
 
         const realms = ThemeManager.getAllRealms();
         const currentLvl = activeGameManager.player.currentLevel || 1;
-        const currentRealm = ThemeManager.getRealmForLevel(currentLvl);
+        const highestUnlocked = activeGameManager.player.highestUnlockedRealm || Math.max(1, Math.floor((currentLvl - 1) / 50) + 1);
 
         container.innerHTML = realms.map(r => {
-            const isActive = (r.id === currentRealm.id);
-            const currentLevelInThisRealm = (isActive && currentRealm.levelInRealm) ? currentRealm.levelInRealm : 1;
+            const isUnlocked = (r.chapter === 1) || (r.chapter <= highestUnlocked);
+            const progress = ThemeManager.getRealmProgress(r.id, currentLvl);
+            const isActive = isUnlocked && (currentLvl >= r.levelStart && currentLvl <= r.levelEnd);
+            const currentLevelInThisRealm = isActive ? (((currentLvl - 1) % 50) + 1) : (isUnlocked ? 1 : 1);
             const currentLevelName = (r.levelNames && r.levelNames[currentLevelInThisRealm - 1]) ? r.levelNames[currentLevelInThisRealm - 1] : `Level ${currentLevelInThisRealm}`;
+
+            if (!isUnlocked) {
+                return `
+                    <div class="realm-card-item locked" style="display: flex; flex-direction: column; position: relative;">
+                        <div class="realm-card-lock-badge">🔒 Ch ${r.chapter} Locked</div>
+                        <div class="realm-card-thumb" style="width: 100%; height: 96px; border-radius: 8px; margin-bottom: 8px; background: url('${r.mockupImage || r.bgImage}') center/cover no-repeat; border: 1px solid rgba(255,255,255,0.15);"></div>
+                        <div class="realm-card-chapter" style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Chapter ${r.chapter}</div>
+                        <div class="realm-card-title" style="font-size: 13px; font-weight: 700; line-height: 1.25; margin: 4px 0 2px 0; color: #cbd5e1;">${r.name}</div>
+                        <div class="realm-card-subtitle" style="font-size: 11px; opacity: 0.7; color: #94a3b8; margin-bottom: 6px;">${r.subtitle}</div>
+                        <div class="realm-card-levels" style="margin-bottom: 10px; font-size: 11px; color: #f59e0b; font-weight: 600;">🔒 Clear Ch ${r.chapter - 1} (Lvl ${(r.chapter - 1) * 50}) to Unlock</div>
+                        <button class="c-btn" disabled style="padding: 6px 8px; font-size: 11px; width: 100%; background: rgba(255,255,255,0.08); color: #64748b; font-weight: 700; border-radius: 8px; margin-top: auto; cursor: not-allowed; border: 1px solid rgba(255,255,255,0.1);">
+                            🔒 Locked
+                        </button>
+                    </div>
+                `;
+            }
+
             return `
                 <div class="realm-card-item ${isActive ? 'active' : ''}" style="display: flex; flex-direction: column;">
                     <div class="realm-card-thumb" style="width: 100%; height: 96px; border-radius: 8px; margin-bottom: 8px; background: url('${r.mockupImage || r.bgImage}') center/cover no-repeat; border: 1px solid rgba(255,215,0,0.35); box-shadow: 0 4px 12px rgba(0,0,0,0.45);"></div>
-                    <div class="realm-card-chapter" style="font-size: 11px; font-weight: 700; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.5px;">Chapter ${r.chapter}</div>
+                    <div class="realm-card-chapter" style="font-size: 11px; font-weight: 700; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.5px;">Chapter ${r.chapter} · ${progress.isCompleted ? '✅ Complete' : `${progress.completedLevels}/50 Cleared`}</div>
                     <div class="realm-card-title" style="font-size: 13px; font-weight: 700; line-height: 1.25; margin: 4px 0 2px 0;">${r.name}</div>
-                    <div class="realm-card-subtitle" style="font-size: 11px; opacity: 0.85; color: #c5a880; margin-bottom: 6px;">${r.subtitle}</div>
+                    <div class="realm-card-subtitle" style="font-size: 11px; opacity: 0.85; color: #c5a880; margin-bottom: 4px;">${r.subtitle}</div>
+                    <div class="realm-progress-bar-bg">
+                        <div class="realm-progress-bar-fill" style="width: ${progress.percent}%;"></div>
+                    </div>
                     <div class="realm-card-levels" style="margin-bottom: 10px; font-size: 11px; color: #ffd700; font-weight: 600;">Lvl ${currentLevelInThisRealm}: ${currentLevelName}</div>
-                    <button class="c-btn" onclick="window.selectRealm('${r.id}', ${r.levelStart})" style="padding: 6px 8px; font-size: 11px; width: 100%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 700; border-radius: 8px; margin-top: auto;">
+                    <button class="c-btn" onclick="window.selectRealm('${r.id}', ${isActive ? currentLvl : r.levelStart})" style="padding: 6px 8px; font-size: 11px; width: 100%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 700; border-radius: 8px; margin-top: auto;">
                         ▶ Enter Sanctuary
                     </button>
                 </div>
@@ -57469,9 +59027,16 @@ window.addEventListener('load', () => {
     };
 
     window.selectRealm = (realmId, startLevel) => {
+        const currentLvl = activeGameManager.player.currentLevel || 1;
+        const highestUnlocked = activeGameManager.player.highestUnlockedRealm || Math.max(1, Math.floor((currentLvl - 1) / 50) + 1);
+        const realm = REALMS.find(r => r.id === realmId);
+        if (realm && realm.chapter > highestUnlocked) {
+            window.showToastMessage(`🔒 Chapter ${realm.chapter} is locked! Complete Chapter ${realm.chapter - 1} first.`);
+            return;
+        }
         window.closeRealmsBrowser();
         activeGameManager.loadLevel(startLevel);
-        window.showToastMessage(`🗺️ Entered Chapter ${realmId}: Level ${startLevel}`);
+        window.showToastMessage(`🗺️ Entered Chapter ${realm ? realm.chapter : ''}: Level ${startLevel}`);
     };
 
     window.openLevelJumpModal = () => {
