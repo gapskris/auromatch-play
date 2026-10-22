@@ -5965,11 +5965,11 @@ body {
                 <div class="setting-row">
                     <div>
                         <div class="setting-label" style="font-weight: 700;">Curriculum Mode</div>
-                        <div style="font-size: 10px; opacity: 0.75; max-width: 200px;">Choose between V1 General Knowledge and V2 Ashram Spiritual Sanctuary</div>
+                        <div style="font-size: 10px; opacity: 0.75; max-width: 200px;">Choose between V1 General Knowledge and V2 Grand Thematic Realms</div>
                     </div>
                     <select id="set-experience-mode" onchange="changeExperienceModeSetting()" style="background: rgba(0,0,0,0.15); border: 1px solid var(--border-current); color: var(--text-current); padding: 4px 8px; border-radius: 8px; font-weight: 600;">
                         <option value="gk_quest">🌟 V1: General Knowledge Quest (520 Levels)</option>
-                        <option value="ashram_sanctuary">🪷 V2: Ashram Spiritual Sanctuary (15 Gardens)</option>
+                        <option value="ashram_sanctuary">🪷 V2: Grand Thematic Realms (20 Realms · 1,000 Levels)</option>
                     </select>
                 </div>
             </div>
@@ -58624,7 +58624,7 @@ window.addEventListener('load', () => {
             if (state.gameplayMode === 'realms' && state.activeRealm) {
                 const realm = state.activeRealm;
                 const lvlName = realm.levelName ? `: ${realm.levelName}` : '';
-                levelIndicator.innerText = `Ch. ${realm.chapter || 1}: ${realm.name} · Lvl ${realm.masterLevelIndex || 1}/15${lvlName}${formStr}`;
+                levelIndicator.innerText = `Ch. ${realm.chapter || 1}: ${realm.name} · Lvl ${realm.masterLevelIndex || 1}/50${lvlName}${formStr}`;
                 levelIndicator.title = `Chapter ${realm.chapter || 1}: ${realm.name} · Level ${realm.masterLevelIndex || 1} of 15 (Click to Jump)`;
             } else {
                 const total = state.totalLevels || 200;
@@ -59369,7 +59369,7 @@ window.addEventListener('load', () => {
         const val = document.getElementById('set-experience-mode').value;
         updateExperienceMode(val);
         if (val === 'ashram_sanctuary') {
-            window.showToastMessage("🪷 V2 Ashram Sanctuary mode activated. 15 Sacred Gardens available!");
+            window.showToastMessage("🪷 V2 Ashram Sanctuary mode activated. 20 Grand Realms available!");
         } else {
             window.showToastMessage("🌟 V1 General Knowledge Quest activated (520 Levels).");
         }
