@@ -23,2719 +23,5410 @@
     <!-- CSS Design System -->
     <style>
 :root {
+
     /* Solar Evening / Sanctuary Palette */
+
     --bg-evening: radial-gradient(circle at center, #0e4e37 0%, #041812 100%);
+
     --panel-evening: rgba(4, 24, 18, 0.65);
+
     --border-evening: rgba(255, 255, 255, 0.08);
+
     --text-evening: #f4f4f5;
+
     --accent-evening: #c5a880; /* Spiritual Gold */
+
     --glass-overlay-evening: rgba(4, 24, 18, 0.85);
 
+
+
     /* Solar Morning / Sunrise Palette */
+
     --bg-morning: linear-gradient(135deg, #fdfcf7 0%, #f7f3e3 100%);
+
     --panel-morning: rgba(255, 255, 255, 0.70);
+
     --border-morning: rgba(255, 255, 255, 0.40);
+
     --text-morning: #27272a;
+
     --accent-morning: #d97706; /* Burnished Gold */
+
     --glass-overlay-morning: rgba(253, 252, 247, 0.90);
 
+
+
     /* Dynamic placeholders updated by JS */
+
     --bg-current: var(--bg-evening);
+
     --panel-current: var(--panel-evening);
+
     --border-current: var(--border-evening);
+
     --text-current: var(--text-evening);
+
     --accent-current: var(--accent-evening);
+
     --overlay-current: var(--glass-overlay-evening);
 
+
+
     --cream-tile: #fcf9f2;
+
     --cream-edge: #e7dfd0;
+
     --shadow-tile: 0 4px 0 var(--cream-edge), 0 8px 16px rgba(0, 0, 0, 0.3);
+
     --shadow-selected: 0 2px 0 var(--cream-edge), 0 4px 8px rgba(0, 0, 0, 0.2);
+
     --z-bg: 1;
+
     --z-tiles: 10;
+
     --z-tray: 50;
+
     --z-overlay: 100;
 
+
+
     /* Tile default variables */
+
     --tile-depth-color: #d4c7b3;
+
     --tile-glow-color: rgba(197, 168, 128, 0.4);
+
 }
+
+
 
 * {
+
     box-sizing: border-box;
+
     margin: 0;
+
     padding: 0;
+
     -webkit-tap-highlight-color: transparent;
+
 }
+
+
 
 body {
+
     font-family: 'Outfit', sans-serif;
+
     background: var(--bg-current);
+
     color: var(--text-current);
+
     min-height: 100vh;
+
     min-height: var(--app-height, 100dvh);
+
     display: flex;
+
     justify-content: center;
+
     align-items: center;
+
     overflow: hidden;
+
     padding: 10px;
+
     transition: background 2.0s ease, color 2.0s ease, border-color 2.0s ease;
+
 }
+
+
 
 /* Dynamic Stardust Background Canvas */
+
 #stardust-canvas {
+
     position: absolute;
+
     top: 0;
+
     left: 0;
+
     width: 100%;
+
     height: 100%;
+
     z-index: var(--z-bg);
+
     pointer-events: none;
+
 }
+
+
 
 /* Device Wrapper Container (Centered Box) */
+
 .app-container {
+
     width: 100%;
+
     max-width: 412px;
+
     height: 92dvh;
+
     height: var(--app-height, 92dvh);
+
     max-height: 860px;
+
     background: var(--panel-current);
+
     backdrop-filter: blur(25px);
+
     border: 1px solid var(--border-current);
+
     border-radius: 40px;
+
     box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+
     display: flex;
+
     flex-direction: column;
+
     overflow: hidden;
+
     position: relative;
+
     z-index: 5;
+
     transition: background 2.0s ease, border-color 2.0s ease;
+
 }
+
+
 
 /* Views routing layers */
+
 .screen-view {
+
     display: none;
+
     width: 100%;
+
     height: 100%;
+
     flex-direction: column;
+
     overflow-y: auto;
+
     position: relative;
+
 }
+
+
 
 .screen-view.active-screen {
+
     display: flex;
+
 }
+
+
 
 /* Standard Header */
+
 .app-header {
+
     padding: 16px 20px 8px;
+
     text-align: center;
+
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
+
     border-bottom: 1px solid var(--border-current);
+
     background: rgba(0,0,0,0.05);
+
 }
+
+
 
 .hdr-btn {
+
     font-size: 20px;
+
     color: var(--text-current);
+
     cursor: pointer;
+
     opacity: 0.85;
+
     background: none;
+
     border: none;
+
     transition: transform 0.2s ease;
+
 }
+
 .hdr-btn:hover { transform: scale(1.1); }
 
+
+
 .title-display {
+
     font-family: 'Playfair Display', serif;
+
     font-size: clamp(1.1rem, 3.5dvw, 1.3rem);
+
     font-weight: 600;
+
     letter-spacing: 0.5px;
+
     color: var(--accent-current);
+
 }
+
+
 
 /* WELCOME SCREEN VIEW */
+
 .welcome-view {
+
     justify-content: center;
+
     align-items: center;
+
     padding: 30px;
+
     text-align: center;
+
 }
+
+
 
 .logo-glowing-lotus {
+
     width: 110px;
+
     height: 110px;
+
     margin-bottom: 24px;
+
     filter: drop-shadow(0 0 16px var(--accent-current));
+
     animation: slowPulse 4s infinite ease-in-out;
+
 }
+
+
 
 @keyframes slowPulse {
+
     0%, 100% { transform: scale(1); filter: drop-shadow(0 0 12px var(--accent-current)); }
+
     50% { transform: scale(1.06); filter: drop-shadow(0 0 24px var(--accent-current)); }
+
 }
+
+
 
 .app-headline {
+
     font-family: 'Playfair Display', serif;
+
     font-size: clamp(1.8rem, 5.5dvw, 2.3rem);
+
     font-weight: 700;
+
     line-height: 1.25;
+
     margin-bottom: 8px;
+
     color: #ffffff;
+
     text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+
 }
+
 .theme-morning .app-headline { color: var(--text-morning); text-shadow: none; }
 
+
+
 .app-subhead {
+
     font-size: 14px;
+
     letter-spacing: 2px;
+
     text-transform: uppercase;
+
     color: var(--accent-current);
+
     margin-bottom: 36px;
+
     font-weight: 600;
+
 }
+
+
 
 .cta-btn {
+
     background: var(--accent-current);
+
     color: #ffffff;
+
     border: none;
+
     padding: 14px 36px;
+
     font-size: 15px;
+
     font-weight: 600;
+
     border-radius: 40px;
+
     cursor: pointer;
+
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+
     transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+
 }
+
 .cta-btn:hover {
+
     transform: translateY(-2px);
+
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+
 }
+
 .theme-morning .cta-btn { color: #ffffff; }
 
+
+
 /* ONBOARDING PATH SELECTOR MODAL */
+
 .onboarding-overlay {
+
     position: absolute;
+
     inset: 0;
+
     background: var(--overlay-current);
+
     display: none;
+
     flex-direction: column;
+
     justify-content: center;
+
     align-items: center;
+
     padding: 24px;
+
     z-index: var(--z-overlay);
+
     backdrop-filter: blur(15px);
+
 }
+
+
 
 .onboarding-overlay.active { display: flex; }
 
+
+
 .onboarding-card {
+
     width: 100%;
+
     background: var(--panel-current);
+
     border: 1px solid var(--border-current);
+
     border-radius: 20px;
+
     padding: 16px 20px;
+
     margin-bottom: 16px;
+
     cursor: pointer;
+
     text-align: left;
+
     transition: all 0.3s ease;
+
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
 }
+
+
 
 .onboarding-card:hover {
+
     transform: scale(1.02);
+
     border-color: var(--accent-current);
+
     background: rgba(255,255,255,0.03);
+
 }
+
+
 
 .onboarding-card h4 {
+
     font-family: 'Playfair Display', serif;
+
     font-size: 18px;
+
     color: var(--accent-current);
+
     margin-bottom: 4px;
+
 }
+
+
 
 .onboarding-card p {
+
     font-size: 12px;
+
     opacity: 0.85;
+
     line-height: 1.4;
+
 }
+
+
 
 /* GARDEN SELECTOR SCREEN */
+
 .garden-list-container {
+
     display: flex;
+
     flex-direction: column;
+
     gap: 12px;
+
     padding: 16px 20px 96px 20px;
+
     overflow-y: auto;
+
     -webkit-overflow-scrolling: touch;
+
 }
+
+
 
 .garden-card {
+
     background: rgba(255,255,255,0.02);
+
     border: 1px solid var(--border-current);
+
     border-radius: 16px;
+
     padding: 12px 16px;
+
     cursor: pointer;
+
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
+
     transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+
 }
+
+
 
 .garden-card:hover {
+
     border-color: var(--accent-current);
+
     background: rgba(255,255,255,0.05);
+
     transform: translateY(-2px);
+
     box-shadow: 0 6px 18px rgba(0,0,0,0.3);
+
 }
+
+
 
 .garden-card:active {
+
     transform: scale(0.99);
+
 }
+
+
 
 .garden-icon-badge {
+
     font-size: 24px;
+
     width: 44px;
+
     height: 44px;
+
     min-width: 44px;
+
     border-radius: 12px;
+
     background: rgba(255, 255, 255, 0.05);
+
     border: 1px solid var(--border-current);
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
 }
+
+
 
 .garden-diff-badge {
+
     display: inline-block;
+
     font-size: 10px;
+
     font-weight: 700;
+
     padding: 2px 8px;
+
     border-radius: 10px;
+
     margin-top: 4px;
+
     letter-spacing: 0.3px;
+
 }
+
 .diff-easy {
+
     background: rgba(16, 185, 129, 0.2);
+
     color: #34d399;
+
     border: 1px solid rgba(16, 185, 129, 0.35);
+
 }
+
 .diff-medium {
+
     background: rgba(245, 158, 11, 0.2);
+
     color: #fbbf24;
+
     border: 1px solid rgba(245, 158, 11, 0.35);
+
 }
+
 .diff-hard {
+
     background: rgba(244, 63, 94, 0.2);
+
     color: #fb7185;
+
     border: 1px solid rgba(244, 63, 94, 0.35);
+
 }
+
+
 
 .garden-meta {
+
     text-align: left;
+
 }
+
+
 
 .garden-name {
+
     font-family: 'Playfair Display', serif;
+
     font-size: 16px;
+
     font-weight: 600;
+
     color: #ffffff;
+
     margin-bottom: 3px;
+
 }
+
 .theme-morning .garden-name { color: var(--text-morning); }
 
+
+
 .garden-concept {
+
     font-size: 10px;
+
     color: var(--accent-current);
+
     text-transform: uppercase;
+
     letter-spacing: 1px;
+
     font-weight: 500;
+
 }
+
+
 
 .garden-difficulty {
+
     font-size: 11px;
+
     opacity: 0.75;
+
     margin-top: 4px;
+
 }
+
+
 
 .garden-arrow {
+
     color: var(--accent-current);
+
     font-size: 18px;
+
 }
+
+
 
 /* CORE MATCHING BOARD SCREEN */
+
 /* Concept 1 styling: Glass-like glow edges */
+
 .app-container.concept-1 {
+
     border-color: rgba(197, 168, 128, 0.4);
+
     box-shadow: 0 0 32px rgba(197, 168, 128, 0.15);
+
 }
+
 /* Concept 3 styling: Warm wood altar board panels */
+
 .app-container.concept-3 {
+
     background: radial-gradient(circle, #2d1c10 0%, #150b05 100%);
+
     border-color: #52351c;
+
 }
+
+
 
 /* Matching Tray / Dock at the Top (Mode B Tile Club) */
+
 .tray-container {
+
     padding: 8px 16px;
+
     display: flex;
+
     flex-direction: column;
+
     justify-content: center;
+
     align-items: center;
+
     background: transparent !important;
+
     border: none !important;
+
     z-index: var(--z-tray);
+
     width: 100%;
+
 }
+
+
 
 .tray-guidance-bar {
+
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
+
     width: 100%;
+
     max-width: 440px;
+
     margin-bottom: 6px;
+
     font-size: 11px;
+
     font-weight: 600;
+
     color: var(--accent-current);
+
 }
+
+
 
 .tray-guidance-text {
+
     letter-spacing: 0.3px;
+
 }
+
+
 
 .tray-slot-counter {
+
     background: rgba(255, 215, 0, 0.15);
+
     border: 1px solid rgba(255, 215, 0, 0.4);
+
     border-radius: 10px;
+
     padding: 2px 7px;
+
     font-size: 10px;
+
     color: #ffd700;
+
     font-weight: 700;
+
 }
+
+
 
 .tray {
+
     width: 100%;
+
     max-width: 440px;
+
     height: 72px;
+
     background: rgba(255, 255, 255, 0.05);
+
     backdrop-filter: blur(12px);
+
     border: 1.5px solid var(--accent-current);
+
     border-radius: 16px;
+
     display: flex;
+
     align-items: center;
+
     justify-content: space-evenly;
+
     padding: 5px clamp(4px, 1.2vw, 8px);
+
     gap: clamp(3px, 1vw, 6px);
+
     margin: 0 auto;
+
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+
 }
+
 .theme-morning .tray {
+
     background: rgba(255, 255, 255, 0.7);
+
     border-color: var(--accent-morning);
+
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+
 }
+
+
 
 .tray-slot {
+
     flex: 1;
+
     min-width: clamp(36px, 10vw, 54px);
+
     height: 60px;
+
     border-radius: 10px;
+
     background: rgba(255, 255, 255, 0.03);
+
     border: 1px dashed rgba(197, 168, 128, 0.4);
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
     position: relative;
+
     transition: all 0.2s ease;
+
     cursor: pointer;
+
 }
+
 .theme-morning .tray-slot {
+
     background: rgba(0, 0, 0, 0.02);
+
     border-color: rgba(217, 119, 6, 0.35);
+
 }
+
+
 
 .tray-slot-pair-pending {
+
     border-color: #ffd700 !important;
+
     background: rgba(255, 215, 0, 0.10) !important;
+
 }
+
+
 
 /* Triad Match Celebration Animation */
+
 .tray-triad-burst {
+
     animation: triadClearBurst 0.22s ease-in-out forwards !important;
+
 }
+
+
 
 @keyframes triadClearBurst {
+
     0% { transform: scale(1); filter: brightness(1); }
+
     50% { transform: scale(1.12); filter: brightness(1.4) drop-shadow(0 0 10px #10b981); }
+
     100% { transform: scale(0.7); opacity: 0; }
+
 }
+
+
 
 .tray-tile-symbol {
+
     font-size: 20px;
+
     line-height: 1;
+
 }
+
+
 
 .tray-tile-label {
+
     font-size: 8px;
+
     font-weight: 800;
+
     color: #111827;
+
     text-transform: uppercase;
+
     text-align: center;
+
     max-width: 100%;
+
     display: -webkit-box;
+
     -webkit-line-clamp: 2;
+
     -webkit-box-orient: vertical;
+
     overflow: hidden;
+
     word-break: break-word;
+
     overflow-wrap: break-word;
+
     line-height: 1.05;
+
     margin-top: 1px;
+
 }
+
+
 
 .tray-pair-glow {
+
     border: 1.5px solid #ffd700 !important;
+
     animation: trayPairPulse 1.2s infinite alternate ease-in-out;
+
 }
+
+
 
 @keyframes trayPairPulse {
+
     from { box-shadow: 0 0 4px #ffd700, 0 3px 0 rgba(0,0,0,0.3); }
+
     to { box-shadow: 0 0 12px #ffb300, 0 3px 0 rgba(0,0,0,0.3); }
+
 }
+
+
 
 .tray-pair-badge {
+
     position: absolute;
+
     top: -4px;
+
     right: -4px;
+
     background: #f59e0b;
+
     color: #000;
+
     font-size: 7px;
+
     font-weight: 900;
+
     border-radius: 6px;
+
     padding: 1px 3px;
+
     box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+
 }
+
+
 
 /* Game Board stack area */
+
 .board-container {
+
     flex-grow: 1;
+
     position: relative;
+
     overflow: visible;
+
     display: flex;
+
     flex-direction: column;
+
     justify-content: center;
+
     align-items: center;
+
     width: 100%;
+
     height: 100%;
+
     min-height: 480px;
+
     padding: 6px 0 12px 0;
+
     box-sizing: border-box;
+
     background: rgba(0, 0, 0, 0.22);
+
     border-radius: 16px;
+
     box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+
     border: 1px solid rgba(255, 215, 0, 0.15);
+
 }
+
+
 
 .floating-gameplay-prompt {
+
     display: inline-flex;
+
     align-items: center;
+
     gap: 8px;
+
     padding: 6px 18px;
+
     background: rgba(15, 23, 42, 0.85);
+
     backdrop-filter: blur(8px);
+
     border: 1px solid var(--accent-current);
+
     border-radius: 20px;
+
     color: #fef08a;
+
     font-size: 12px;
+
     font-weight: 700;
+
     letter-spacing: 0.3px;
+
     margin-bottom: 6px;
+
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35);
+
     z-index: 10;
+
     animation: gentlePulse 2.5s infinite ease-in-out;
+
 }
+
+
 
 @keyframes gentlePulse {
+
     0%, 100% { transform: scale(1); opacity: 0.95; }
+
     50% { transform: scale(1.02); opacity: 1; }
+
 }
+
+
 
 .tile-layout {
+
     position: relative;
+
     width: 100%;
+
     max-width: 980px;
+
     height: 100%;
+
     min-height: 520px;
+
     display: flex;
+
     justify-content: center;
+
     align-items: center;
+
 }
+
+
 
 /* 3D Glassmorphic Tile Design */
+
 .tile-3d {
+
     position: absolute;
+
     width: 50px;
+
     height: 66px;
+
     border-radius: 12px;
+
     background: linear-gradient(135deg, rgba(252, 249, 242, 0.95) 0%, rgba(240, 230, 210, 0.9) 100%);
+
     border: 1px solid #d4c7b3;
+
     cursor: pointer;
+
     display: flex;
+
     flex-direction: column;
+
     justify-content: space-between;
+
     align-items: center;
+
     padding: 4px;
+
     user-select: none;
+
     
+
     /* 3D tactile borders and shadows */
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.8),
+
         inset 0 -2px 0 rgba(0, 0, 0, 0.1),
+
         0 4px 6px rgba(0, 0, 0, 0.2),
+
         0 8px 0 var(--tile-depth-color),
+
         0 12px 20px rgba(0, 0, 0, 0.35);
+
         
+
     transition: transform 0.2s cubic-bezier(0.25, 1, 0.5, 1), filter 0.3s ease, box-shadow 0.2s ease;
+
 }
+
+
 
 .tile-3d.layer-0 { z-index: 10; }
+
 .tile-3d.layer-1 { z-index: 20; }
+
 .tile-3d.layer-2 { z-index: 30; }
+
 .tile-3d.layer-3 { z-index: 40; }
 
+
+
 /* Interactive Hover & Tap states */
+
 .tile-3d:not(.blocked):hover {
+
     transform: translateY(-4px);
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.9),
+
         inset 0 -2px 0 rgba(0, 0, 0, 0.1),
+
         0 6px 10px rgba(0, 0, 0, 0.25),
+
         0 12px 0 var(--tile-depth-color),
+
         0 16px 28px rgba(0, 0, 0, 0.4);
+
 }
+
+
 
 .tile-3d:active {
+
     transform: translateY(4px);
+
     box-shadow: 
+
         inset 0 1px 0 rgba(255, 255, 255, 0.5),
+
         0 1px 2px rgba(0, 0, 0, 0.15),
+
         0 4px 0 var(--tile-depth-color),
+
         0 6px 12px rgba(0, 0, 0, 0.3);
+
 }
+
+
 
 /* Glowing spiritual aura behind active/unblocked tiles */
+
 .tile-3d.glowing-aura {
+
     filter: drop-shadow(0 0 6px var(--tile-glow-color));
+
     animation: gentleGlow 3s infinite ease-in-out;
+
 }
+
+
 
 @keyframes gentleGlow {
+
     0%, 100% { filter: drop-shadow(0 0 5px var(--tile-glow-color)); }
+
     50% { filter: drop-shadow(0 0 12px var(--tile-glow-color)); }
+
 }
+
+
 
 /* Blocked tiles desaturate, lock cursor, and mute the aura */
+
 .tile-3d.blocked {
+
     filter: grayscale(100%) brightness(0.65) contrast(0.95);
+
     cursor: not-allowed;
+
     box-shadow: 
+
         0 2px 3px rgba(0, 0, 0, 0.15),
+
         0 4px 0 #5a5a5a,
+
         0 6px 12px rgba(0, 0, 0, 0.2);
+
 }
+
+
 
 .tile-symbol {
+
     width: 30px;
+
     height: 30px;
+
     border-radius: 50%;
+
     display: flex;
+
     justify-content: center;
+
     align-items: center;
+
     font-size: 15px;
+
     font-weight: 600;
+
 }
+
+
 
 .tile-name {
+
     font-size: 7px;
+
     font-weight: 700;
+
     color: #8d7b68;
+
     text-transform: uppercase;
+
     letter-spacing: 0.3px;
+
     text-align: center;
+
     line-height: 1.1;
+
     word-wrap: break-word;
+
     width: 100%;
+
 }
+
+
 
 /* Watercolor backgrounds for tiles */
+
 .f-lotus { background: #ffebee; color: #e91e63; }
+
 .f-jasmine { background: #f9f9f9; color: #757575; }
+
 .f-rose { background: #fce4ec; color: #c2185b; }
+
 .f-hibiscus { background: #ffebee; color: #d32f2f; }
+
 .f-marigold { background: #fff3e0; color: #f57c00; }
+
 .f-periwinkle { background: #ede7f6; color: #673ab7; }
+
 .f-zinnia { background: #fff8e1; color: #ffb300; }
+
 .f-tulsi { background: #e8f5e9; color: #2e7d32; }
+
 .f-gold { background: #fffde7; color: #d97706; }
+
 .f-terracotta { background: #fbe9e7; color: #d84315; }
+
 .f-blue { background: #e3f2fd; color: #1565c0; }
+
 .f-brown { background: #efebe9; color: #4e342e; }
 
+
+
 /* Slide-into-tray item animation */
+
 .tray-tile {
+
     width: 44px;
+
     height: 58px;
+
     background: var(--cream-tile);
+
     border: 1px solid #d4c7b3;
+
     border-radius: 6px;
+
     box-shadow: 0 3px 0 var(--cream-edge);
+
     display: flex;
+
     flex-direction: column;
+
     justify-content: space-between;
+
     align-items: center;
+
     padding: 3px;
+
     animation: slideIntoTray 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+
     user-select: none;
+
     cursor: pointer;
+
     transition: transform 0.15s ease, box-shadow 0.15s ease;
+
 }
+
+
 
 .tray-tile:hover {
+
     transform: translateY(-3px) scale(1.05);
+
     box-shadow: 0 5px 0 var(--cream-edge), 0 4px 12px rgba(255, 215, 0, 0.4);
+
 }
+
+
 
 .tray-tile:active {
+
     transform: translateY(1px) scale(0.98);
+
 }
+
+
 
 .senior-view .tray-tile {
+
     width: 48px;
+
     height: 64px;
+
 }
+
 .senior-view .tray-tile-symbol {
+
     font-size: 24px;
+
 }
+
 .senior-view .tray-tile-label {
+
     font-size: 9px;
+
 }
+
+
 
 @keyframes slideIntoTray {
+
     from { transform: scale(1.1) translateY(40px); opacity: 0.5; }
+
     to { transform: scale(1) translateY(0); opacity: 1; }
+
 }
+
+
 
 /* WISDOM CARD OVERLAY */
+
 .match-overlay {
+
     position: absolute;
+
     inset: 0;
+
     background: var(--overlay-current);
+
     display: none;
+
     justify-content: center;
+
     align-items: center;
+
     padding: 20px;
+
     z-index: var(--z-overlay);
+
     animation: fadeInOverlay 0.3s ease;
+
     backdrop-filter: blur(15px);
+
 }
+
+
 
 @keyframes fadeInOverlay {
+
     from { opacity: 0; }
+
     to { opacity: 1; }
+
 }
+
+
 
 .match-card {
+
     background: #ffffff;
+
     border-radius: 28px;
+
     width: 100%;
+
     max-width: 340px;
+
     max-height: 80vh;
+
     overflow-y: auto;
+
     padding: 24px 20px;
+
     text-align: center;
+
     box-shadow: 0 20px 48px rgba(0,0,0,0.4);
+
     border: 1.5px solid var(--accent-current);
+
     color: #3e3223;
+
     animation: scaleUpCard 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
 }
+
+
 
 @keyframes scaleUpCard {
+
     from { transform: scale(0.9) translateY(10px); }
+
     to { transform: scale(1) translateY(0); }
+
 }
+
+
 
 .match-card-icon {
+
     width: 56px;
+
     height: 56px;
+
     border-radius: 50%;
+
     margin-bottom: 12px;
+
     display: flex;
+
     justify-content: center;
+
     align-items: center;
+
     font-size: 28px;
+
     box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+
 }
+
+
 
 .match-card h3 {
+
     font-family: 'Playfair Display', serif;
+
     font-size: 22px;
+
     font-weight: 700;
+
     margin-bottom: 2px;
+
     color: #1c150e;
+
 }
+
+
 
 .match-card-quality {
+
     font-size: 11px;
+
     font-weight: 700;
+
     color: var(--accent-morning);
+
     text-transform: uppercase;
+
     letter-spacing: 1.5px;
+
     margin-bottom: 14px;
+
 }
+
+
 
 .match-card-desc {
+
     font-family: 'Playfair Display', serif;
+
     font-style: italic;
+
     font-size: 14px;
+
     line-height: 1.6;
+
     color: #4a3e31;
+
     margin-bottom: 16px;
+
     background: #faf8f5;
+
     padding: 12px 14px;
+
     border-radius: 12px;
+
     border-left: 3px solid var(--accent-current);
+
     text-align: left;
+
 }
+
+
 
 .glossary-term {
+
     border-bottom: 1.5px dotted var(--accent-morning);
+
     cursor: help;
+
     font-weight: 500;
+
     color: #1a6b4a;
+
 }
+
+
 
 .card-controls {
+
     display: flex;
+
     gap: 10px;
+
     margin-bottom: 16px;
+
     width: 100%;
+
     justify-content: center;
+
 }
+
+
 
 .c-btn {
+
     background: rgba(0,0,0,0.03);
+
     border: 1px solid rgba(0,0,0,0.1);
+
     padding: 8px 16px;
+
     border-radius: 20px;
+
     font-size: 12px;
+
     cursor: pointer;
+
     font-weight: 500;
+
     color: #4a3e31;
+
     display: flex;
+
     align-items: center;
+
     gap: 6px;
+
 }
+
 .c-btn:hover { background: rgba(0,0,0,0.06); }
 
+
+
 .sabda-link {
+
     font-size: 11px;
+
     color: #1c5e42;
+
     text-decoration: underline;
+
     margin-bottom: 16px;
+
     display: block;
+
 }
+
+
 
 .close-btn {
+
     background: var(--accent-current);
+
     color: #ffffff;
+
     border: none;
+
     padding: 10px 24px;
+
     font-size: 13px;
+
     font-weight: 600;
+
     border-radius: 24px;
+
     cursor: pointer;
+
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+
     transition: all 0.2s ease;
+
 }
+
 .close-btn:hover {
+
     transform: translateY(-1px);
+
     box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+
 }
+
+
 
 /* CONSECRATION JAR (EVENING JOURNAL) SCREEN */
+
 .jar-view {
+
     padding: 24px;
+
     align-items: center;
+
     text-align: center;
+
 }
+
+
 
 .jar-canvas-container {
+
     position: relative;
+
     width: 100%;
+
     height: 240px;
+
     margin-bottom: 16px;
+
     display: flex;
+
     justify-content: center;
+
     align-items: center;
+
 }
+
+
 
 #jar-canvas {
+
     position: absolute;
+
     top: 0;
+
     left: 0;
+
     width: 100%;
+
     height: 100%;
+
     z-index: 10;
+
 }
+
+
 
 .jar-svg {
+
     width: 140px;
+
     height: 180px;
+
     filter: drop-shadow(0 4px 16px rgba(197, 168, 128, 0.3));
+
     z-index: 5;
+
     transition: transform 0.3s ease;
+
 }
+
 .jar-svg.glow {
+
     transform: scale(1.05);
+
     filter: drop-shadow(0 0 24px rgba(255, 223, 128, 0.6));
+
 }
+
+
 
 .reflection-textarea {
+
     width: 100%;
+
     height: 90px;
+
     background: rgba(0,0,0,0.15);
+
     border: 1px solid var(--border-current);
+
     border-radius: 16px;
+
     padding: 12px;
+
     color: var(--text-current);
+
     font-family: inherit;
+
     font-size: 14px;
+
     resize: none;
+
     margin-bottom: 16px;
+
     outline: none;
+
 }
+
 .theme-morning .reflection-textarea { background: rgba(255,255,255,0.6); }
 
+
+
 /* CONSTELLATION GRID (STAR CALENDAR) SCREEN */
+
 .constellation-view {
+
     padding: 20px;
+
     align-items: center;
+
 }
+
+
 
 .stars-container {
+
     width: 100%;
+
     height: 320px;
+
     position: relative;
+
     background: rgba(0, 0, 0, 0.25);
+
     border: 1px solid var(--border-current);
+
     border-radius: 20px;
+
     margin-bottom: 16px;
+
     overflow: hidden;
+
 }
+
+
 
 #constellation-svg {
+
     position: absolute;
+
     inset: 0;
+
     width: 100%;
+
     height: 100%;
+
     z-index: 5;
+
 }
+
+
 
 .star-node {
+
     position: absolute;
+
     width: 16px;
+
     height: 16px;
+
     background: #718096;
+
     border-radius: 50%;
+
     z-index: 10;
+
     cursor: pointer;
+
     display: flex;
+
     justify-content: center;
+
     align-items: center;
+
     transform: translate(-50%, -50%);
+
     transition: all 0.3s ease;
+
 }
+
+
 
 .star-node.active-star {
+
     background: var(--accent-current);
+
     box-shadow: 0 0 12px var(--accent-current);
+
     animation: starPulse 2.5s infinite ease-in-out;
+
 }
+
+
 
 @keyframes starPulse {
+
     0%, 100% { transform: translate(-50%, -50%) scale(1); }
+
     50% { transform: translate(-50%, -50%) scale(1.22); }
+
 }
+
+
 
 .star-node.event-halo {
+
     border: 2px solid #fffb8f;
+
     box-shadow: 0 0 16px #ffeb3b;
+
 }
+
+
 
 /* DAILY ASPIRATION (ORACLE) VIEW */
+
 .oracle-view {
+
     padding: 30px;
+
     align-items: center;
+
     text-align: center;
+
 }
+
+
 
 .bag-container {
+
     width: 180px;
+
     height: 180px;
+
     margin: 24px 0;
+
     display: flex;
+
     justify-content: center;
+
     align-items: center;
+
     cursor: pointer;
+
     position: relative;
+
 }
+
+
 
 .velvet-bag {
+
     width: 140px;
+
     height: 140px;
+
     filter: drop-shadow(0 8px 24px rgba(0,0,0,0.5));
+
     transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+
 }
+
 .velvet-bag.shake {
+
     animation: shakeBag 0.6s ease;
+
 }
+
+
 
 @keyframes shakeBag {
+
     0%, 100% { transform: rotate(0deg); }
+
     20%, 60% { transform: rotate(-8deg); }
+
     40%, 80% { transform: rotate(8deg); }
+
 }
+
+
 
 /* SETTINGS & BACKUP VIEW */
+
 .settings-view {
+
     padding: 20px;
+
     text-align: left;
+
 }
+
+
 
 .setting-section {
+
     margin-bottom: 20px;
+
     background: rgba(255,255,255,0.02);
+
     border: 1px solid var(--border-current);
+
     border-radius: 16px;
+
     padding: 16px;
+
 }
+
+
 
 .setting-row {
+
     display: flex;
+
     justify-content: space-between;
+
     align-items: center;
+
     margin-bottom: 12px;
+
 }
+
 .setting-row:last-child { margin-bottom: 0; }
 
+
+
 .setting-label {
+
     font-size: 14px;
+
     font-weight: 500;
+
 }
+
+
 
 .volume-slider {
+
     width: 120px;
+
     accent-color: var(--accent-current);
+
 }
+
+
 
 .setting-toggle {
+
     cursor: pointer;
+
     accent-color: var(--accent-current);
+
 }
+
+
 
 .set-btn {
+
     background: rgba(255,255,255,0.06);
+
     border: 1px solid var(--border-current);
+
     color: var(--text-current);
+
     padding: 8px 16px;
+
     border-radius: 12px;
+
     cursor: pointer;
+
     font-size: 12px;
+
 }
+
 .set-btn:hover { background: rgba(255,255,255,0.1); }
 
+
+
 .set-danger-btn {
+
     background: rgba(211, 47, 47, 0.15);
+
     border: 1px solid #d32f2f;
+
     color: #ff8a80;
+
     padding: 8px 16px;
+
     border-radius: 12px;
+
     cursor: pointer;
+
     font-size: 12px;
+
 }
+
 .set-danger-btn:hover { background: rgba(211, 47, 47, 0.25); }
 
+
+
 /* BOTTOM NAV BAR */
+
 .app-footer {
+
     padding: 12px 16px;
+
     display: flex;
+
     justify-content: space-around;
+
     align-items: center;
+
     border-top: 1px solid var(--border-current);
+
     background: rgba(0,0,0,0.12);
+
     z-index: 10;
+
 }
+
+
 
 .nav-tab {
+
     font-size: 11px;
+
     color: var(--text-current);
+
     opacity: 0.6;
+
     cursor: pointer;
+
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
     gap: 4px;
+
     transition: all 0.2s ease;
+
 }
+
+
 
 .nav-tab.active-tab {
+
     opacity: 1;
+
     color: var(--accent-current);
+
 }
+
+
 
 .nav-icon {
+
     font-size: 18px;
+
 }
 
+
+
 /* GLOSSARY & BOTTOM SHEETS */
+
 .bottom-sheet {
+
     position: absolute;
+
     inset: 0;
+
     background: rgba(0,0,0,0.4);
+
     z-index: var(--z-overlay);
+
     display: none;
+
     justify-content: center;
+
     align-items: flex-end;
+
 }
+
+
 
 .bottom-sheet.active { display: flex; }
 
+
+
 .sheet-card {
+
     background: #ffffff;
+
     color: #3e3223;
+
     width: 100%;
+
     border-radius: 28px 28px 0 0;
+
     padding: 24px;
+
     max-height: 50vh;
+
     overflow-y: auto;
+
     animation: slideUpSheet 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+
     text-align: center;
+
     border-top: 2px solid var(--accent-current);
+
 }
+
+
 
 .sheet-title {
+
     font-family: 'Playfair Display', serif;
+
     font-size: 20px;
+
     font-weight: 700;
+
     margin-bottom: 8px;
+
 }
+
+
 
 .sheet-desc {
+
     font-size: 14px;
+
     line-height: 1.5;
+
     color: #5d4f3f;
+
     margin-bottom: 20px;
+
 }
+
+
 
 /* ==========================================================================
+
    ENHANCEMENT: VITA MAHJONG, SENIOR ACCESSIBILITY & 3-COLUMN DESKTOP LAYOUT
+
    ========================================================================== */
 
+
+
 /* 2.5D Isometric Tile Styling */
+
 /* 2.5D Isometric Tile Styling */
+
 .tile-element {
+
     position: absolute;
+
     border-radius: 12px;
+
     background: #ffffff;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.9),
+
         inset 0 -2px 0 rgba(0, 0, 0, 0.15),
+
         0 4px 6px rgba(0, 0, 0, 0.25),
+
         0 8px 0 #bfa075,
+
         0 12px 20px rgba(0, 0, 0, 0.35);
+
     border: 2px solid #422a18;
+
     cursor: pointer;
+
     user-select: none;
+
     touch-action: none;
+
     transition: transform 0.12s cubic-bezier(0.2, 0.9, 0.3, 1), box-shadow 0.12s ease, filter 0.2s ease;
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
 }
+
+
 
 /* Authentic Ceramic Tile Tap Depression */
+
 .tile-element:active:not(.tile-blocked) {
+
     transform: translateY(3px) !important;
+
     box-shadow: 
+
         inset 0 1px 0 rgba(255, 255, 255, 0.6),
+
         0 1px 2px rgba(0, 0, 0, 0.2),
+
         0 4px 0 #8d6e63,
+
         0 6px 12px rgba(0, 0, 0, 0.3) !important;
+
 }
+
+
 
 /* Category Color Top Ribbon */
+
 .tile-category-ribbon {
+
     position: absolute;
+
     top: 0;
+
     left: 8px;
+
     right: 8px;
+
     height: 3px;
+
     border-radius: 0 0 3px 3px;
+
     opacity: 0.95;
+
     z-index: 4;
+
 }
+
+
 
 /* Recessed Label Banner */
+
 .tile-label-banner {
+
     width: calc(100% - 6px);
+
     min-height: 16px;
+
     max-height: 22px;
+
     padding: 1px 3px;
+
     background: rgba(0, 0, 0, 0.05);
+
     border-radius: 3px;
+
     margin: 0 0 2px 0;
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
     box-sizing: border-box;
+
     overflow: hidden;
+
     flex-shrink: 0;
+
 }
+
+
 
 /* Archetype 1: Classic Carved Ivory Tablet */
+
 .archetype-ivory {
+
     background: linear-gradient(145deg, #ffffff 0%, #fbf8f1 60%, #f4ede1 100%) !important;
+
     border-color: #6d4c41 !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.95),
+
         inset 0 -2px 0 rgba(0, 0, 0, 0.12),
+
         0 4px 6px rgba(0, 0, 0, 0.25),
+
         0 8px 0 #bfa075,
+
         0 12px 20px rgba(0, 0, 0, 0.35);
+
 }
+
+
 
 /* Archetype 2: Burnished Golden Relic Tile (+10 Sparks Bonus!) */
+
 .archetype-golden_relic {
+
     background: linear-gradient(135deg, #fffde7 0%, #fff176 40%, #ffd54f 80%, #ffca28 100%) !important;
+
     border-color: #b45309 !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.95),
+
         inset 0 -2px 0 rgba(180, 83, 9, 0.3),
+
         0 4px 6px rgba(0, 0, 0, 0.3),
+
         0 8px 0 #d97706,
+
         0 12px 22px rgba(245, 158, 11, 0.4) !important;
+
 }
+
 .archetype-golden_relic .tile-label {
+
     color: #78350f !important;
+
 }
+
 .tile-spark-badge {
+
     position: absolute;
+
     top: 2px;
+
     right: 3px;
+
     background: #d97706;
+
     color: #fff;
+
     font-size: 8px;
+
     font-weight: 800;
+
     padding: 1px 4px;
+
     border-radius: 6px;
+
     box-shadow: 0 1px 2px rgba(0,0,0,0.4);
+
     letter-spacing: 0.2px;
+
     z-index: 5;
+
 }
+
+
 
 /* Archetype 3: Scenic Cameo Medallion */
+
 .archetype-cameo {
+
     background: linear-gradient(145deg, #fffaf5 0%, #ffe8d6 60%, #ffd8be 100%) !important;
+
     border-color: #9a3412 !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.9),
+
         inset 0 -2px 0 rgba(154, 52, 18, 0.2),
+
         0 4px 6px rgba(0, 0, 0, 0.25),
+
         0 8px 0 #c2410c,
+
         0 12px 20px rgba(0, 0, 0, 0.35);
+
 }
+
 .archetype-cameo .tile-label {
+
     color: #7c2d12 !important;
+
 }
+
+
 
 /* Archetype 4: Prismatic Hexagonal Seal */
+
 .archetype-hex_seal {
+
     background: linear-gradient(145deg, #f0fdfa 0%, #e0f2fe 50%, #bae6fd 100%) !important;
+
     border-color: #0369a1 !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.95),
+
         inset 0 -2px 0 rgba(3, 105, 161, 0.25),
+
         0 4px 6px rgba(0, 0, 0, 0.25),
+
         0 8px 0 #0284c7,
+
         0 12px 20px rgba(0, 0, 0, 0.35);
+
 }
+
 .archetype-hex_seal .tile-label {
+
     color: #0c4a6e !important;
+
 }
+
+
 
 /* Mixed Deck Archetype A: Burnished Walnut Wood Plaque */
+
 .archetype-walnut_wood {
+
     background: linear-gradient(145deg, #fdf6ec 0%, #ecd9be 55%, #dfc49e 100%) !important;
+
     border-color: #5c3317 !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.9),
+
         inset 0 -2px 0 rgba(92, 51, 23, 0.35),
+
         0 4px 6px rgba(0, 0, 0, 0.3),
+
         0 8px 0 #78350f,
+
         0 12px 22px rgba(92, 51, 23, 0.45) !important;
+
 }
+
 .archetype-walnut_wood .tile-label { color: #3b1d08 !important; font-weight: 800; }
+
 .archetype-walnut_wood .tile-label-banner { background: rgba(92, 51, 23, 0.08) !important; }
 
+
+
 /* Mixed Deck Archetype B: Translucent Celadon Jade Tablet */
+
 .archetype-celadon_jade {
+
     background: linear-gradient(145deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%) !important;
+
     border-color: #166534 !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.95),
+
         inset 0 -2px 0 rgba(22, 101, 52, 0.3),
+
         0 4px 6px rgba(0, 0, 0, 0.25),
+
         0 8px 0 #15803d,
+
         0 12px 22px rgba(22, 101, 52, 0.4) !important;
+
 }
+
 .archetype-celadon_jade .tile-label { color: #14532d !important; font-weight: 800; }
+
 .archetype-celadon_jade .tile-label-banner { background: rgba(22, 101, 52, 0.08) !important; }
 
+
+
 /* ==========================================================================
+
    13 Secular Realms Campaign - Tactile Tile Archetypes
+
    ========================================================================== */
 
+
+
 /* 1. Whispering Pines: Woodland Bark & Emerald Leaf */
+
 .archetype-bark_leaf {
+
     background: linear-gradient(145deg, #f4efe6 0%, #e8dfcf 55%, #d5c3aa 100%) !important;
+
     border-color: #3e2723 !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.9),
+
         inset 0 -2px 0 rgba(62, 39, 35, 0.25),
+
         0 4px 6px rgba(0, 0, 0, 0.3),
+
         0 8px 0 #5d4037,
+
         0 12px 20px rgba(0, 0, 0, 0.45) !important;
+
 }
+
 .archetype-bark_leaf .tile-label { color: #2e1a12 !important; font-weight: 700; }
 
+
+
 /* 2. Temple of Lines: Layered Slate & Blueprint Zen */
+
 .archetype-slate_zen {
+
     background: linear-gradient(145deg, #eceff1 0%, #cfd8dc 50%, #b0bec5 100%) !important;
+
     border-color: #263238 !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.95),
+
         inset 0 -2px 0 rgba(38, 50, 56, 0.3),
+
         0 4px 6px rgba(0, 0, 0, 0.35),
+
         0 8px 0 #37474f,
+
         0 12px 20px rgba(0, 0, 0, 0.5) !important;
+
 }
+
 .archetype-slate_zen .tile-label { color: #1a252c !important; font-weight: 700; }
 
+
+
 /* 3. Biblios Wisdom: Antique Parchment & Gilded Leather Tome */
+
 .archetype-leather_tome {
+
     background: linear-gradient(145deg, #fdf6e2 0%, #f4e8c1 60%, #e6d39c 100%) !important;
+
     border-color: #4a2810 !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.9),
+
         inset 0 -2px 0 rgba(180, 83, 9, 0.25),
+
         0 4px 6px rgba(0, 0, 0, 0.3),
+
         0 8px 0 #854d0e,
+
         0 12px 22px rgba(113, 63, 18, 0.4) !important;
+
 }
+
 .archetype-leather_tome .tile-label { color: #422006 !important; font-weight: 700; }
 
+
+
 /* 4. Celestial Starlight: Aquamarine Cosmic Glass */
+
 .archetype-cosmic_glass {
+
     background: linear-gradient(145deg, #f0fdfa 0%, #ccfbf1 50%, #99f6e4 100%) !important;
+
     border-color: #0f766e !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.95),
+
         inset 0 -2px 0 rgba(15, 118, 110, 0.3),
+
         0 4px 6px rgba(0, 0, 0, 0.25),
+
         0 8px 0 #115e59,
+
         0 12px 22px rgba(15, 118, 110, 0.45) !important;
+
 }
+
 .archetype-cosmic_glass .tile-label { color: #134e4a !important; font-weight: 700; }
 
+
+
 /* 5. Golden Nebula: Obsidian Mirrors & Luminous Gold */
+
 .archetype-gold_mantra {
+
     background: linear-gradient(145deg, #fefce8 0%, #fef08a 45%, #facc15 100%) !important;
+
     border-color: #713f12 !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.95),
+
         inset 0 -2px 0 rgba(161, 98, 7, 0.35),
+
         0 4px 6px rgba(0, 0, 0, 0.3),
+
         0 8px 0 #a16207,
+
         0 12px 24px rgba(234, 179, 8, 0.5) !important;
+
 }
+
 .archetype-gold_mantra .tile-label { color: #582e05 !important; font-weight: 800; }
 
+
+
 /* 6. Spirit Altar: Carrara Marble on Teak Wood */
+
 .archetype-marble_altar {
+
     background: linear-gradient(145deg, #ffffff 0%, #f8fafc 50%, #e2e8f0 100%) !important;
+
     border-color: #475569 !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.95),
+
         inset 0 -2px 0 rgba(71, 85, 105, 0.2),
+
         0 4px 6px rgba(0, 0, 0, 0.25),
+
         0 8px 0 #64748b,
+
         0 12px 20px rgba(0, 0, 0, 0.4) !important;
+
 }
+
 .archetype-marble_altar .tile-label { color: #1e293b !important; font-weight: 700; }
 
+
+
 /* 7. Sacred Sanctuary: Chiseled Brass Lotus */
+
 .archetype-brass_lotus {
+
     background: linear-gradient(145deg, #fffbeb 0%, #fef3c7 45%, #fde68a 100%) !important;
+
     border-color: #92400e !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.95),
+
         inset 0 -2px 0 rgba(180, 83, 9, 0.3),
+
         0 4px 6px rgba(0, 0, 0, 0.3),
+
         0 8px 0 #b45309,
+
         0 12px 22px rgba(217, 119, 6, 0.45) !important;
+
 }
+
 .archetype-brass_lotus .tile-label { color: #78350f !important; font-weight: 800; }
 
+
+
 /* 8. Ocean Horizon: Tumbled Sea-Glass */
+
 .archetype-seaglass {
+
     background: linear-gradient(145deg, #f0fdf4 0%, #dcfce7 50%, #bbf7d0 100%) !important;
+
     border-color: #15803d !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.95),
+
         inset 0 -2px 0 rgba(21, 128, 61, 0.25),
+
         0 4px 6px rgba(0, 0, 0, 0.25),
+
         0 8px 0 #166534,
+
         0 12px 20px rgba(22, 101, 52, 0.4) !important;
+
 }
+
 .archetype-seaglass .tile-label { color: #14532d !important; font-weight: 700; }
 
+
+
 /* 9. Terracotta Earth: Warm Sun-Baked Red Clay */
+
 .archetype-terracotta {
+
     background: linear-gradient(145deg, #fff7ed 0%, #ffedd5 50%, #fed7aa 100%) !important;
+
     border-color: #9a3412 !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.9),
+
         inset 0 -2px 0 rgba(154, 52, 18, 0.3),
+
         0 4px 6px rgba(0, 0, 0, 0.3),
+
         0 8px 0 #c2410c,
+
         0 12px 20px rgba(194, 65, 12, 0.45) !important;
+
 }
+
 .archetype-terracotta .tile-label { color: #7c2d12 !important; font-weight: 700; }
 
+
+
 /* 10. Floral Harmony: Rose Quartz & Floral Cameo */
+
 .archetype-enamel_cameo {
+
     background: linear-gradient(145deg, #fff1f2 0%, #ffe4e6 50%, #fecdd3 100%) !important;
+
     border-color: #be123c !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.95),
+
         inset 0 -2px 0 rgba(190, 18, 60, 0.25),
+
         0 4px 6px rgba(0, 0, 0, 0.25),
+
         0 8px 0 #9f1239,
+
         0 12px 20px rgba(190, 18, 60, 0.4) !important;
+
 }
+
 .archetype-enamel_cameo .tile-label { color: #881337 !important; font-weight: 700; }
 
+
+
 /* 11. Blooming Mandala: Circular Porcelain Cameos */
+
 .archetype-porcelain_cameo {
+
     background: linear-gradient(145deg, #faf5ff 0%, #f3e8ff 50%, #e9d5ff 100%) !important;
+
     border-color: #7e22ce !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.95),
+
         inset 0 -2px 0 rgba(126, 34, 206, 0.25),
+
         0 4px 6px rgba(0, 0, 0, 0.25),
+
         0 8px 0 #6b21a8,
+
         0 12px 20px rgba(126, 34, 206, 0.4) !important;
+
 }
+
 .archetype-porcelain_cameo .tile-label { color: #581c87 !important; font-weight: 700; }
 
+
+
 /* 12. Sacred Spiral: Golden Vine Orbits */
+
 .archetype-spiral_vine {
+
     background: linear-gradient(145deg, #f7fee7 0%, #ecfccb 50%, #d9f99d 100%) !important;
+
     border-color: #4d7c0f !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.95),
+
         inset 0 -2px 0 rgba(77, 124, 15, 0.25),
+
         0 4px 6px rgba(0, 0, 0, 0.25),
+
         0 8px 0 #3f6212,
+
         0 12px 20px rgba(77, 124, 15, 0.4) !important;
+
 }
+
 .archetype-spiral_vine .tile-label { color: #365314 !important; font-weight: 700; }
 
+
+
 /* 13. Master Sanctuary: Carved Walnut & Ivory */
+
 .archetype-ivory_wood {
+
     background: linear-gradient(145deg, #fefce8 0%, #fef3c7 40%, #e2d9c8 100%) !important;
+
     border-color: #523e2b !important;
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.95),
+
         inset 0 -2px 0 rgba(82, 62, 43, 0.3),
+
         0 4px 6px rgba(0, 0, 0, 0.3),
+
         0 8px 0 #78583c,
+
         0 12px 22px rgba(82, 62, 43, 0.45) !important;
+
 }
+
 .archetype-ivory_wood .tile-label { color: #382618 !important; font-weight: 700; }
 
+
+
 .tile-face {
+
     width: 100%;
+
     height: 100%;
+
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
     justify-content: space-between;
+
     padding: 4px 3px 3px 3px;
+
     position: relative;
+
     box-sizing: border-box;
+
     overflow: hidden;
+
 }
+
+
 
 /* Authentic Artwork Tile Skins (Photo-Real Dedicated 3D Tile Sets) */
+
 .tile-element.tile-authentic-art {
+
     background: transparent !important;
+
     border: none !important;
+
     box-shadow: none !important;
+
     overflow: visible !important;
+
 }
+
+
 
 .tile-element.tile-authentic-art .tile-face {
+
     background: transparent !important;
+
     border: none !important;
+
     box-shadow: none !important;
+
     overflow: visible !important;
+
     padding: 0 !important;
+
 }
+
+
 
 .tile-art-face {
+
     width: 100%;
+
     height: 100%;
+
     position: relative;
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
     border-radius: 12px;
+
 }
+
+
 
 .tile-art-img {
+
     width: 100%;
+
     height: 100%;
+
     object-fit: fill;
+
     display: block;
+
     pointer-events: none;
+
     user-select: none;
+
     -webkit-user-drag: none;
+
     filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.45));
+
     transition: transform 0.15s ease, filter 0.15s ease;
+
 }
+
+
 
 .tile-element.tile-authentic-art.tile-blocked .tile-art-img {
+
     filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4)) brightness(0.64) saturate(0.72) contrast(0.95);
+
 }
+
+
 
 .tile-element.tile-authentic-art.tile-free:hover .tile-art-img {
+
     filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.55)) brightness(1.10);
+
     transform: translateY(-2px);
+
 }
+
+
 
 .tile-element.tile-authentic-art.tile-selected .tile-art-img {
+
     filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.95)) brightness(1.25);
+
     transform: translateY(-6px) scale(1.06);
+
 }
+
+
 
 .tile-element.tile-authentic-art.tile-hint-aura .tile-art-img {
+
     filter: drop-shadow(0 0 16px #38bdf8) brightness(1.25);
+
     animation: tilePulseHint 1.2s infinite ease-in-out;
+
 }
+
+
 
 .tile-icon {
+
     font-size: var(--tile-icon-size, 42px);
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
     flex-grow: 1;
+
     line-height: 1;
+
     margin: 2px 0 0 0;
+
     filter: drop-shadow(0 3px 6px rgba(0, 0, 0, 0.32)) drop-shadow(0 0 10px rgba(251, 191, 36, 0.42));
+
     transition: transform 0.15s ease, filter 0.15s ease;
+
     user-select: none;
+
     -webkit-user-select: none;
+
     flex-shrink: 0;
+
 }
+
+
 
 .tile-free:hover .tile-icon {
+
     transform: scale(1.08);
+
     filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 14px rgba(251, 191, 36, 0.65));
+
 }
+
+
 
 .tile-label {
+
     font-weight: 700;
+
     color: #181e29;
+
     text-align: center;
+
     line-height: 1.05;
+
     width: 100%;
+
     display: -webkit-box;
+
     -webkit-line-clamp: 2;
+
     -webkit-box-orient: vertical;
+
     overflow: hidden;
+
     word-break: break-word;
+
     overflow-wrap: break-word;
+
     hyphens: auto;
+
     letter-spacing: -0.2px;
+
     padding: 0 1px;
+
 }
+
+
 
 /* Free / Playable Tile: Warm ambient rim light and elevated 3D presence */
+
 .tile-free {
+
     filter: brightness(1.02);
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.98),
+
         0 4px 8px rgba(0, 0, 0, 0.25),
+
         0 9px 0 #bfa075,
+
         0 0 12px rgba(255, 215, 0, 0.32),
+
         0 14px 20px rgba(0, 0, 0, 0.35);
+
     transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+
 }
+
+
 
 .tile-free:hover {
+
     transform: translateY(-5px);
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 1.0),
+
         0 8px 12px rgba(0, 0, 0, 0.3),
+
         0 14px 0 #bfa075,
+
         0 0 18px rgba(255, 215, 0, 0.55),
+
         0 20px 28px rgba(0, 0, 0, 0.45);
+
 }
+
+
 
 /* Selected State */
+
 .tile-selected {
+
     border-color: #ffd700 !important;
+
     background: #fff8e7 !important;
+
     transform: translateY(-7px) scale(1.05) !important;
+
     box-shadow: 
+
         0 0 20px #D4AF37,
+
         0 14px 0 #d97706,
+
         0 22px 32px rgba(0, 0, 0, 0.5) !important;
+
 }
+
+
 
 /* Deep 3D Isometric Stack Shading (Layers 1-7) */
+
 .tile-element[data-z="1"] { box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 4px 6px rgba(0,0,0,0.25), 0 8px 0 #bfa075, 0 10px 16px rgba(0,0,0,0.3); }
+
 .tile-element[data-z="2"] { box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 5px 8px rgba(0,0,0,0.28), 0 11px 0 #b09167, 0 13px 20px rgba(0,0,0,0.34); }
+
 .tile-element[data-z="3"] { box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 6px 10px rgba(0,0,0,0.32), 0 14px 0 #9f8158, 0 16px 24px rgba(0,0,0,0.38); }
+
 .tile-element[data-z="4"] { box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 7px 12px rgba(0,0,0,0.36), 0 17px 0 #8f7249, 0 19px 28px rgba(0,0,0,0.42); }
+
 .tile-element[data-z="5"] { box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 8px 14px rgba(0,0,0,0.40), 0 20px 0 #7f633b, 0 22px 32px rgba(0,0,0,0.46); }
+
 .tile-element[data-z="6"] { box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 9px 16px rgba(0,0,0,0.45), 0 23px 0 #6e542c, 0 25px 36px rgba(0,0,0,0.50); }
+
 .tile-element[data-z="7"] { box-shadow: inset 0 2px 0 rgba(255,255,255,0.9), 0 10px 18px rgba(0,0,0,0.50), 0 26px 0 #5d451e, 0 28px 40px rgba(0,0,0,0.55); }
 
+
+
 /* High-Contrast Keyboard Accessibility Focus Ring */
+
 .tile-keyboard-focus {
+
     outline: 3px solid #38bdf8 !important;
+
     outline-offset: 3px !important;
+
     box-shadow: 0 0 16px rgba(56, 189, 248, 0.8) !important;
+
 }
+
+
 
 /* Blocked / Submerged Tile: Deep matte shading, muted saturation, clear non-playable mobile cue */
+
 .tile-blocked {
+
     filter: brightness(0.72) saturate(0.82) contrast(0.95);
+
     cursor: pointer;
+
     box-shadow: 
+
         inset 0 1px 0 rgba(255, 255, 255, 0.25),
+
         0 2px 4px rgba(0, 0, 0, 0.35),
+
         0 4px 0 #5c4b37,
+
         0 6px 10px rgba(0, 0, 0, 0.4);
+
     opacity: 0.82;
+
     transition: filter 0.2s ease, opacity 0.2s ease, transform 0.15s ease;
+
 }
+
+
 
 .tile-blocked:hover {
+
     filter: brightness(0.78) saturate(0.88) contrast(0.96);
+
 }
+
+
 
 /* Micro-nudge animation when blocked tile is tapped */
+
 @keyframes blockedTileNudge {
+
     0%, 100% { transform: translateX(0); }
+
     20% { transform: translateX(-4px); }
+
     40% { transform: translateX(4px); }
+
     60% { transform: translateX(-2px); }
+
     80% { transform: translateX(2px); }
+
 }
+
+
 
 .tile-nudge-blocked {
+
     animation: blockedTileNudge 0.3s ease-in-out;
+
 }
+
+
 
 /* Modern Tactile Action Bar (Pic 3 Mahjong Style) */
+
 .gameplay-action-bar {
+
     display: flex;
+
     gap: clamp(6px, 2vw, 16px);
+
     margin-top: 14px;
+
     justify-content: center;
+
     align-items: center;
+
     width: 100%;
+
     max-width: 480px;
+
 }
+
+
 
 .tactile-action-btn {
+
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
     gap: 4px;
+
     background: transparent;
+
     border: none;
+
     cursor: pointer;
+
     position: relative;
+
     user-select: none;
+
     transition: transform 0.15s cubic-bezier(0.25, 1, 0.5, 1);
+
 }
+
+
 
 .tactile-action-btn:hover {
+
     transform: translateY(-2px);
+
 }
+
+
 
 .action-btn-circle {
+
     width: clamp(40px, 10vw, 50px);
+
     height: clamp(40px, 10vw, 50px);
+
     border-radius: 50%;
+
     background: linear-gradient(145deg, #1f2937, #111827);
+
     border: 2px solid var(--accent-current);
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
     font-size: clamp(18px, 4.5vw, 22px);
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.2),
+
         0 4px 8px rgba(0, 0, 0, 0.4),
+
         0 6px 0 rgba(0, 0, 0, 0.5);
+
     transition: all 0.15s ease;
+
 }
+
+
 
 /* Field Guide Sidebar & Lore Card Tokens */
+
 .fg-domain-badge {
+
     font-size: 10px;
+
     font-weight: 700;
+
     text-transform: uppercase;
+
     letter-spacing: 0.5px;
+
     padding: 2px 8px;
+
     border-radius: 12px;
+
     background: rgba(197, 168, 128, 0.15);
+
     color: var(--accent-morning);
+
     border: 1px solid rgba(197, 168, 128, 0.3);
+
 }
+
+
 
 .fg-meta-label {
+
     display: inline-block;
+
     color: #c5a880;
+
     font-size: 10px;
+
     font-weight: 700;
+
     text-transform: uppercase;
+
     letter-spacing: 0.5px;
+
 }
+
+
 
 .fg-audio-bar {
+
     display: flex;
+
     justify-content: center;
+
     gap: 8px;
+
     margin: 4px 0;
+
 }
+
+
 
 .fg-listen-btn, .fg-stop-btn {
+
     background: rgba(255, 255, 255, 0.08);
+
     border: 1px solid var(--border-current);
+
     color: #ffffff;
+
     border-radius: 16px;
+
     cursor: pointer;
+
     font-weight: 600;
+
     transition: all 0.15s ease;
+
 }
+
+
 
 .fg-listen-btn:hover {
+
     background: rgba(255, 215, 0, 0.2);
+
     border-color: #ffd700;
+
     color: #ffd700;
+
 }
+
+
 
 .fg-stop-btn:hover {
+
     background: rgba(239, 68, 68, 0.2);
+
     border-color: #ef4444;
+
     color: #ef4444;
+
 }
+
+
 
 .theme-morning .action-btn-circle {
+
     background: linear-gradient(145deg, #ffffff, #f3f4f6);
+
     border-color: var(--accent-morning);
+
     box-shadow: 
+
         inset 0 2px 0 rgba(255, 255, 255, 0.8),
+
         0 4px 8px rgba(0, 0, 0, 0.12),
+
         0 5px 0 #d1d5db;
+
 }
+
+
 
 .tactile-action-btn:active .action-btn-circle {
+
     box-shadow: 
+
         inset 0 2px 4px rgba(0, 0, 0, 0.4),
+
         0 1px 2px rgba(0, 0, 0, 0.3),
+
         0 2px 0 rgba(0, 0, 0, 0.5);
+
     transform: translateY(3px);
+
 }
+
+
 
 .action-btn-title {
+
     font-size: 11px;
+
     font-weight: 700;
+
     color: var(--text-current);
+
     letter-spacing: 0.3px;
+
     text-transform: uppercase;
+
 }
+
+
 
 .action-btn-badge {
+
     position: absolute;
+
     top: -2px;
+
     right: 2px;
+
     background: #ffd700;
+
     color: #0b1215;
+
     font-size: 9px;
+
     font-weight: 900;
+
     padding: 1px 5px;
+
     border-radius: 8px;
+
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+
 }
+
+
 
 /* Hint Aura */
+
 .tile-hint-aura {
+
     animation: hintPulse 1.2s infinite alternate;
+
 }
+
+
 
 @keyframes hintPulse {
+
     0% { box-shadow: 0 0 8px #10B981, 0 8px 0 #bfa075; }
+
     100% { box-shadow: 0 0 24px #34D399, 0 8px 0 #bfa075, 0 0 12px #FDE047; }
+
 }
+
+
 
 /* Senior View [Aa] Accessibility Mode */
+
 .senior-view .tile-element,
+
 .senior-tile {
+
     border-width: 3px !important;
+
     border-color: #1e1b4b !important;
+
     background: #ffffff !important;
+
 }
+
+
 
 .senior-view .tile-label-banner {
+
     min-height: 20px;
+
     max-height: 28px;
+
 }
+
+
 
 .senior-view .tile-label {
+
     font-weight: 900 !important;
+
     color: #000000 !important;
+
     line-height: 1.08;
+
 }
+
+
 
 .senior-view .tile-icon {
+
     font-size: clamp(38px, 6vw, 56px) !important;
+
 }
+
+
 
 /* Contrast ratio > 11:1 for senior readability */
+
 .senior-view {
+
     --text-current: #ffffff !important;
+
     --border-current: rgba(255, 255, 255, 0.3) !important;
+
 }
+
+
 
 /* Focus IQ Badge in HUD (Brain Training Gamification) */
+
 .hud-iq-badge {
+
     font-size: 11px;
+
     font-weight: 800;
+
     color: #f59e0b;
+
     background: rgba(245, 158, 11, 0.15);
+
     border: 1px solid rgba(245, 158, 11, 0.4);
+
     padding: 2px 8px;
+
     border-radius: 12px;
+
     display: inline-flex;
+
     align-items: center;
+
     gap: 4px;
+
     letter-spacing: 0.3px;
+
     transition: transform 0.2s ease, box-shadow 0.2s ease;
+
 }
+
 .hud-iq-badge:hover {
+
     transform: scale(1.05);
+
     box-shadow: 0 0 10px rgba(245, 158, 11, 0.5);
+
 }
+
+
 
 /* Dual Mode Bar in HUD */
+
 .mode-toggle-bar {
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
     gap: clamp(4px, 1.2vw, 8px);
+
     padding: 6px clamp(6px, 1.8vw, 12px);
+
     background: rgba(0, 0, 0, 0.28);
+
     border-radius: 20px;
+
     margin: 4px 10px;
+
     flex-wrap: nowrap;
+
 }
+
+
 
 .mode-btn {
+
     padding: 5px clamp(6px, 1.5vw, 12px);
+
     border-radius: 12px;
+
     font-size: clamp(10px, 2.5vw, 12px);
+
     font-weight: 600;
+
     border: 1px solid rgba(255, 255, 255, 0.2);
+
     background: transparent;
+
     color: var(--text-current);
+
     cursor: pointer;
+
     transition: all 0.2s ease;
+
     white-space: nowrap;
+
 }
+
+
 
 .mode-btn.active {
+
     background: var(--accent-current);
+
     color: #0b1215;
+
     border-color: var(--accent-current);
+
     font-weight: 700;
+
 }
+
+
 
 .mode-btn-classic {
+
     border-color: rgba(96, 165, 250, 0.4);
+
     color: #93c5fd;
+
 }
+
+
 
 .mode-btn-classic.active {
+
     background: linear-gradient(135deg, #2563eb, #1d4ed8);
+
     color: #ffffff;
+
     border-color: #60a5fa;
+
     box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
+
 }
+
+
 
 .mode-btn-realms {
+
     border-color: rgba(255, 215, 0, 0.4);
+
     color: #fde047;
+
 }
+
+
 
 .mode-btn-realms.active {
+
     background: linear-gradient(135deg, #f59e0b, #d97706);
+
     color: #ffffff;
+
     border-color: #ffd700;
+
     box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+
 }
+
+
 
 .senior-toggle-btn {
+
     padding: 5px clamp(6px, 1.5vw, 10px);
+
     border-radius: 12px;
+
     font-size: clamp(10px, 2.4vw, 12px);
+
     font-weight: 700;
+
     border: 1px solid var(--accent-current);
+
     background: rgba(197, 168, 128, 0.15);
+
     color: var(--accent-current);
+
     cursor: pointer;
+
     margin-left: auto;
+
     white-space: nowrap;
+
 }
+
+
 
 .senior-toggle-btn.active {
+
     background: var(--accent-current);
+
     color: #0b1215;
+
 }
+
+
 
 /* Photorealistic Realm Board Wallpaper */
+
 #center-stage-col.theme-realm-stage {
+
     background-size: cover !important;
+
     background-position: center center !important;
+
     background-repeat: no-repeat !important;
+
     transition: background-image 0.6s ease;
+
 }
+
+
 
 .board-container.theme-realm-active {
-    background-size: cover !important;
-    background-position: center center !important;
-    background-repeat: no-repeat !important;
+
+    background: transparent !important;
+
     position: relative;
+
     border-radius: 16px;
-    box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.45);
-    transition: background-image 0.6s ease;
+
+    box-shadow: none !important;
+
 }
+
+
 
 .board-container.theme-realm-active::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: radial-gradient(circle at center, rgba(0, 0, 0, 0.05) 0%, rgba(0, 0, 0, 0.35) 100%);
-    border-radius: 16px;
-    pointer-events: none;
-    z-index: 1;
+
+    display: none !important;
+
 }
+
+
 
 /* Archetype specific action bar styling in Realms mode matching doc images */
+
 .gameplay-action-bar[data-realm-archetype="terracotta"] .action-btn-circle {
+
     background: linear-gradient(145deg, #7c3a21, #431b0c);
+
     border: 2px solid #ea580c;
+
     box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3), 0 4px 8px rgba(0, 0, 0, 0.6), 0 0 12px rgba(234, 88, 12, 0.4);
+
     color: #ffedd5;
+
 }
+
 .gameplay-action-bar[data-realm-archetype="bark_leaf"] .action-btn-circle {
+
     background: linear-gradient(145deg, #1b4332, #081c15);
+
     border: 2px solid #52b788;
+
     box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3), 0 4px 8px rgba(0, 0, 0, 0.6), 0 0 12px rgba(82, 183, 136, 0.4);
+
     color: #d8f3dc;
+
 }
+
 .gameplay-action-bar[data-realm-archetype="slate_zen"] .action-btn-circle {
+
     background: linear-gradient(145deg, #334155, #0f172a);
+
     border: 2px solid #94a3b8;
+
     box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3), 0 4px 8px rgba(0, 0, 0, 0.6), 0 0 12px rgba(148, 163, 184, 0.4);
+
     color: #f1f5f9;
+
 }
+
 .gameplay-action-bar[data-realm-archetype="leather_tome"] .action-btn-circle {
+
     background: linear-gradient(145deg, #582f0e, #331800);
+
     border: 2px solid #d4af37;
+
     box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.3), 0 4px 8px rgba(0, 0, 0, 0.6), 0 0 12px rgba(212, 175, 55, 0.4);
+
     color: #fefae0;
+
 }
+
 .gameplay-action-bar[data-realm-archetype="cosmic_glass"] .action-btn-circle {
+
     background: linear-gradient(145deg, #0e7490, #082f49);
+
     border: 2px solid #38bdf8;
+
     box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.4), 0 4px 8px rgba(0, 0, 0, 0.6), 0 0 14px rgba(56, 189, 248, 0.5);
+
     color: #e0f2fe;
+
 }
+
 .gameplay-action-bar[data-realm-archetype="gold_mantra"] .action-btn-circle {
+
     background: linear-gradient(145deg, #78350f, #291205);
+
     border: 2px solid #fbbf24;
+
     box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.35), 0 4px 8px rgba(0, 0, 0, 0.6), 0 0 14px rgba(251, 191, 36, 0.5);
+
     color: #fef3c7;
+
 }
+
 .gameplay-action-bar[data-realm-archetype="marble_altar"] .action-btn-circle {
+
     background: linear-gradient(145deg, #f8fafc, #cbd5e1);
+
     border: 2px solid #d97706;
+
     box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.9), 0 4px 8px rgba(0, 0, 0, 0.5), 0 0 12px rgba(217, 119, 6, 0.4);
+
     color: #1e293b;
+
 }
+
+
 
 /* Realms Browser Modal Styles */
+
 .realms-browser-overlay {
+
     display: none;
+
     position: absolute;
+
     top: 0;
+
     left: 0;
+
     width: 100%;
+
     height: 100%;
+
     background: rgba(4, 24, 18, 0.92);
+
     backdrop-filter: blur(20px);
+
     z-index: var(--z-overlay);
+
     justify-content: center;
+
     align-items: center;
+
     padding: 16px 10px;
+
     box-sizing: border-box;
+
 }
+
+
 
 .realms-browser-overlay.active {
+
     display: flex;
+
 }
+
+
 
 .realms-browser-card {
+
     background: rgba(14, 78, 55, 0.96);
+
     border: 1px solid var(--accent-current);
+
     border-radius: 24px;
+
     padding: clamp(14px, 3.5vw, 24px);
+
     width: 100%;
+
     max-width: min(480px, 96vw);
+
     max-height: min(90dvh, 90vh);
+
     overflow-y: auto;
+
     overscroll-behavior: contain;
+
     box-sizing: border-box;
+
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+
     display: flex;
+
     flex-direction: column;
+
     gap: 12px;
+
     animation: scaleUpCard 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
 }
+
+
 
 .realms-grid {
+
     display: grid;
+
     grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+
     gap: 10px;
+
     width: 100%;
+
 }
+
+
 
 .realm-card-item {
+
     background: rgba(255, 255, 255, 0.05);
+
     border: 1px solid rgba(255, 255, 255, 0.12);
+
     border-radius: 14px;
+
     padding: 10px 8px;
+
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
     text-align: center;
+
     cursor: pointer;
+
     transition: all 0.2s ease;
+
     position: relative;
+
     overflow: hidden;
+
 }
+
+
 
 .realm-card-item:hover {
+
     background: rgba(255, 255, 255, 0.1);
+
     border-color: #ffd700;
+
     transform: translateY(-2px);
+
 }
+
+
 
 .realm-card-item.active {
+
     border-color: #ffd700;
+
     background: rgba(245, 158, 11, 0.18);
+
     box-shadow: 0 0 12px rgba(245, 158, 11, 0.35);
+
 }
+
+
 
 .realm-card-icon {
+
     font-size: 26px;
+
     margin-bottom: 4px;
+
 }
+
+
 
 .realm-card-chapter {
+
     font-size: 9px;
+
     font-weight: 700;
+
     text-transform: uppercase;
+
     color: #c5a880;
+
     letter-spacing: 0.5px;
+
 }
+
+
 
 .realm-card-title {
+
     font-size: 12px;
+
     font-weight: 700;
+
     color: #ffffff;
+
     margin: 2px 0;
+
     line-height: 1.2;
+
 }
+
+
 
 .realm-card-levels {
+
     font-size: 10px;
+
     color: #a7f3d0;
+
 }
+
+
 
 /* ========================================================
+
    OPTION A: IMMERSIVE FULL-SCREEN SOLITAIRE (Desktop >= 1024px)
+
    Sidebars are collapsible off-canvas drawers.
+
    Board fills the entire viewport width.
+
    ======================================================== */
+
 @media (min-width: 1024px) {
+
     body {
+
         padding: 0;
+
         margin: 0;
+
         width: 100vw;
+
         height: 100vh;
+
         overflow: hidden;
+
     }
 
+
+
     .app-container {
+
         width: 100vw !important;
+
         max-width: 1920px !important;
+
         height: 100vh !important;
+
         max-height: 1080px !important;
+
         border-radius: 0 !important;
+
         border: none !important;
+
         background: transparent !important;
+
         padding: 0 !important;
+
     }
+
+
 
     /* Full-width single column — sidebars are drawers, not grid columns */
+
     .game-desktop-grid {
+
         display: flex !important;
+
         flex-direction: column !important;
+
         width: 100% !important;
+
         height: 100% !important;
+
         overflow: hidden !important;
+
         position: relative;
+
     }
+
+
 
     /* Center stage takes ALL available width */
+
     #center-stage-col {
+
         flex: 1 !important;
+
         display: flex !important;
+
         flex-direction: column !important;
+
         align-items: center !important;
+
         justify-content: flex-start !important;
+
         position: relative !important;
+
         overflow: hidden !important;
+
         width: 100% !important;
+
     }
+
+
 
     /* OFF-CANVAS LEFT DRAWER: Knowledge Field Guide */
+
     #field-guide-col {
+
         display: flex !important;
+
         flex-direction: column;
+
         padding: 20px 16px 16px 16px;
+
         background: rgba(4, 24, 18, 0.97);
+
         backdrop-filter: blur(24px);
+
         border-right: 1px solid var(--border-current);
+
         overflow-y: auto;
+
         gap: 14px;
+
         position: fixed !important;
+
         top: 0 !important;
+
         left: 0 !important;
+
         width: 340px !important;
+
         height: 100vh !important;
+
         z-index: 200 !important;
+
         transform: translateX(-100%);
+
         transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+
         box-shadow: 4px 0 24px rgba(0, 0, 0, 0.5);
+
     }
+
+
 
     #field-guide-col.drawer-open {
+
         transform: translateX(0);
+
     }
+
+
 
     /* OFF-CANVAS RIGHT DRAWER: Sanctuary Alignment */
+
     #status-prahar-col {
+
         display: flex !important;
+
         flex-direction: column;
+
         padding: 20px 16px 16px 16px;
+
         background: rgba(4, 24, 18, 0.97);
+
         backdrop-filter: blur(24px);
+
         border-left: 1px solid var(--border-current);
+
         overflow-y: auto;
+
         gap: 18px;
+
         position: fixed !important;
+
         top: 0 !important;
+
         right: 0 !important;
+
         width: 340px !important;
+
         height: 100vh !important;
+
         z-index: 200 !important;
+
         transform: translateX(100%);
+
         transition: transform 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+
         box-shadow: -4px 0 24px rgba(0, 0, 0, 0.5);
+
     }
+
+
 
     #status-prahar-col.drawer-open {
+
         transform: translateX(0);
+
     }
+
+
 
     /* Semi-transparent backdrop when a drawer is open */
+
     .drawer-backdrop {
+
         display: none;
+
         position: fixed;
+
         inset: 0;
+
         background: rgba(0, 0, 0, 0.45);
+
         z-index: 199;
+
         backdrop-filter: blur(2px);
+
         cursor: pointer;
+
     }
+
+
 
     .drawer-backdrop.active {
+
         display: block;
+
     }
+
+
 
     /* Board fills the full stage — no width cap, no height cap */
+
     .board-container {
+
         width: 100% !important;
+
         max-width: 100% !important;
+
         flex: 1 1 0 !important;
+
         /* RC3: use --app-height set by JS viewport updater; subtract header+modebar */
+
         height: calc(var(--app-height, 100vh) - 104px) !important;
+
         min-height: 0 !important;
+
         max-height: none !important;
+
         position: relative !important;
+
         overflow: visible !important;
+
         border-radius: 0 !important;
+
         border: none !important;
+
         background: transparent !important;
+
         box-shadow: none !important;
+
         padding: 0 !important;
+
     }
+
+
 
     /* RC2: #board (.tile-layout) must inherit full parent size.
+
        The global rule has max-width:980px and min-height:520px -- kill them on desktop. */
+
     .game-desktop-grid .tile-layout {
+
         width: 100% !important;
+
         max-width: none !important;
+
         height: 100% !important;
+
         min-height: 0 !important;
+
         position: relative !important;
+
         display: block !important;
+
     }
+
+
 
     /* Tray stays full-width center */
+
     .game-desktop-grid .tray-container {
+
         width: 100%;
+
         max-width: 680px;
+
         background: transparent !important;
+
         border: none !important;
+
         margin: 0 auto;
+
     }
+
+
 
     /* Drawer Toggle Floating Buttons */
+
     .drawer-toggle-left,
+
     .drawer-toggle-right {
+
         position: fixed !important;
+
         top: 50% !important;
+
         transform: translateY(-50%) !important;
+
         z-index: 201 !important;
+
         background: rgba(4, 24, 18, 0.9) !important;
+
         border: 1px solid var(--border-current) !important;
+
         color: var(--accent-current) !important;
+
         font-size: 11px !important;
+
         font-weight: 700 !important;
+
         letter-spacing: 0.5px !important;
+
         padding: 10px 8px !important;
+
         cursor: pointer !important;
+
         transition: all 0.2s ease !important;
+
         writing-mode: vertical-rl !important;
+
         text-orientation: mixed !important;
+
         display: flex !important;
+
         align-items: center !important;
+
         gap: 4px !important;
+
         border-radius: 0 8px 8px 0 !important;
+
         box-shadow: 2px 0 12px rgba(0,0,0,0.4) !important;
+
         backdrop-filter: blur(8px) !important;
+
         line-height: 1.3 !important;
+
         min-height: 80px !important;
+
     }
+
+
 
     .drawer-toggle-left {
+
         left: 0 !important;
+
         border-radius: 0 8px 8px 0 !important;
+
         border-left: none !important;
+
     }
+
+
 
     .drawer-toggle-right {
+
         right: 0 !important;
+
         border-radius: 8px 0 0 8px !important;
+
         border-right: none !important;
+
     }
+
+
 
     .drawer-toggle-left:hover,
+
     .drawer-toggle-right:hover {
+
         background: rgba(14, 78, 55, 0.95) !important;
+
         color: #ffd700 !important;
+
         box-shadow: 4px 0 20px rgba(0,0,0,0.6) !important;
+
     }
+
+
 
     /* Close button inside each drawer panel */
+
     .drawer-close-btn {
+
         position: absolute;
+
         top: 12px;
+
         right: 12px;
+
         width: 30px;
+
         height: 30px;
+
         border-radius: 50%;
+
         border: 1px solid rgba(255,255,255,0.2);
+
         background: rgba(255,255,255,0.08);
+
         color: #ffffff;
+
         font-size: 16px;
+
         cursor: pointer;
+
         display: flex;
+
         align-items: center;
+
         justify-content: center;
+
         z-index: 10002;
+
         transition: background 0.2s;
+
     }
+
     .drawer-close-btn:hover {
+
         background: rgba(255,255,255,0.18);
+
     }
+
 }
+
+
 
 /* Mobile Viewport (< 1024px): Standard Single-Column Frame */
+
 @media (max-width: 1023px) {
+
     #field-guide-col, #status-prahar-col {
+
         display: none !important;
+
     }
+
+
 
     /* RC-A fix: drawer buttons / backdrop exist in HTML but must be invisible on mobile.
+
        Without this they render as full-width white blocks stealing ~90px of vertical space. */
+
     .drawer-toggle-left,
+
     .drawer-toggle-right,
+
     .drawer-backdrop,
+
     .drawer-close-btn {
+
         display: none !important;
+
     }
+
+
 
     .game-desktop-grid {
+
         display: flex;
+
         flex-direction: column;
+
         height: 100%;
+
         width: 100%;
+
     }
+
     #center-stage-col {
+
         flex: 1;
+
         display: flex;
+
         flex-direction: column;
+
         height: 100%;
+
     }
+
+
 
     /* RC-B fix: remove the min-height:480px floor from the base .board-container rule
+
        on mobile so JS reads the real rendered height, not the CSS minimum. */
+
     .board-container {
+
         min-height: 0 !important;
+
         padding: 4px 0 6px 0 !important;
+
     }
+
 }
+
+
 
 /* Vak-Inspired HUD Progression Bar */
+
 .hud-progression-bar {
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
     gap: 8px;
+
     flex: 1;
+
 }
+
+
 
 .hud-rank-badge {
+
     background: rgba(197, 168, 128, 0.15);
+
     border: 1px solid var(--accent-current);
+
     border-radius: 12px;
+
     padding: 3px 8px;
+
     font-size: 11px;
+
     font-weight: 600;
+
     color: var(--accent-current);
+
     letter-spacing: 0.5px;
+
     white-space: nowrap;
+
 }
+
+
 
 .hud-level-indicator {
+
     font-size: 13px;
+
     font-weight: 700;
+
     color: #ffffff;
+
     letter-spacing: 0.5px;
+
     white-space: nowrap;
+
 }
+
+
 
 .hud-sparks-count {
+
     background: rgba(255, 215, 0, 0.15);
+
     border: 1px solid rgba(255, 215, 0, 0.4);
+
     border-radius: 12px;
+
     padding: 3px 8px;
+
     font-size: 11px;
+
     font-weight: 700;
+
     color: #ffd700;
+
     white-space: nowrap;
+
 }
+
+
 
 /* Toast Message */
+
 .toast-banner {
+
     position: fixed;
+
     top: 20px;
+
     left: 50%;
+
     transform: translateX(-50%);
+
     background: rgba(15, 23, 42, 0.95);
+
     border: 1px solid var(--accent-current);
+
     color: #ffd700;
+
     padding: 8px 18px;
+
     border-radius: 20px;
+
     font-size: 12px;
+
     font-weight: 600;
+
     box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+
     z-index: 9999;
+
     opacity: 0;
+
     transition: opacity 0.3s ease;
+
     pointer-events: none;
+
 }
+
+
 
 .toast-banner.show {
+
     opacity: 1;
+
 }
+
+
 
 /* Stage Victory Modal */
+
 .stage-clear-overlay {
+
     display: none;
+
     position: absolute;
+
     top: 0;
+
     left: 0;
+
     width: 100%;
+
     height: 100%;
+
     background: rgba(4, 24, 18, 0.88);
+
     backdrop-filter: blur(16px);
+
     z-index: var(--z-overlay);
+
     justify-content: center;
+
     align-items: center;
+
     padding: 16px 12px;
+
     box-sizing: border-box;
+
 }
+
+
 
 .stage-clear-overlay.active {
+
     display: flex;
+
 }
+
+
 
 .stage-clear-card {
+
     background: rgba(14, 78, 55, 0.95);
+
     border: 1px solid var(--accent-current);
+
     border-radius: 24px;
+
     padding: clamp(14px, 4vw, 22px);
+
     width: 100%;
+
     max-width: min(380px, 94vw);
+
     max-height: min(88dvh, 88vh);
+
     overflow-y: auto;
+
     overscroll-behavior: contain;
+
     box-sizing: border-box;
+
     text-align: center;
+
     box-shadow: 0 16px 48px rgba(0,0,0,0.6);
+
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
+
     gap: 10px;
+
     animation: scaleUpCard 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
 }
+
+
 
 .stage-clear-card::-webkit-scrollbar {
+
     width: 4px;
+
 }
+
 .stage-clear-card::-webkit-scrollbar-thumb {
+
     background: rgba(255, 215, 0, 0.3);
+
     border-radius: 4px;
+
 }
+
+
 
 /* Avatar Pill Touch Ergonomics - Responsive Clamp */
+
 .avatar-pill {
+
     width: clamp(32px, 8.2vw, 38px) !important;
+
     height: clamp(32px, 8.2vw, 38px) !important;
+
     min-width: unset !important;
+
     font-size: clamp(16px, 4.2vw, 19px) !important;
+
     flex-shrink: 0;
+
     border-radius: 50%;
+
     display: flex;
+
     align-items: center;
+
     justify-content: center;
+
     background: rgba(255, 255, 255, 0.06);
+
     border: 1px solid rgba(255, 255, 255, 0.2);
+
     cursor: pointer;
+
     transition: transform 0.15s ease, box-shadow 0.15s ease;
+
 }
+
+
 
 .avatar-pill:hover {
+
     transform: scale(1.12);
+
 }
+
+
 
 .avatar-pill.active {
+
     background: rgba(255, 215, 0, 0.25) !important;
+
     border: 2px solid #ffd700 !important;
+
     box-shadow: 0 0 12px rgba(255, 215, 0, 0.6) !important;
+
     transform: scale(1.08);
+
 }
+
+
 
 /* Mobile Frame Adjustments (< 600px) */
+
 @media (max-width: 600px) {
+
     body {
+
         padding: 0;
+
     }
+
     .app-container {
+
         max-width: 100vw;
+
         height: 100vh;
+
         height: var(--app-height, 100dvh);
+
         max-height: var(--app-height, 100dvh);
+
         border-radius: 0;
+
         border: none;
+
     }
+
 }
+
+
 
 /* Narrow Mobile Screens (< 380px) */
+
 @media (max-width: 380px) {
+
     .app-header {
+
         padding: 8px 10px;
+
     }
+
     .hud-rank-badge {
+
         font-size: 10px;
+
         padding: 2px 6px;
+
     }
+
     .hud-level-indicator {
+
         font-size: 11px;
+
     }
+
     .hud-sparks-count {
+
         font-size: 10px;
+
         padding: 2px 6px;
+
     }
+
     .footer-btn {
+
         padding: 5px 8px !important;
+
         font-size: 10px !important;
+
     }
+
 }
+
+
 
 .hud-player-badge {
+
     background: rgba(255, 255, 255, 0.10);
+
     border: 1px solid var(--border-current);
+
     border-radius: 12px;
+
     padding: 3px 8px;
+
     font-size: 11px;
+
     font-weight: 600;
+
     color: #ffffff;
+
     letter-spacing: 0.5px;
+
     white-space: nowrap;
+
 }
+
+
 
 @media (max-width: 420px) {
+
     .hud-progression-bar {
+
         gap: 4px;
+
     }
+
     .hud-player-badge {
+
         font-size: 10px;
+
         padding: 2px 5px;
+
     }
+
     .hud-player-badge span#header-player-name {
+
         display: none;
+
     }
+
     .hud-rank-badge {
+
         font-size: 10px;
+
         padding: 2px 5px;
+
     }
+
     .hud-sparks-count {
+
         font-size: 10px;
+
         padding: 2px 5px;
+
     }
+
     .hud-level-indicator {
+
         font-size: 11px;
+
     }
+
     #header-clean-solve-badge {
+
         font-size: 9px !important;
+
         padding: 2px 5px !important;
+
     }
+
 }
+
+
 
 /* Golden Starlight Dissolution Animation (Vita Pairs & Tile Club Triads) */
+
 .tile-dissolving-sparkle {
+
     position: absolute !important;
+
     pointer-events: none !important;
+
     z-index: 1000 !important;
+
     animation: tileSparkleDissolve 0.38s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+
 }
+
+
 
 @keyframes tileSparkleDissolve {
+
     0% {
+
         transform: translateY(0) scale(1);
+
         filter: drop-shadow(0 0 6px #ffd700) brightness(1);
+
         opacity: 1;
+
     }
+
     30% {
+
         transform: translateY(-8px) scale(1.08);
+
         filter: drop-shadow(0 0 20px #fde047) brightness(1.35);
+
         opacity: 0.95;
+
     }
+
     70% {
+
         transform: translateY(-16px) scale(0.92);
+
         filter: drop-shadow(0 0 28px #ffd700) brightness(1.5);
+
         opacity: 0.6;
+
     }
+
     100% {
+
         transform: translateY(-24px) scale(0.65);
+
         filter: drop-shadow(0 0 35px #fbbf24) brightness(1.8);
+
         opacity: 0;
+
     }
+
 }
+
+
 
 /* Floating Stardust Particles */
+
 .celestial-spark-particle {
+
     position: absolute;
+
     pointer-events: none;
+
     z-index: 1100;
+
     font-size: 14px;
+
     line-height: 1;
+
     user-select: none;
+
     animation: sparkFlyOut 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+
 }
+
+
 
 .celestial-spark-dot {
+
     position: absolute;
+
     pointer-events: none;
+
     z-index: 1100;
+
     width: 6px;
+
     height: 6px;
+
     border-radius: 50%;
+
     background: radial-gradient(circle, #ffffff 20%, #fde047 60%, #f59e0b 100%);
+
     box-shadow: 0 0 8px #ffd700, 0 0 16px #f59e0b;
+
     animation: sparkDotFlyOut 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+
 }
+
+
 
 @keyframes sparkFlyOut {
+
     0% {
+
         transform: translate(0, 0) scale(0.3) rotate(0deg);
+
         opacity: 1;
+
         filter: drop-shadow(0 0 4px #ffd700);
+
     }
+
     50% {
+
         opacity: 1;
+
         transform: translate(var(--dx), var(--dy)) scale(1.2) rotate(var(--rot));
+
         filter: drop-shadow(0 0 12px #fde047);
+
     }
+
     100% {
+
         transform: translate(calc(var(--dx) * 1.3), calc(var(--dy) * 1.3 - 10px)) scale(0);
+
         opacity: 0;
+
         filter: drop-shadow(0 0 20px #ffd700);
+
     }
+
 }
+
+
 
 @keyframes sparkDotFlyOut {
+
     0% {
+
         transform: translate(0, 0) scale(0.5);
+
         opacity: 1;
+
     }
+
     50% {
+
         opacity: 1;
+
         transform: translate(var(--dx), var(--dy)) scale(1.3);
+
     }
+
     100% {
+
         transform: translate(calc(var(--dx) * 1.25), calc(var(--dy) * 1.25 - 8px)) scale(0);
+
         opacity: 0;
+
     }
+
 }
+
+
 
 /* Tray Triad Dissolve Flash */
+
 .tray-slot-triad-sparkle {
+
     animation: trayTriadFlash 0.38s ease-out forwards !important;
+
 }
+
+
 
 @keyframes trayTriadFlash {
+
     0% {
+
         box-shadow: inset 0 0 0 rgba(255, 215, 0, 0);
+
         transform: scale(1);
+
     }
+
     30% {
+
         box-shadow: 0 0 20px #ffd700, inset 0 0 14px #fde047;
+
         transform: scale(1.08) translateY(-4px);
+
     }
+
     100% {
+
         box-shadow: 0 0 30px rgba(255, 215, 0, 0), inset 0 0 20px rgba(255, 215, 0, 0);
+
         transform: scale(1) translateY(0);
+
     }
+
 }
+
+
 
 /* Kinetic Starlight Convergence: 2 matching tiles fly to midpoint and collide */
+
 .tile-converging-smash {
+
     animation: tileConvergeAndSmash 0.38s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+
     pointer-events: none !important;
+
     will-change: transform, opacity, filter;
+
 }
+
+
 
 @keyframes tileConvergeAndSmash {
+
     0% {
+
         transform: translate(0, 0) scale(1) rotate(0deg);
+
         opacity: 1;
+
         filter: brightness(1) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+
     }
+
     45% {
+
         transform: translate(var(--target-x), var(--target-y)) scale(1.08) rotate(3deg);
+
         opacity: 1;
+
         filter: brightness(1.35) drop-shadow(0 0 16px #ffd700);
+
     }
+
     55% {
+
         transform: translate(var(--target-x), var(--target-y)) scale(1.15) rotate(-2deg);
+
         opacity: 1;
+
         filter: brightness(1.6) drop-shadow(0 0 24px #ffffff);
+
     }
+
     80% {
+
         transform: translate(var(--target-x), var(--target-y)) scale(0.85);
+
         opacity: 0.65;
+
         filter: brightness(1.4) drop-shadow(0 0 16px #f59e0b);
+
     }
+
     100% {
+
         transform: translate(var(--target-x), var(--target-y)) scale(0.25);
+
         opacity: 0;
+
         filter: brightness(2) drop-shadow(0 0 30px #ffd700);
+
     }
+
 }
+
+
 
 /* Board Micro-Impact Nudge on Midpoint Collision */
+
 .board-micro-impact {
+
     animation: boardNudgeImpact 0.16s ease-out;
+
 }
 
+
+
 @keyframes boardNudgeImpact {
+
     0% { transform: scale(1); }
+
     40% { transform: scale(0.996) translateY(1.5px); }
+
     100% { transform: scale(1) translateY(0); }
+
 }
+
+
 
 
 </style>
@@ -52654,14 +55345,22 @@ const THEME_TILE_DEFS = {
     { name: "Seagrass Frond", symbol: "🌿" }, { name: "Sunken Coin", symbol: "🪙" }
   ],
   terracotta_earth: [
-    { name: "Tree of Life", symbol: "🌳" }, { name: "Terracotta Leaf", symbol: "🍂" },
-    { name: "Clay Amphora", symbol: "🏺" }, { name: "Deep Root", symbol: "🌱" },
-    { name: "Sun-Baked Brick", symbol: "🧱" }, { name: "Potter Wheel", symbol: "⚙️" },
-    { name: "River Pebble", symbol: "🪨" }, { name: "Earthy Wheat", symbol: "🌾" },
-    { name: "Hearth Flame", symbol: "🔥" }, { name: "Clay Basin", symbol: "🥣" },
-    { name: "Ancient Fossil", symbol: "🐚" }, { name: "Desert Bloom", symbol: "🌵" },
-    { name: "Sienna Sun", symbol: "☀️" }, { name: "Clay Tablet", symbol: "📜" },
-    { name: "Terra Cameo", symbol: "🏵️" }, { name: "Harvest Basket", symbol: "🧺" }
+    { name: "Tree of Life", symbol: "🌳" },
+    { name: "Banyan Spray", symbol: "🍃" },
+    { name: "Five-Leaf Fan", symbol: "🌿" },
+    { name: "Celtic Knot", symbol: "🏵️" },
+    { name: "Trinity Triquetra", symbol: "☘️" },
+    { name: "Sacred Spiral", symbol: "🌀" },
+    { name: "Ancient Seedling", symbol: "🌱" },
+    { name: "Sanctuary Arch", symbol: "⛩️" },
+    { name: "Lotus Fleur", symbol: "🪷" },
+    { name: "Vine Weave", symbol: "♾️" },
+    { name: "Solar Rosette", symbol: "☀️" },
+    { name: "Clay Amphora", symbol: "🏺" },
+    { name: "Golden Tree", symbol: "✨" },
+    { name: "Luminous Leaf", symbol: "🌟" },
+    { name: "Radiant Triquetra", symbol: "💫" },
+    { name: "Moss Patina Leaf", symbol: "🍃" }
   ],
   floral_harmony: [
     { name: "Lotus Cameo", symbol: "🪷" }, { name: "Rose Cameo", symbol: "🌹" },
@@ -53297,7 +55996,7 @@ class GameManager {
         if (isRealmsMode && this.activeRealm) {
           boardContainer.classList.add('theme-realm-active');
           boardContainer.setAttribute('data-realm-archetype', activeArch || '');
-          boardContainer.style.backgroundImage = `url('${this.activeRealm.bgImage}')`;
+          boardContainer.style.backgroundImage = 'none';
           if (stageCol) {
             stageCol.classList.add('theme-realm-stage');
             stageCol.style.backgroundImage = `url('${this.activeRealm.bgImage}')`;
