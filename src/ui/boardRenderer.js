@@ -18,7 +18,21 @@ export class BoardRenderer {
 
   constructor(boardContainerId, options = {}) {
 
-    this.container = document.getElementById(boardContainerId);
+    this.container = (typeof document !== 'undefined' && boardContainerId) ? document.getElementById(boardContainerId) : null;
+
+    let actualOptions = options;
+
+    if (Array.isArray(options)) {
+
+      this.tiles = options;
+
+      actualOptions = arguments[2] || {};
+
+    } else {
+
+      this.tiles = [];
+
+    }
 
     this.options = {
 
@@ -28,11 +42,9 @@ export class BoardRenderer {
 
       onTileClick: null,
 
-      ...options
+      ...actualOptions
 
     };
-
-    this.tiles = [];
 
     this.stageLayoutMetrics = null;
 
@@ -302,7 +314,19 @@ export class BoardRenderer {
 
     if (containerW && containerW > boardTotalW) {
 
-      offsetX = Math.max(minSafeOffsetX, Math.floor((containerW - boardTotalW) / 2));
+      if (isTileClubMode && !isMobile && !isTablet) {
+
+        // Option A: Shift tile stack towards the right on PC Desktop (Tile Club)
+
+        const rightMargin = 48;
+
+        offsetX = Math.max(minSafeOffsetX, containerW - boardTotalW - rightMargin);
+
+      } else {
+
+        offsetX = Math.max(minSafeOffsetX, Math.floor((containerW - boardTotalW) / 2));
+
+      }
 
     }
 
