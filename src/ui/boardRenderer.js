@@ -190,11 +190,11 @@ export class BoardRenderer {
 
     const availW = Math.max(260, containerW - 16);
 
-    const promptDeduction = isMobile ? 30 : (isTablet ? 32 : 0);
+    // Sizing Parity: AvailH is unified across all gameplay modes (Pairs, Tile Club, Classic, Realms)
+    // so that switching between categories never causes the tile formation to jump or shrink.
+    const promptDeduction = isMobile ? 24 : (isTablet ? 28 : 0);
 
-    const trayDeduction = (isTileClubMode && containerH > 480) ? (isMobile ? 70 : 85) : 0;
-
-    const availH = Math.max(200, containerH - promptDeduction - trayDeduction);
+    const availH = Math.max(200, containerH - promptDeduction);
 
 
 
@@ -210,6 +210,8 @@ export class BoardRenderer {
 
     const heightCoverage = isMobile ? 0.92 : 0.91;
 
+
+
     const maxWFromWidth = (availW * widthCoverage) / colDenominator;
 
     const maxHFromHeight = (availH * heightCoverage) / rowDenominator;
@@ -224,41 +226,33 @@ export class BoardRenderer {
 
 
 
-    // Dynamic width bounds across viewports (Pairs, Tile Club, Classic, Realms)
+    // Dynamic width bounds across viewports (Unified parity across Pairs, Tile Club, Classic, Realms)
 
     let minAllowed, maxAllowed;
 
     if (isMobile) {
 
-      // Mobile Viewport (< 480px): Balanced sizing so board and holding tray co-exist comfortably
+      // Mobile Viewport (< 480px): Unified 72px ceiling ensures identical tile scale between Pairs & Tile Club
 
       minAllowed = isSenior ? 48 : 42;
 
-      maxAllowed = isSenior ? 84
-
-        : (isTileClubMode ? 64
-
-        : (isRealmsMode  ? 82
-
-        : 76));
+      maxAllowed = isSenior ? 84 : (isRealmsMode ? 82 : 72);
 
     } else if (isTablet) {
 
-      // Tablet Viewport (480px - 1023px): Expand to fill 90%+ of board area (~86px-110px)
+      // Tablet Viewport (480px - 1023px): Unified across all modes (~86px-116px)
 
       minAllowed = isSenior ? 66 : 58;
 
-      maxAllowed = isSenior ? 130 : (isTileClubMode ? 100 : 116);
+      maxAllowed = isSenior ? 130 : 116;
 
     } else {
 
-      // Desktop Viewport (>= 1024px): Full-screen immersive — sidebars are off-canvas overlays,
-
-      // rawFitW drives freely. High safety ceiling only.
+      // Desktop Viewport (>= 1024px): Full-screen immersive — identical ceiling across all modes
 
       minAllowed = isSenior ? 80 : 70;
 
-      maxAllowed = isSenior ? 300 : (isTileClubMode ? 240 : 280);
+      maxAllowed = isSenior ? 300 : 280;
 
     }
 
@@ -380,19 +374,30 @@ export class BoardRenderer {
 
 
 
-    // RC3 fix: measure board or parent height.
-    // On mobile screens, thresholds adjust down so true rendered height is used.
+    // Unified Stage Measurement:
+    // Measure #center-stage-col height uniformly across Pairs, Tile Club, Classic, and Realms
+    // so that switching between categories never causes the tile formation to jump or shrink.
     const isMobile = containerW < 480;
-    const isTileClub = this.options.gameplayMode === 'tile_club';
-    const _minHThresh = isMobile ? 160 : 200;
-    const _rawH = (this.container && this.container.clientHeight > _minHThresh)
-      ? this.container.clientHeight
-      : ((_boardParent && _boardParent.clientHeight > _minHThresh)
-        ? _boardParent.clientHeight
-        : 0);
-    const containerH = _rawH > _minHThresh
-      ? _rawH
-      : (typeof window !== 'undefined' ? Math.floor(window.innerHeight * (isMobile ? (isTileClub ? 0.52 : 0.68) : 0.82)) : 700);
+    const _stageCol = (typeof document !== 'undefined') ? document.getElementById('center-stage-col') : null;
+    const _stageH = (_stageCol && _stageCol.clientHeight > 200) ? _stageCol.clientHeight : 0;
+
+    let containerH;
+    if (_stageH > 200) {
+      // Stage exists: reserve space for bottom action bar (~52px), holding tray (~64px), and prompt (~26px)
+      // uniformly so tile scale remains 100% identical between modes.
+      const uiReserve = isMobile ? 142 : 144;
+      containerH = Math.max(200, _stageH - uiReserve);
+    } else {
+      const _minHThresh = isMobile ? 160 : 200;
+      const _rawH = (this.container && this.container.clientHeight > _minHThresh)
+        ? this.container.clientHeight
+        : ((_boardParent && _boardParent.clientHeight > _minHThresh)
+          ? _boardParent.clientHeight
+          : 0);
+      containerH = _rawH > _minHThresh
+        ? _rawH
+        : (typeof window !== 'undefined' ? Math.floor(window.innerHeight * (isMobile ? 0.58 : 0.74)) : 700);
+    }
 
 
 
