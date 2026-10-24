@@ -12,6 +12,8 @@ import {
   playTileSelectChime,
   playBlockedWarningChime,
   playTileSmashWhoosh,
+  playComboMatchChime,
+  playTileSettleSound,
   setTuningScale,
   unlockAudioContext
 } from '../audio/synthesizer.js';
@@ -21,9 +23,11 @@ import {
   triggerTileConvergenceSmash,
   triggerTrayTriadSparkle
 } from '../ui/particles.js';
-import { ThemeManager, REALMS, TOTAL_REALM_LEVELS } from './themeManager.js';
+import { ThemeManager, REALMS, TOTAL_REALM_LEVELS, TOTAL_CLASSIC_LEVELS } from './themeManager.js';
 
 export const TOTAL_LEVELS = 520;
+export const TOTAL_PAIRS_LEVELS = 200;
+export { TOTAL_CLASSIC_LEVELS };
 
 export const RANKS = [
   { name: 'Aspirant', symbol: '🌱', minLevel: 1, maxLevel: 25 },
@@ -46,15 +50,37 @@ export function getRankForLevel(level) {
  * Smooth S-Curve Tile Density Function across 520 Levels
  */
 export function getTileCountForLevel(levelNum) {
-  if (levelNum === 1) return 24;          // Level 1: 24 tiles (Tutorial)
-  if (levelNum <= 10) return 36;         // Levels 2-10: 36 tiles (Foundation)
-  if (levelNum <= 30) return 48;         // Levels 11-30: 48 tiles (Ascent)
-  if (levelNum <= 75) return 60;         // Levels 31-75: 60 tiles (Depth)
-  if (levelNum <= 150) return 72;        // Levels 76-150: 72 tiles (Mastery)
-  if (levelNum <= 260) return 84;        // Levels 151-260: 84 tiles (Grand Peak)
-  if (levelNum <= 390) return 96;        // Levels 261-390: 96 tiles (Sunburst Gateway)
-  return 108;                            // Levels 391-520+: 108 tiles (Grand Citadel)
+  if (levelNum === 1) return 36;          // Level 1: 36 tiles (Introductory Grand Solitaire)
+  if (levelNum <= 10) return 48;         // Levels 2-10: 48 tiles (Foundation)
+  if (levelNum <= 30) return 60;         // Levels 11-30: 60 tiles (Ascent)
+  if (levelNum <= 75) return 72;         // Levels 31-75: 72 tiles (Depth)
+  if (levelNum <= 150) return 84;        // Levels 76-150: 84 tiles (Mastery)
+  if (levelNum <= 260) return 96;        // Levels 151-260: 96 tiles (Grand Peak)
+  return 108;                            // Levels 261-520+: 108 tiles (Grand Citadel)
 }
+
+/**
+ * 4-Tier Stacking Difficulty Curve for 50 Levels per Theme:
+ * Tier 1: Levels 1–5 (Zen Ease): 24–36 tiles (12–18 pairs), 1–2 layers, high free-edge ratio.
+ * Tier 2: Levels 6–20 (Moderate Flow): 48–64 tiles, 3 layers.
+ * Tier 3: Levels 21–40 (Strategic Hard): 72–96 tiles, 4–5 layers.
+ * Tier 4: Levels 41–50 (Master Monolith): 100–108 tiles, 5–6 layers.
+ */
+export function getRealmTileCount(levelNum) {
+  const levelInRealm = ((levelNum - 1) % 50) + 1;
+  if (levelInRealm <= 2) return 24;      // Level 1-2: 24 tiles (12 pairs, peaceful start)
+  if (levelInRealm <= 4) return 30;      // Level 3-4: 30 tiles (15 pairs)
+  if (levelInRealm <= 5) return 36;      // Level 5: 36 tiles (18 pairs)
+  if (levelInRealm <= 10) return 48;     // Level 6-10: 48 tiles (24 pairs, 3 layers)
+  if (levelInRealm <= 15) return 56;     // Level 11-15: 56 tiles (28 pairs)
+  if (levelInRealm <= 20) return 64;     // Level 16-20: 64 tiles (32 pairs)
+  if (levelInRealm <= 28) return 72;     // Level 21-28: 72 tiles (36 pairs, 4-5 layers)
+  if (levelInRealm <= 34) return 84;     // Level 29-34: 84 tiles (42 pairs)
+  if (levelInRealm <= 40) return 96;     // Level 35-40: 96 tiles (48 pairs)
+  if (levelInRealm <= 45) return 102;    // Level 41-45: 102 tiles (51 pairs)
+  return 108;                            // Level 46-50: 108 tiles (54 pairs, Master Monolith)
+}
+
 
 export class GameManager {
   constructor(options = {}) {
@@ -62,13 +88,15 @@ export class GameManager {
     this.seniorView = (options.seniorView !== undefined) 
       ? !!options.seniorView 
       : !!(profileState && profileState.settings && profileState.settings.seniorViewActive);
-    this.tuningBase = options.tuningBase || 432;
+    this.tuningBase = (options.tuningBase !== undefined) ? options.tuningBase : 'off';
     this.boardRenderer = null;
     this.inputDispatcher = null;
 
     // Player progression state (Sparks Economy & 520 Levels)
     this.player = this.loadPlayerState();
     this.hintsUsedInStage = 0;
+    this.lastMatchTime = 0;
+    this.comboCount = 0;
 
     // State collections
     this.tiles = [];
@@ -115,6 +143,7 @@ export class GameManager {
             currentLevel: Math.max(1, Math.min(TOTAL_LEVELS, parsed.currentLevel || 1)),
             sparks: typeof parsed.sparks === 'number' ? parsed.sparks : 100,
             score: typeof parsed.score === 'number' ? parsed.score : 0,
+            focusIQ: typeof parsed.focusIQ === 'number' ? parsed.focusIQ : (80 + Math.min(120, ((parsed.currentLevel || 1) - 1) * 2)),
             isNewUser: parsed.currentLevel === 1 && !parsed.hasProgress
           };
           if (state.name) {
@@ -124,7 +153,8 @@ export class GameManager {
                 name: state.name,
                 currentLevel: state.currentLevel,
                 sparks: state.sparks,
-                score: state.score
+                score: state.score,
+                focusIQ: state.focusIQ
               };
               this.saveProfilesMap(profiles);
             }
@@ -135,7 +165,7 @@ export class GameManager {
     } catch (e) {
       console.warn('Failed to load player state:', e);
     }
-    return { name: '', currentLevel: 1, sparks: 100, score: 0, isNewUser: true };
+    return { name: '', currentLevel: 1, sparks: 100, score: 0, focusIQ: 80, isNewUser: true };
   }
 
   savePlayerState() {
@@ -146,6 +176,7 @@ export class GameManager {
           currentLevel: this.player.currentLevel,
           sparks: this.player.sparks,
           score: this.player.score || 0,
+          focusIQ: this.player.focusIQ || 80,
           hasProgress: this.player.currentLevel > 1 || this.player.sparks !== 100 || (this.player.score || 0) > 0
         }));
 
@@ -156,7 +187,8 @@ export class GameManager {
             avatar: this.player.avatar || '🦉',
             currentLevel: this.player.currentLevel,
             sparks: this.player.sparks,
-            score: this.player.score || 0
+            score: this.player.score || 0,
+            focusIQ: this.player.focusIQ || 80
           };
           this.saveProfilesMap(profiles);
         }
@@ -250,6 +282,13 @@ export class GameManager {
     return getRankForLevel(this.player.currentLevel);
   }
 
+  getTotalLevels() {
+    if (this.gameplayMode === 'vita') return TOTAL_PAIRS_LEVELS; // 200 Levels (Pairs Campaign)
+    if (this.gameplayMode === 'classic') return TOTAL_CLASSIC_LEVELS; // 200 Levels (Classic Campaign)
+    if (this.gameplayMode === 'realms') return TOTAL_REALM_LEVELS; // 195 Levels (Thematic Realms)
+    return 200;
+  }
+
   init(boardContainerId, stageContainerId = null) {
     initAudioEngine(0.40, 0.60, this.tuningBase);
 
@@ -274,10 +313,10 @@ export class GameManager {
   }
 
   loadLevel(levelNum) {
-    return this.startNewStage(levelNum);
+    return this.startNewStage(levelNum, true);
   }
 
-  startNewStage(stageParam = null) {
+  startNewStage(stageParam = null, forceLevel = false) {
     this.tray = [];
     this.selectedTile = null;
     this.matchedPairs = [];
@@ -290,7 +329,7 @@ export class GameManager {
     let tileCount = null;
 
     if (typeof stageParam === 'number') {
-      if ([12, 24, 36, 48, 60, 72, 84, 96, 108].includes(stageParam)) {
+      if (!forceLevel && [12, 24, 36, 48, 60, 72, 84, 96, 108].includes(stageParam)) {
         tileCount = stageParam;
       } else {
         levelNum = Math.max(1, Math.min(TOTAL_LEVELS, stageParam));
@@ -299,11 +338,10 @@ export class GameManager {
       }
     }
 
-    if (!tileCount) {
-      tileCount = getTileCountForLevel(levelNum);
-    }
-
     const isRealmsMode = (this.gameplayMode === 'realms');
+    if (!tileCount) {
+      tileCount = isRealmsMode ? getRealmTileCount(levelNum) : getTileCountForLevel(levelNum);
+    }
     const isTileClub = (this.gameplayMode === 'tile_club');
     const K = isTileClub ? 3 : 2;
     const distinctFloraCount = Math.max(3, Math.floor(tileCount / K));
@@ -342,6 +380,25 @@ export class GameManager {
           }
         }
       });
+    } else {
+      // In standard modes (Pairs, Tile Club, Classic): Apply the multi-material mixed deck!
+      // ~75% Classic Cream Ivory Tablet, ~15% Burnished Walnut Wood, ~10% Celadon Jade Tablet
+      const distinctFlora = Array.from(new Set(this.tiles.map(t => t.floraId)));
+      const floraToMaterialMap = {};
+      distinctFlora.forEach((fId, idx) => {
+        const ratio = (idx + 1) / distinctFlora.length;
+        if (ratio > 0.88) {
+          floraToMaterialMap[fId] = 'celadon_jade'; // Translucent Celadon Jade
+        } else if (ratio > 0.72) {
+          floraToMaterialMap[fId] = 'walnut_wood';  // Burnished Walnut Wood
+        } else {
+          floraToMaterialMap[fId] = 'ivory';         // Classic Ivory Tablet
+        }
+      });
+
+      this.tiles.forEach(t => {
+        t.archetype = floraToMaterialMap[t.floraId] || 'ivory';
+      });
     }
 
     if (this.boardRenderer) {
@@ -354,13 +411,32 @@ export class GameManager {
     // Apply photorealistic clean realm background if in realms mode
     if (typeof document !== 'undefined') {
       const boardContainer = document.querySelector('.board-container');
+      const stageCol = document.getElementById('center-stage-col');
       if (boardContainer) {
         if (isRealmsMode && this.activeRealm) {
           boardContainer.classList.add('theme-realm-active');
-          boardContainer.style.backgroundImage = `url('${this.activeRealm.bgImage}')`;
+          boardContainer.setAttribute('data-realm-archetype', activeArch || '');
+          boardContainer.style.backgroundImage = 'none';
+          if (stageCol) {
+            stageCol.classList.add('theme-realm-stage');
+            stageCol.style.backgroundImage = `url('${this.activeRealm.bgImage}')`;
+          }
+          const actBar = document.querySelector('.gameplay-action-bar');
+          if (actBar) {
+            actBar.setAttribute('data-realm-archetype', activeArch || '');
+          }
         } else {
           boardContainer.classList.remove('theme-realm-active');
+          boardContainer.removeAttribute('data-realm-archetype');
           boardContainer.style.backgroundImage = '';
+          if (stageCol) {
+            stageCol.classList.remove('theme-realm-stage');
+            stageCol.style.backgroundImage = '';
+          }
+          const actBar = document.querySelector('.gameplay-action-bar');
+          if (actBar) {
+            actBar.removeAttribute('data-realm-archetype');
+          }
         }
       }
     }
@@ -375,7 +451,11 @@ export class GameManager {
   setGameplayMode(mode) {
     if (this.gameplayMode === mode) return;
     this.gameplayMode = mode;
-    this.startNewStage(this.tiles.length || 36);
+    if (mode === 'realms') {
+      this.startNewStage(1);
+    } else {
+      this.startNewStage(this.player.currentLevel || 1);
+    }
   }
 
   toggleSeniorView(forcedValue = null) {
@@ -537,8 +617,19 @@ export class GameManager {
 
       const flora = firstTile.floraData || getFloraById(firstTile.floraId);
 
-      // Award score (+100 base score)
-      this.player.score = (this.player.score || 0) + 100;
+      // Track Procedural Combo Chain
+      const nowMatchTime = Date.now();
+      if (this.lastMatchTime && (nowMatchTime - this.lastMatchTime <= 2800)) {
+        this.comboCount = (this.comboCount || 1) + 1;
+      } else {
+        this.comboCount = 1;
+      }
+      this.lastMatchTime = nowMatchTime;
+
+      // Award score (+100 base score * combo multiplier)
+      const comboMult = Math.min(3, 1 + (this.comboCount - 1) * 0.25);
+      const earnedPts = Math.round(100 * comboMult);
+      this.player.score = (this.player.score || 0) + earnedPts;
 
       // Award bonus sparks for Golden Relic archetypes (+10 Sparks!)
       if (flora && flora.archetype === 'golden_relic') {
@@ -557,10 +648,17 @@ export class GameManager {
         tiles: [firstTile, tile]
       });
 
-      // Visual Kinetic Convergence Smash & Stardust Dissolution
+      // Visual 2-Tile Radiant Glow & Kinetic Convergence Smash
       if (typeof document !== 'undefined') {
         const el1 = document.getElementById(firstTile.id);
         const el2 = document.getElementById(tile.id);
+        if (el1) el1.classList.add('tile-matching-glow');
+        if (el2) el2.classList.add('tile-matching-glow');
+
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+          try { navigator.vibrate(25); } catch(e){}
+        }
+
         if (el1 && el2) {
           triggerTileConvergenceSmash(el1, el2);
         } else {
@@ -569,8 +667,28 @@ export class GameManager {
         }
       }
 
+      // Procedural Web Audio API combo pitch arpeggio & smash whoosh
+      playComboMatchChime(this.comboCount);
       playTileSmashWhoosh();
       playAshramMeditationGong();
+
+      // Physical Tile Settling Physics for newly unblocked tiles
+      if (typeof document !== 'undefined') {
+        const activeRemaining = this.tiles.filter(t => !t.isMatched);
+        const newlyPlayable = activeRemaining.filter(t => VitaBoardGenerator.isTileFree(t, activeRemaining));
+        if (newlyPlayable.length > 0) {
+          setTimeout(() => {
+            playTileSettleSound();
+            newlyPlayable.forEach(nt => {
+              const el = document.getElementById(nt.id);
+              if (el) {
+                el.classList.add('tile-settle');
+                setTimeout(() => el.classList.remove('tile-settle'), 260);
+              }
+            });
+          }, 180);
+        }
+      }
 
       if (this.onMatchSuccess) {
         this.onMatchSuccess({
@@ -797,6 +915,14 @@ export class GameManager {
       }
 
       const completedLevel = this.player.currentLevel;
+      // Sequential Chapter Unlock check for 20 Themes (every 50 levels)
+      const isChapterComplete = (this.gameplayMode === 'realms') && (completedLevel % 50 === 0);
+      const completedChapterNum = Math.floor((completedLevel - 1) / 50) + 1;
+      const nextChapterNum = completedChapterNum + 1;
+      if (isChapterComplete) {
+        this.player.highestUnlockedRealm = Math.max(this.player.highestUnlockedRealm || 1, nextChapterNum);
+      }
+
       const isMilestone = (completedLevel % 10 === 0);
       if (isMilestone) {
         earnedSparks += 20; // +20 extra sparks bonus on Sanctuary Milestone levels (Total +30!)
@@ -804,8 +930,9 @@ export class GameManager {
 
       const oldRank = this.getRank();
 
-      // Advance level up to TOTAL_LEVELS (520)
-      this.player.currentLevel = Math.min(TOTAL_LEVELS, this.player.currentLevel + 1);
+      // Advance level up to the mode's campaign ceiling (200 for Pairs & Classic)
+      const maxLevels = this.getTotalLevels();
+      this.player.currentLevel = Math.min(maxLevels, this.player.currentLevel + 1);
       const newRank = this.getRank();
       let rankPromoted = false;
       if (newRank.name !== oldRank.name) {
@@ -818,6 +945,10 @@ export class GameManager {
       if (cleanSolve) earnedScore += 500;
       this.player.score = (this.player.score || 0) + earnedScore;
 
+      // Cognitive Focus IQ advancement (+2 base, +3 on clean solve)
+      const iqBonus = cleanSolve ? 3 : 2;
+      this.player.focusIQ = (this.player.focusIQ || 80) + iqBonus;
+
       this.player.sparks += earnedSparks;
       this.savePlayerState();
 
@@ -825,12 +956,14 @@ export class GameManager {
         this.onStageComplete({
           completedLevel,
           nextLevel: this.player.currentLevel,
+          totalLevels: maxLevels,
           earnedSparks,
           cleanSolve,
           isMilestone,
           rankPromoted,
           oldRank,
           newRank,
+          focusIQ: this.player.focusIQ,
           totalSparks: this.player.sparks
         });
       }
@@ -854,10 +987,12 @@ export class GameManager {
         totalTilesCount: this.tiles.length,
         name: this.player.name,
         currentLevel: this.player.currentLevel,
+        totalLevels: this.getTotalLevels(),
         formationName: this.currentFormationName || VitaBoardGenerator.getFormationName(this.player.currentLevel),
         sparks: this.player.sparks,
         score: this.player.score || 0,
-        activeRealm: this.activeRealm || ThemeManager.getRealmForLevel(this.player.currentLevel),
+        focusIQ: this.player.focusIQ || 80,
+        activeRealm: (this.gameplayMode === 'realms') ? (this.activeRealm || ThemeManager.getRealmForLevel(this.player.currentLevel)) : null,
         rank: this.getRank(),
         isNewUser: !!this.player.isNewUser,
         hintsUsedInStage: this.hintsUsedInStage
@@ -869,23 +1004,15 @@ export class GameManager {
 export const activeGameManager = new GameManager();
 
 
-export const gardens = [
-  { id: 'samadhi', name: 'Ashram Samadhi Courtyard', icon: '🪷', concept: 'Concept 2: Circular Mandala', type: 'flowers', style: 2, diff: 'Easy (24 tiles)' },
-  { id: 'playground', name: 'Ashram Playground', icon: '🕊️', concept: 'Concept 2: Circular Mandala', type: 'qualities', style: 2, diff: 'Medium (36 tiles)' },
-  { id: 'matrimandir_ch', name: 'Auroville Matrimandir Chamber', icon: '🏛️', concept: 'Concept 1: Glass Stack', type: 'sanskrit', style: 1, diff: 'Hard (48 tiles)' },
-  { id: 'lake_estate', name: 'Ashram Farms & Lake Estate', icon: '🌿', concept: 'Concept 3: Tactile Altar', type: 'instruments', style: 3, diff: 'Medium (36 tiles)' },
-  { id: 'service_tree', name: 'Ashram Service Tree', icon: '🌳', concept: 'Concept 2: Circular Mandala', type: 'flowers', style: 2, diff: 'Easy (24 tiles)' },
-  { id: 'banyan_tree', name: 'Auroville Banyan Tree', icon: '🌳', concept: 'Concept 2: Circular Mandala', type: 'qualities', style: 2, diff: 'Medium (36 tiles)' },
-  { id: 'coastline', name: 'Pondicherry Promenade Coastline', icon: '🌊', concept: 'Concept 1: Glass Stack', type: 'sanskrit', style: 1, diff: 'Hard (48 tiles)' },
-  { id: 'library', name: 'SABDA & Ashram Library', icon: '📜', concept: 'Concept 3: Tactile Altar', type: 'flowers', style: 3, diff: 'Medium (36 tiles)' },
-  { id: 'golconde', name: 'Ashram Golconde Dormitory', icon: '🏛️', concept: 'Concept 3: Tactile Altar', type: 'qualities', style: 3, diff: 'Easy (24 tiles)' },
-  { id: 'archives', name: 'Ashram Archives & Research', icon: '📚', concept: 'Concept 3: Tactile Altar', type: 'sanskrit', style: 3, diff: 'Hard (48 tiles)' },
-  { id: 'matrimandir_pt', name: 'Auroville Matrimandir Petals', icon: '🌺', concept: 'Concept 1: Glass Stack', type: 'flowers', style: 1, diff: 'Easy (24 tiles)' },
-  { id: 'green_belt', name: 'Auroville Green Belt', icon: '🌱', concept: 'Concept 2: Circular Mandala', type: 'qualities', style: 2, diff: 'Medium (36 tiles)' },
-  { id: 'classroom', name: 'SAICE & Integral Education', icon: '🎓', concept: 'Concept 3: Tactile Altar', type: 'flowers', style: 3, diff: 'Medium (36 tiles)' },
-  { id: 'botanical', name: 'Pondicherry Botanical Garden', icon: '🌸', concept: 'Concept 2: Circular Mandala', type: 'flowers', style: 2, diff: 'Easy (24 tiles)' },
-  { id: 'dining', name: 'Ashram Dining Hall', icon: '🕯️', concept: 'Concept 3: Tactile Altar', type: 'qualities', style: 3, diff: 'Hard (48 tiles)' }
-];
+export const gardens = REALMS.map(r => ({
+  id: r.id,
+  name: r.name,
+  icon: r.icon,
+  concept: r.subtitle,
+  type: 'sacred_realms',
+  style: 1,
+  diff: 'Chapter ' + r.chapter + ' (50 Levels)'
+}));
 
 export function renderSelectorSanctuaries() {
   if (typeof document === 'undefined') return;
@@ -974,22 +1101,16 @@ export function routeToScreen(screenId) {
 
 export function startGardenSanctuary(garden) {
   if (typeof document === 'undefined') return;
-  const titleEl = document.getElementById('game-title');
-  if (titleEl && garden && garden.name) {
-    titleEl.innerText = garden.name;
+  const realm = REALMS.find(r => r.id === (garden ? garden.id : null));
+  if (activeGameManager) {
+    if (realm) {
+      activeGameManager.setGameplayMode('realms');
+      activeGameManager.loadLevel(realm.levelStart);
+    } else {
+      activeGameManager.loadLevel(1);
+    }
   }
   routeToScreen('game');
-  let tileCount = 36;
-  if (garden && garden.diff) {
-    if (garden.diff.includes('24')) tileCount = 24;
-    else if (garden.diff.includes('48')) tileCount = 48;
-  }
-  if (activeGameManager) {
-    if (!activeGameManager.boardRenderer) {
-      activeGameManager.init('board', 'center-stage-col');
-    }
-    activeGameManager.startNewStage(tileCount);
-  }
 }
 
 export const ORACLE_QUALITIES = [

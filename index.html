@@ -3708,17 +3708,31 @@ body {
 
     justify-content: center;
 
-    gap: clamp(4px, 1.2vw, 8px);
+    gap: clamp(3px, 1vw, 6px);
 
-    padding: 6px clamp(6px, 1.8vw, 12px);
+    padding: 4px clamp(4px, 1.2vw, 8px);
 
     background: rgba(0, 0, 0, 0.28);
 
     border-radius: 20px;
 
-    margin: 4px 10px;
+    margin: 4px auto;
+
+    max-width: 100%;
 
     flex-wrap: nowrap;
+
+    overflow-x: auto;
+
+    scrollbar-width: none;
+
+    -webkit-overflow-scrolling: touch;
+
+}
+
+.mode-toggle-bar::-webkit-scrollbar {
+
+    display: none;
 
 }
 
@@ -5880,10 +5894,10 @@ body {
 
             <!-- Mode Switcher HUD Bar -->
             <div class="mode-toggle-bar">
-                <button class="mode-btn active" id="btn-mode-vita" onclick="window.switchGameplayMode('vita')" title="Pairs Campaign (200 Levels)">🪷 Pairs (200)</button>
+                <button class="mode-btn active" id="btn-mode-vita" onclick="window.switchGameplayMode('vita')" title="Pairs Campaign (200 Levels)">🪷 Pairs</button>
                 <button class="mode-btn" id="btn-mode-tileclub" onclick="window.switchGameplayMode('tile_club')" title="Tile Club Triad Match-3">📥 Tile Club</button>
-                <button class="mode-btn mode-btn-classic" id="btn-mode-classic" onclick="window.switchGameplayMode('classic')" title="Classic Mahjong Solitaire Campaign (200 Levels)">🏛️ Classic (200)</button>
-                <button class="mode-btn mode-btn-realms" id="btn-mode-realms" onclick="window.switchGameplayMode('realms')" title="20 Thematic Realms (1,000 Levels)">🗺️ Realms (20)</button>
+                <button class="mode-btn mode-btn-classic" id="btn-mode-classic" onclick="window.switchGameplayMode('classic')" title="Classic Mahjong Solitaire Campaign (200 Levels)">🏛️ Classic</button>
+                <button class="mode-btn mode-btn-realms" id="btn-mode-realms" onclick="window.switchGameplayMode('realms')" title="20 Thematic Realms (1,000 Levels)">🗺️ Realms</button>
                 <button class="senior-toggle-btn" id="btn-toggle-senior" onclick="window.toggleSeniorViewMode()">[Aa] Senior</button>
             </div>
 
@@ -6005,9 +6019,9 @@ body {
                     <div id="audio-tuning-ctrl" style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-current); border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 8px;">
                         <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #c5a880; font-weight: 700;">Acoustic Tuning</div>
                         <div style="display: flex; gap: 6px;">
-                            <button class="mode-btn active" id="btn-tune-432" onclick="window.setTuningBase(432)" style="flex: 1; font-size: 11px; padding: 6px 4px; text-align: center;">432 Hz Natural</button>
+                            <button class="mode-btn" id="btn-tune-432" onclick="window.setTuningBase(432)" style="flex: 1; font-size: 11px; padding: 6px 4px; text-align: center;">432 Hz Natural</button>
                             <button class="mode-btn" id="btn-tune-440" onclick="window.setTuningBase(440)" style="flex: 1; font-size: 11px; padding: 6px 4px; text-align: center;">440 Hz Concert</button>
-                            <button class="mode-btn" id="btn-tune-off" onclick="window.setTuningBase('off')" style="flex: 0.9; font-size: 11px; padding: 6px 4px; text-align: center;" title="Disable acoustic tuning ambient drone">Disable</button>
+                            <button class="mode-btn active" id="btn-tune-off" onclick="window.setTuningBase('off')" style="flex: 0.9; font-size: 11px; padding: 6px 4px; text-align: center;" title="Disable acoustic tuning ambient drone">Disable</button>
                         </div>
                     </div>
 
@@ -52969,7 +52983,8 @@ const ragaDrone = {
     filterNode: null,
     volume: 0.40,
     gongVolume: 0.60,
-    tuningBase: 432 // 432 Hz or 440 Hz
+    tuningBase: 'off', // Default disabled
+    disabled: true
 };
 
 function getAudioContext() {
@@ -52982,13 +52997,14 @@ function getAudioContext() {
     return audioCtx;
 }
 
-function initAudioEngine(volumeRaga = 0.40, volumeGong = 0.60, tuningBase = 432) {
+function initAudioEngine(volumeRaga = 0.40, volumeGong = 0.60, tuningBase = 'off') {
     const ctx = getAudioContext();
     if (!ctx) return;
     
     ragaDrone.volume = volumeRaga;
     ragaDrone.gongVolume = volumeGong;
     ragaDrone.tuningBase = tuningBase;
+    ragaDrone.disabled = (tuningBase === 'off' || tuningBase === 0 || tuningBase === 'disable');
 
     if (!gongGainNode) {
         gongGainNode = ctx.createGain();
@@ -57837,7 +57853,7 @@ class GameManager {
     this.seniorView = (options.seniorView !== undefined) 
       ? !!options.seniorView 
       : !!(profileState && profileState.settings && profileState.settings.seniorViewActive);
-    this.tuningBase = options.tuningBase || 432;
+    this.tuningBase = (options.tuningBase !== undefined) ? options.tuningBase : 'off';
     this.boardRenderer = null;
     this.inputDispatcher = null;
 

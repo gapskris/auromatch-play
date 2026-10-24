@@ -11,7 +11,8 @@ export const ragaDrone = {
     filterNode: null,
     volume: 0.40,
     gongVolume: 0.60,
-    tuningBase: 432 // 432 Hz or 440 Hz
+    tuningBase: 'off', // Default disabled
+    disabled: true
 };
 
 export function getAudioContext() {
@@ -24,13 +25,14 @@ export function getAudioContext() {
     return audioCtx;
 }
 
-export function initAudioEngine(volumeRaga = 0.40, volumeGong = 0.60, tuningBase = 432) {
+export function initAudioEngine(volumeRaga = 0.40, volumeGong = 0.60, tuningBase = 'off') {
     const ctx = getAudioContext();
     if (!ctx) return;
     
     ragaDrone.volume = volumeRaga;
     ragaDrone.gongVolume = volumeGong;
     ragaDrone.tuningBase = tuningBase;
+    ragaDrone.disabled = (tuningBase === 'off' || tuningBase === 0 || tuningBase === 'disable');
 
     if (!gongGainNode) {
         gongGainNode = ctx.createGain();
@@ -434,4 +436,95 @@ export function getAudioEngineState() {
     volumeGong: ragaDrone.gongVolume,
     disabled: !!ragaDrone.disabled
   };
+}
+
+
+/**
+ * Combo Match Procedural Chime: Scales along a Pythagorean harmonic arpeggio based on 432 Hz tuning.
+ * Combo 1: Root Tone (518.4 Hz / C5)
+ * Combo 2: Major Third (648.0 Hz / E5)
+ * Combo 3: Perfect Fifth (777.6 Hz / G5)
+ * Combo 4: Octave (1036.8 Hz / High C6)
+ * Combo 5+: Harmonic Serenity Wash (Chord + Shimmer)
+ */
+export function playComboMatchChime(comboCount = 1) {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    unlockAudioContext();
+
+    const now = ctx.currentTime;
+    const is432 = (ragaDrone.tuningBase === 432);
+    const root = is432 ? 518.4 : 528.0;
+
+    // Arpeggio frequency ratios: Root (1.0), Major Third (1.25), Fifth (1.5), Octave (2.0), 9th (2.25)
+    const steps = [1.0, 1.25, 1.50, 2.0, 2.25];
+    const stepIdx = Math.min(Math.max(0, comboCount - 1), steps.length - 1);
+    const freq = root * steps[stepIdx];
+
+    // Primary resonant sine chime
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = (comboCount >= 4) ? 'triangle' : 'sine';
+    osc.frequency.setValueAtTime(freq, now);
+
+    const baseVol = Math.min(0.28, 0.16 + (comboCount * 0.02));
+    gain.gain.setValueAtTime(0.001, now);
+    gain.gain.linearRampToValueAtTime(baseVol, now + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + (comboCount >= 3 ? 0.55 : 0.40));
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start(now);
+    osc.stop(now + 0.60);
+
+    // If combo >= 3, add secondary harmonic overtone
+    if (comboCount >= 3) {
+        const osc2 = ctx.createOscillator();
+        const gain2 = ctx.createGain();
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(freq * 1.5, now);
+        gain2.gain.setValueAtTime(0.001, now);
+        gain2.gain.linearRampToValueAtTime(baseVol * 0.4, now + 0.03);
+        gain2.gain.exponentialRampToValueAtTime(0.0001, now + 0.45);
+        osc2.connect(gain2);
+        gain2.connect(ctx.destination);
+        osc2.start(now);
+        osc2.stop(now + 0.50);
+        setTimeout(() => {
+            try { osc2.disconnect(); gain2.disconnect(); } catch(e){}
+        }, 550);
+    }
+
+    setTimeout(() => {
+        try { osc.disconnect(); gain.disconnect(); } catch(e){}
+    }, 650);
+}
+
+/**
+ * Tile Settling Sound: Subtle tactile micro-drop when newly unblocked tiles settle
+ */
+export function playTileSettleSound() {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    const now = ctx.currentTime;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(220, now);
+    osc.frequency.exponentialRampToValueAtTime(140, now + 0.035);
+
+    gain.gain.setValueAtTime(0.04, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.045);
+
+    setTimeout(() => {
+        try { osc.disconnect(); gain.disconnect(); } catch(e){}
+    }, 100);
 }

@@ -3684,17 +3684,31 @@ body {
 
     justify-content: center;
 
-    gap: clamp(4px, 1.2vw, 8px);
+    gap: clamp(3px, 1vw, 6px);
 
-    padding: 6px clamp(6px, 1.8vw, 12px);
+    padding: 4px clamp(4px, 1.2vw, 8px);
 
     background: rgba(0, 0, 0, 0.28);
 
     border-radius: 20px;
 
-    margin: 4px 10px;
+    margin: 4px auto;
+
+    max-width: 100%;
 
     flex-wrap: nowrap;
+
+    overflow-x: auto;
+
+    scrollbar-width: none;
+
+    -webkit-overflow-scrolling: touch;
+
+}
+
+.mode-toggle-bar::-webkit-scrollbar {
+
+    display: none;
 
 }
 
