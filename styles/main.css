@@ -4372,7 +4372,7 @@ body {
 
 
 
-    /* Board fills the full stage — no width cap, no height cap */
+    /* Board fills the full stage cleanly with flexbox - zero tray collision */
 
     .board-container {
 
@@ -4382,9 +4382,7 @@ body {
 
         flex: 1 1 0 !important;
 
-        /* RC3: use --app-height set by JS viewport updater; subtract header+modebar */
-
-        height: calc(var(--app-height, 100vh) - 104px) !important;
+        height: auto !important;
 
         min-height: 0 !important;
 
@@ -4392,7 +4390,7 @@ body {
 
         position: relative !important;
 
-        overflow: visible !important;
+        overflow: hidden !important;
 
         border-radius: 0 !important;
 
@@ -4430,7 +4428,7 @@ body {
 
 
 
-    /* Tray stays full-width center */
+    /* Tray stays full-width center without shrinking or collision */
 
     .game-desktop-grid .tray-container {
 
@@ -4442,7 +4440,35 @@ body {
 
         border: none !important;
 
-        margin: 0 auto;
+        margin: 2px auto !important;
+
+        padding: 4px 16px !important;
+
+        flex-shrink: 0 !important;
+
+        z-index: 20;
+
+    }
+
+    .game-desktop-grid .gameplay-action-bar {
+
+        flex-shrink: 0 !important;
+
+        margin-top: 2px !important;
+
+        margin-bottom: 4px !important;
+
+        z-index: 20;
+
+    }
+
+    /* Hide mobile footer on Desktop */
+
+    #game-screen .app-footer,
+
+    .app-footer {
+
+        display: none !important;
 
     }
 

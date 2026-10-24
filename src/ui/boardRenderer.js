@@ -204,9 +204,9 @@ export class BoardRenderer {
 
     // Sizing Parity: AvailH is unified across all gameplay modes (Pairs, Tile Club, Classic, Realms)
     // so that switching between categories never causes the tile formation to jump or shrink.
-    const promptDeduction = isMobile ? 24 : (isTablet ? 28 : 0);
+    const promptDeduction = isMobile ? 24 : (isTablet ? 28 : 24);
 
-    const availH = Math.max(200, containerH - promptDeduction);
+    const availH = Math.max(160, containerH - promptDeduction - (isMobile ? 0 : 8));
 
 
 
@@ -260,11 +260,11 @@ export class BoardRenderer {
 
     } else {
 
-      // Desktop Viewport (>= 1024px): Full-screen immersive — identical ceiling across all modes
+      // Desktop Viewport (>= 1024px): Full-screen immersive — scales gracefully down on short viewports
 
-      minAllowed = isSenior ? 80 : 70;
+      minAllowed = isSenior ? 52 : 42;
 
-      maxAllowed = isSenior ? 300 : 280;
+      maxAllowed = isSenior ? 130 : 116;
 
     }
 
@@ -314,19 +314,7 @@ export class BoardRenderer {
 
     if (containerW && containerW > boardTotalW) {
 
-      if (isTileClubMode && !isMobile && !isTablet) {
-
-        // Option A: Shift tile stack towards the right on PC Desktop (Tile Club)
-
-        const rightMargin = 48;
-
-        offsetX = Math.max(minSafeOffsetX, containerW - boardTotalW - rightMargin);
-
-      } else {
-
-        offsetX = Math.max(minSafeOffsetX, Math.floor((containerW - boardTotalW) / 2));
-
-      }
+      offsetX = Math.max(minSafeOffsetX, Math.floor((containerW - boardTotalW) / 2));
 
     }
 
@@ -398,29 +386,29 @@ export class BoardRenderer {
 
 
 
-    // Unified Stage Measurement:
-    // Measure #center-stage-col height uniformly across Pairs, Tile Club, Classic, and Realms
-    // so that switching between categories never causes the tile formation to jump or shrink.
     const isMobile = containerW < 480;
-    const _stageCol = (typeof document !== 'undefined') ? document.getElementById('center-stage-col') : null;
-    const _stageH = (_stageCol && _stageCol.clientHeight > 200) ? _stageCol.clientHeight : 0;
+    const isTablet = containerW >= 480 && containerW < 1024;
+    const isTileClub = (this.options.gameplayMode === 'tile_club');
+
+    const _minHThresh = isMobile ? 120 : 160;
+    const _rawH = (this.container && this.container.clientHeight > _minHThresh)
+      ? this.container.clientHeight
+      : ((_boardParent && _boardParent.clientHeight > _minHThresh)
+        ? _boardParent.clientHeight
+        : 0);
 
     let containerH;
-    if (_stageH > 200) {
-      // Stage exists: reserve space for bottom action bar (~52px), holding tray (~64px), and prompt (~26px)
-      // uniformly so tile scale remains 100% identical between modes.
-      const uiReserve = isMobile ? 142 : 144;
-      containerH = Math.max(200, _stageH - uiReserve);
+    if (_rawH > _minHThresh) {
+      containerH = _rawH;
     } else {
-      const _minHThresh = isMobile ? 160 : 200;
-      const _rawH = (this.container && this.container.clientHeight > _minHThresh)
-        ? this.container.clientHeight
-        : ((_boardParent && _boardParent.clientHeight > _minHThresh)
-          ? _boardParent.clientHeight
-          : 0);
-      containerH = _rawH > _minHThresh
-        ? _rawH
-        : (typeof window !== 'undefined' ? Math.floor(window.innerHeight * (isMobile ? 0.58 : 0.74)) : 700);
+      const _stageCol = (typeof document !== 'undefined') ? document.getElementById('center-stage-col') : null;
+      const _stageH = (_stageCol && _stageCol.clientHeight > 200) ? _stageCol.clientHeight : 0;
+      if (_stageH > 200) {
+        const uiReserve = isMobile ? (isTileClub ? 142 : 78) : (isTileClub ? 144 : 72);
+        containerH = Math.max(180, _stageH - uiReserve);
+      } else {
+        containerH = typeof window !== 'undefined' ? Math.floor(window.innerHeight * (isMobile ? 0.58 : 0.70)) : 600;
+      }
     }
 
 
