@@ -290,6 +290,185 @@ body {
 
 }
 
+/* ==========================================================================
+   AUROMIND SERIES — UNIFIED FRANCHISE BRAND STACK & EYEBROW STYLING
+   ========================================================================== */
+
+.header-left-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+}
+
+.header-brand {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    user-select: none;
+}
+
+.brand-emblem-img {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    filter: drop-shadow(0 0 6px rgba(251, 191, 36, 0.65));
+    flex-shrink: 0;
+    transition: transform 0.25s ease;
+}
+
+.header-brand:hover .brand-emblem-img {
+    transform: rotate(15deg) scale(1.08);
+}
+
+.brand-text-stack {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    line-height: 1.1;
+    text-align: left;
+}
+
+.brand-umbrella-eyebrow {
+    font-family: 'Cinzel', serif;
+    font-size: 0.54rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: #fde68a;
+    opacity: 0.95;
+    text-transform: uppercase;
+    text-shadow: 0 0 6px rgba(251, 191, 36, 0.45);
+    white-space: nowrap;
+    display: inline-block;
+}
+
+.brand-title-row {
+    display: flex;
+    flex-direction: row;
+    align-items: baseline;
+    gap: 0.4rem;
+    flex-wrap: nowrap;
+}
+
+.brand-auromatch-title {
+    margin: 0;
+    font-family: 'Cinzel', serif;
+    font-weight: 900;
+    font-size: 1.15rem;
+    letter-spacing: 2.5px;
+    line-height: 1;
+    color: #fde68a;
+    text-shadow:
+        0 1px 0 #d97706,
+        0 2px 0 #b45309,
+        0 3px 0 #92400e,
+        0 4px 0 #78350f,
+        0 5px 10px rgba(0, 0, 0, 0.85),
+        0 0 16px rgba(251, 191, 36, 0.6);
+    white-space: nowrap;
+}
+
+.brand-tagline-text {
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.72rem;
+    font-style: italic;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.75);
+    white-space: nowrap;
+    letter-spacing: 0.2px;
+}
+
+/* Welcome Screen Large Stack */
+.welcome-brand-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-bottom: 20px;
+}
+
+.welcome-brand-stack .brand-umbrella-eyebrow {
+    font-size: clamp(0.7rem, 2.2vw, 0.85rem);
+    letter-spacing: 3.5px;
+    color: #fde68a;
+    margin-bottom: 2px;
+}
+
+.welcome-brand-stack .app-headline {
+    margin: 0;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 3px;
+    font-weight: 900;
+    color: #fde68a;
+    text-shadow:
+        0 1px 0 #d97706,
+        0 2px 0 #b45309,
+        0 3px 0 #92400e,
+        0 4px 0 #78350f,
+        0 6px 14px rgba(0, 0, 0, 0.9),
+        0 0 24px rgba(251, 191, 36, 0.65);
+}
+
+.welcome-brand-stack .app-subhead {
+    margin-top: 6px;
+    margin-bottom: 0;
+}
+
+/* Theme Awareness & High-Contrast Support */
+.theme-morning .brand-umbrella-eyebrow {
+    color: #78350f !important;
+    text-shadow: none !important;
+    opacity: 0.95 !important;
+}
+
+.theme-morning .brand-auromatch-title,
+.theme-morning .welcome-brand-stack .app-headline {
+    color: #92400e !important;
+    text-shadow: 0 1px 0 #b45309, 0 2px 0 #78350f, 0 3px 6px rgba(120, 53, 15, 0.35) !important;
+}
+
+.theme-morning .brand-tagline-text {
+    color: #78350f !important;
+    opacity: 0.85 !important;
+}
+
+/* Responsive Scaling */
+@media (max-width: 680px) {
+    .brand-tagline-text {
+        display: none !important;
+    }
+    .brand-umbrella-eyebrow {
+        font-size: 0.46rem !important;
+        letter-spacing: 1.4px !important;
+    }
+    .brand-auromatch-title {
+        font-size: 0.95rem !important;
+        letter-spacing: 1.5px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .header-brand .brand-emblem-img {
+        width: 20px !important;
+        height: 20px !important;
+    }
+    .brand-umbrella-eyebrow {
+        font-size: 0.42rem !important;
+        letter-spacing: 1px !important;
+    }
+    .brand-auromatch-title {
+        font-size: 0.85rem !important;
+        letter-spacing: 1.2px !important;
+    }
+}
+
+@media (max-width: 380px) {
+    #game-screen .header-brand {
+        display: none !important;
+    }
+}
+
 
 
 /* WELCOME SCREEN VIEW */
@@ -5721,7 +5900,7 @@ body {
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
 
@@ -5811,8 +5990,11 @@ body {
                 <circle cx="0" cy="0" r="4" fill="#fffef0"/>
               </g>
             </svg>
-            <h1 class="app-headline" id="welcome-title">AuroMatch</h1>
-            <p class="app-subhead" id="welcome-sub">General Knowledge Concentration Quest</p>
+            <div class="welcome-brand-stack">
+              <span class="brand-umbrella-eyebrow">AUROMIND SERIES</span>
+              <h1 class="app-headline" id="welcome-title">AuroMatch</h1>
+              <p class="app-subhead" id="welcome-sub"><span class="brand-tagline-text">• Zen Tile Solitaire & Concentration Quest</span></p>
+            </div>
             
             <!-- Returning User Profile Card (Dynamic) -->
             <div id="welcome-profile-badge" style="display: none; align-items: center; gap: 8px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,215,0,0.3); padding: 6px 16px; border-radius: 24px; margin-bottom: 24px;">
@@ -5855,7 +6037,18 @@ body {
         <!-- Garden Selection Screen -->
         <div class="screen-view" id="selector-screen">
             <header class="app-header">
-                <button class="hdr-btn" onclick="navTo('welcome')">←</button>
+                <div class="header-left-group">
+                    <button class="hdr-btn" onclick="navTo('welcome')" title="Return to Welcome">←</button>
+                    <div class="header-brand">
+                        <img src="./Assets/icons/logo.svg" alt="AuroMatch Emblem" class="brand-emblem-img">
+                        <div class="brand-text-stack">
+                            <span class="brand-umbrella-eyebrow">AUROMIND SERIES</span>
+                            <div class="brand-title-row">
+                                <h2 class="brand-auromatch-title">AUROMATCH</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div style="text-align: center;">
                     <div class="title-display" id="select-hdr">Select Sanctuary</div>
                     <div style="font-size: 10px; color: #c5a880; opacity: 0.85; letter-spacing: 0.5px;">20 Grand Realms · 1,000 Levels</div>
@@ -5870,7 +6063,19 @@ body {
         <!-- Gameplay Board Screen -->
         <div class="screen-view" id="game-screen">
             <header class="app-header">
-                <button class="hdr-btn" onclick="backToWelcome()">←</button>
+                <div class="header-left-group">
+                    <button class="hdr-btn" onclick="backToWelcome()" title="Return to Welcome">←</button>
+                    <div class="header-brand">
+                        <img src="./Assets/icons/logo.svg" alt="AuroMatch Emblem" class="brand-emblem-img">
+                        <div class="brand-text-stack">
+                            <span class="brand-umbrella-eyebrow">AUROMIND SERIES</span>
+                            <div class="brand-title-row">
+                                <h2 class="brand-auromatch-title">AUROMATCH</h2>
+                                <span class="brand-tagline-text">• Zen Tile Solitaire</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="hud-progression-bar">
                     <span class="hud-player-badge" id="header-player-badge" title="Player Name">👤 <span id="header-player-name">Seeker</span></span>
                     <span class="hud-iq-badge" id="header-iq-badge" title="Focus IQ: Cognitive concentration and sharpness index">🧠 IQ: <span id="header-iq-count">80</span></span>
