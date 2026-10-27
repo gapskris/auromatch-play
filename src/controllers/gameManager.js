@@ -23,11 +23,11 @@ import {
   triggerTileConvergenceSmash,
   triggerTrayTriadSparkle
 } from '../ui/particles.js';
-import { ThemeManager, REALMS, TOTAL_REALM_LEVELS, TOTAL_CLASSIC_LEVELS } from './themeManager.js';
+import { ThemeManager, REALMS, TOTAL_REALM_LEVELS, TOTAL_CLASSIC_LEVELS, TOTAL_BOTANICAL_LEVELS } from './themeManager.js';
 
 export const TOTAL_LEVELS = 520;
 export const TOTAL_PAIRS_LEVELS = 400; // Unified Pairs (Mahjong Solitaire) Campaign
-export { TOTAL_CLASSIC_LEVELS };
+export { TOTAL_CLASSIC_LEVELS, TOTAL_BOTANICAL_LEVELS };
 
 export const RANKS = [
   { name: 'Aspirant', symbol: '🌱', minLevel: 1, maxLevel: 25 },
@@ -80,6 +80,26 @@ export function getRealmTileCount(levelNum) {
   if (levelInRealm <= 45) return 102;    // Level 41-45: 102 tiles (51 pairs)
   return 108;                            // Level 46-50: 108 tiles (54 pairs, Master Monolith)
 }
+
+/**
+ * 4-Chapter 200-Level Smooth Learning & Progression Curve for Botanical Art:
+ * Chapter 1 (Lv 1–25): Gentle Awakening (18–30 tiles, 1–2 layers, 4–8 motifs)
+ * Chapter 2 (Lv 26–75): The Blossom (36–48 tiles, 2–3 layers, 16 core motifs)
+ * Chapter 3 (Lv 76–140): Sacred Mandala (60–72 tiles, 3–4 layers, up to 20 motifs)
+ * Chapter 4 (Lv 141–200): Grand Pichwai Temple (84–96 tiles, 4–5 layers, 24 motifs)
+ */
+export function getBotanicalTileCount(levelNum) {
+  if (levelNum <= 5) return 18;      // Levels 1-5: 18 tiles (Introductory gentle start)
+  if (levelNum <= 15) return 24;     // Levels 6-15: 24 tiles
+  if (levelNum <= 25) return 30;     // Levels 16-25: 30 tiles (End Chapter 1)
+  if (levelNum <= 50) return 36;     // Levels 26-50: 36 tiles (Chapter 2 early)
+  if (levelNum <= 75) return 48;     // Levels 51-75: 48 tiles (Chapter 2 completion)
+  if (levelNum <= 110) return 60;    // Levels 76-110: 60 tiles (Chapter 3 early)
+  if (levelNum <= 140) return 72;    // Levels 111-140: 72 tiles (Chapter 3 completion)
+  if (levelNum <= 175) return 84;    // Levels 141-175: 84 tiles (Chapter 4 early)
+  return 96;                         // Levels 176-200: 96 tiles (Chapter 4 grand finale)
+}
+
 
 
 export class GameManager {
@@ -283,6 +303,7 @@ export class GameManager {
   }
 
   getTotalLevels() {
+    if (this.gameplayMode === 'botanical') return TOTAL_BOTANICAL_LEVELS; // 200 Levels (Botanical Art Campaign)
     if (this.gameplayMode === 'vita' || this.gameplayMode === 'classic') return TOTAL_PAIRS_LEVELS; // 400 Levels (Pairs Campaign)
     if (this.gameplayMode === 'realms') return TOTAL_REALM_LEVELS; // 1,000 Levels (Thematic Realms)
     return TOTAL_PAIRS_LEVELS;
@@ -338,24 +359,39 @@ export class GameManager {
     }
 
     const isRealmsMode = (this.gameplayMode === 'realms');
+    const isBotanicalMode = (this.gameplayMode === 'botanical');
     if (!tileCount) {
-      tileCount = isRealmsMode ? getRealmTileCount(levelNum) : getTileCountForLevel(levelNum);
+      if (isRealmsMode) {
+        tileCount = getRealmTileCount(levelNum);
+      } else if (isBotanicalMode) {
+        tileCount = getBotanicalTileCount(levelNum);
+      } else {
+        tileCount = getTileCountForLevel(levelNum);
+      }
     }
     const isTileClub = (this.gameplayMode === 'tile_club');
     const K = isTileClub ? 3 : 2;
-    const distinctFloraCount = Math.max(3, Math.floor(tileCount / K));
+    let distinctFloraCount = Math.max(3, Math.floor(tileCount / K));
+    if (isBotanicalMode) {
+      if (levelNum <= 25) distinctFloraCount = Math.min(distinctFloraCount, 8);
+      else if (levelNum <= 75) distinctFloraCount = Math.min(distinctFloraCount, 16);
+      else if (levelNum <= 140) distinctFloraCount = Math.min(distinctFloraCount, 20);
+      else distinctFloraCount = Math.min(distinctFloraCount, 24);
+    }
     const levelFlora = getTilesForLevel(levelNum, distinctFloraCount);
 
     const layout = VitaBoardGenerator.createLevelLayout(levelNum, tileCount);
     this.currentFormationName = VitaBoardGenerator.getFormationName(levelNum);
     this.tiles = VitaBoardGenerator.generateSolvableBoard(layout, levelFlora, isTileClub ? 'tile_club' : 'vita');
 
-    // Realm Campaign Metadata & Archetype assignment
-    this.activeRealm = isRealmsMode ? ThemeManager.getRealmForLevel(levelNum) : null;
-    const activeArch = (isRealmsMode && this.activeRealm) ? this.activeRealm.archetype : null;
+    // Realm & Botanical Campaign Metadata & Archetype assignment
+    this.activeRealm = isRealmsMode ? ThemeManager.getRealmForLevel(levelNum) :
+                       isBotanicalMode ? ThemeManager.getBotanicalForLevel(levelNum) : null;
+    const activeArch = (isRealmsMode && this.activeRealm) ? this.activeRealm.archetype :
+                       (isBotanicalMode ? 'botanical' : null);
 
-    // In Realms mode, apply the dedicated 16-tile custom artistic skins
-    if (isRealmsMode && this.activeRealm && this.activeRealm.customTiles && this.activeRealm.customTiles.length > 0) {
+    // Apply dedicated custom artistic skins for Realms or Botanical Art
+    if ((isRealmsMode || isBotanicalMode) && this.activeRealm && this.activeRealm.customTiles && this.activeRealm.customTiles.length > 0) {
       const artTiles = this.activeRealm.customTiles;
       const distinctFlora = Array.from(new Set(this.tiles.map(t => t.floraId)));
       const floraToArtMap = {};
@@ -412,12 +448,14 @@ export class GameManager {
       const boardContainer = document.querySelector('.board-container');
       const stageCol = document.getElementById('center-stage-col');
       if (boardContainer) {
-        if (isRealmsMode && this.activeRealm) {
-          boardContainer.classList.add('theme-realm-active');
+        if ((isRealmsMode || isBotanicalMode) && this.activeRealm) {
+          boardContainer.classList.add(isBotanicalMode ? 'theme-botanical-active' : 'theme-realm-active');
+          boardContainer.classList.remove(isBotanicalMode ? 'theme-realm-active' : 'theme-botanical-active');
           boardContainer.setAttribute('data-realm-archetype', activeArch || '');
           boardContainer.style.backgroundImage = 'none';
           if (stageCol) {
-            stageCol.classList.add('theme-realm-stage');
+            stageCol.classList.add(isBotanicalMode ? 'theme-botanical-stage' : 'theme-realm-stage');
+            stageCol.classList.remove(isBotanicalMode ? 'theme-realm-stage' : 'theme-botanical-stage');
             stageCol.style.backgroundImage = `url('${this.activeRealm.bgImage}')`;
           }
           const actBar = document.querySelector('.gameplay-action-bar');
@@ -425,11 +463,11 @@ export class GameManager {
             actBar.setAttribute('data-realm-archetype', activeArch || '');
           }
         } else {
-          boardContainer.classList.remove('theme-realm-active');
+          boardContainer.classList.remove('theme-realm-active', 'theme-botanical-active');
           boardContainer.removeAttribute('data-realm-archetype');
           boardContainer.style.backgroundImage = '';
           if (stageCol) {
-            stageCol.classList.remove('theme-realm-stage');
+            stageCol.classList.remove('theme-realm-stage', 'theme-botanical-stage');
             stageCol.style.backgroundImage = '';
           }
           const actBar = document.querySelector('.gameplay-action-bar');
@@ -451,7 +489,7 @@ export class GameManager {
     if (mode === 'classic') mode = 'vita'; // Backward compatibility alias
     if (this.gameplayMode === mode) return;
     this.gameplayMode = mode;
-    if (mode === 'realms') {
+    if (mode === 'realms' || mode === 'botanical') {
       this.startNewStage(1);
     } else {
       this.startNewStage(this.player.currentLevel || 1);

@@ -5,6 +5,7 @@ export const TOTAL_REALM_LEVELS = 1000; // 20 Themes * 50 Levels per Theme
 export const LEVELS_PER_REALM = 50;
 export const TOTAL_PAIRS_LEVELS = 400; // Unified Pairs (Mahjong Solitaire) Campaign
 export const TOTAL_CLASSIC_LEVELS = TOTAL_PAIRS_LEVELS; // Backward compatibility alias
+export const TOTAL_BOTANICAL_LEVELS = 200; // Botanical Art Campaign (200 Progressive Levels) // Backward compatibility alias
 
 // 16 distinct emblems with symbolic labels for each theme
 const THEME_TILE_DEFS = {
@@ -368,6 +369,42 @@ const THEME_TILE_DEFS = {
     { name: "Jade Lotus Emblem", symbol: "🏵️" },
     { name: "Universal Crown", symbol: "👑" },
   ],
+  "botanical_art": [
+    { name: "Top Rosette Daisy", symbol: "🌸" },
+    { name: "Grand Lotus Palmette", symbol: "🦚" },
+    { name: "Folk Tulip", symbol: "🌷" },
+    { name: "Marigold Daisy", symbol: "🌼" },
+    { name: "Meadow Cosmos", symbol: "🌻" },
+    { name: "Botanical Leaf Sprig", symbol: "🌿" },
+    { name: "Symmetric Frond", symbol: "🍃" },
+    { name: "Core Starburst Rosette", symbol: "✨" },
+    { name: "Full Kaleidoscope Medallion", symbol: "🏵️" },
+    { name: "Cardinal Lotus Bloom", symbol: "🪷" },
+    { name: "Satellite Mini Rosette", symbol: "🌺" },
+    { name: "Crown Feather Plume", symbol: "🪶" },
+    { name: "Curved Leaf Bough", symbol: "🎋" },
+    { name: "Scalloped Tulip Bell", symbol: "🔔" },
+    { name: "Slavic Rose Medallion", symbol: "🌹" },
+    { name: "Cardinal Fleur Finial", symbol: "⚜️" },
+    { name: "Teardrop Bloom Bud", symbol: "💧" },
+    { name: "Bicolor Leaf Accent", symbol: "🌱" },
+    { name: "Foliage Sprout Accent", symbol: "🌾" },
+    { name: "Corner Sun-Daisy Variant", symbol: "☀️" },
+    { name: "Golden Shield Petal", symbol: "🛡️" },
+    { name: "Crimson Spear Ray", symbol: "🗡️" },
+    { name: "Aqua Scalloped Crest", symbol: "🌊" },
+    { name: "Periwinkle Droplet Cluster", symbol: "🫧" },
+  ],
+};
+
+export const BOTANICAL_CAMPAIGN = {
+  id: 'botanical_art',
+  name: 'Botanical Art',
+  subtitle: 'Sacred Folk Botanical Mandala · 200 Progressive Levels',
+  bgImage: './Assets/themes/botanical_art/background.png',
+  archetype: 'botanical',
+  totalLevels: 200,
+  customTiles: null
 };
 
 function buildCustomTilesForTheme(themeId) {
@@ -378,6 +415,8 @@ function buildCustomTilesForTheme(themeId) {
     symbol: d.symbol
   }));
 }
+
+BOTANICAL_CAMPAIGN.customTiles = buildCustomTilesForTheme('botanical_art');
 
 export const REALMS = [
   {
@@ -1704,6 +1743,19 @@ export const REALMS = [
 ];
 
 export class ThemeManager {
+  /**
+   * Retrieves the active Botanical Art campaign definition for any level (1 - 200)
+   */
+  static getBotanicalForLevel(levelNum = 1) {
+    const safeLevel = Math.max(1, Math.min(TOTAL_BOTANICAL_LEVELS, levelNum));
+    return {
+      ...BOTANICAL_CAMPAIGN,
+      currentLevel: safeLevel,
+      isMasterArtLevel: true,
+      levelName: `Garden Level ${safeLevel}`
+    };
+  }
+
   /**
    * Retrieves the active Realm definition for any level (1 - 1000)
    */

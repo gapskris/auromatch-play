@@ -37,9 +37,12 @@ window.addEventListener('load', () => {
         const btnVita = document.getElementById('btn-mode-vita');
         const btnTileClub = document.getElementById('btn-mode-tileclub');
         const btnRealms = document.getElementById('btn-mode-realms');
-        [btnVita, btnTileClub, btnRealms].forEach(b => { if (b) b.classList.remove('active'); });
+        const btnBotanical = document.getElementById('btn-mode-botanical');
+        [btnVita, btnTileClub, btnRealms, btnBotanical].forEach(b => { if (b) b.classList.remove('active'); });
 
-        if ((state.gameplayMode === 'vita' || state.gameplayMode === 'classic') && btnVita) {
+        if (state.gameplayMode === 'botanical' && btnBotanical) {
+            btnBotanical.classList.add('active');
+        } else if ((state.gameplayMode === 'vita' || state.gameplayMode === 'classic') && btnVita) {
             btnVita.classList.add('active');
         } else if (state.gameplayMode === 'tile_club' && btnTileClub) {
             btnTileClub.classList.add('active');
@@ -56,7 +59,9 @@ window.addEventListener('load', () => {
         const promptEl = document.getElementById('gameplay-prompt');
         if (promptEl) {
             const formBadge = state.formationName ? ` · ${state.formationName}` : '';
-            if (state.gameplayMode === 'realms') {
+            if (state.gameplayMode === 'botanical') {
+                promptEl.innerHTML = `<span>🌸 Botanical Art · Level ${state.currentLevel || 1}${formBadge}</span>`;
+            } else if (state.gameplayMode === 'realms') {
                 const realmName = state.activeRealm ? state.activeRealm.name : 'Thematic Realm';
                 promptEl.innerHTML = `<span>🗺️ ${realmName}${formBadge}</span>`;
             } else if (state.gameplayMode === 'vita' || state.gameplayMode === 'classic') {
@@ -492,6 +497,11 @@ window.addEventListener('load', () => {
     activeGameManager.notifyState();
 
     window.switchGameplayMode = (mode) => {
+        if (mode === 'botanical') {
+            activeGameManager.setGameplayMode('botanical');
+            window.showToastMessage("🌸 Botanical Art: 200 progressive levels of authentic Indian folk art & cloisonné 3D tiles!");
+            return;
+        }
         if (mode === 'realms') {
             activeGameManager.setGameplayMode('realms');
             window.showToastMessage("🗺️ 20 Grand Realms: 1,000 Levels (50 per Chapter) with Dedicated 3D Tile Sets & Environmental Sanctuaries!");

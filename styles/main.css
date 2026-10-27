@@ -5851,3 +5851,25 @@ body {
     border-radius: 3px;
     transition: width 0.3s ease;
 }
+
+
+/* 🌸 Dedicated Botanical Art Campaign (200 Progressive Levels) */
+.mode-btn-botanical {
+    border-color: rgba(244, 114, 182, 0.45);
+    color: #f472b6;
+}
+.mode-btn-botanical.active {
+    background: linear-gradient(135deg, #ec4899, #be185d);
+    color: #ffffff;
+    border-color: #f472b6;
+    box-shadow: 0 0 10px rgba(236, 72, 153, 0.45);
+}
+
+.board-container.theme-botanical-active {
+    background: transparent !important;
+}
+
+#center-stage-col.theme-botanical-stage {
+    background: url('../Assets/themes/botanical_art/background.png') center/cover no-repeat !important;
+    box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.7);
+}
