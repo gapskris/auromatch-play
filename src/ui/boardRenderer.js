@@ -193,7 +193,7 @@ export class BoardRenderer {
 
 
 
-    const aspect = isArtThemeMode ? 1.125 : 1.294;
+    const aspect = 1.125; // 320x360 8:9 ratio unified across all themes
 
     const spacingFactor = isArtThemeMode ? 0.86 : 0.85;
 
@@ -249,7 +249,7 @@ export class BoardRenderer {
 
       minAllowed = isSenior ? 48 : 42;
 
-      maxAllowed = isSenior ? 84 : (isArtThemeMode ? 82 : 72);
+      maxAllowed = isSenior ? 84 : (isRealmsMode || this.options.gameplayMode === 'botanical' ? 82 : 72);
 
     } else if (isTablet) {
 
@@ -599,7 +599,7 @@ export class BoardRenderer {
       const isRealmsMode = (this.options.gameplayMode === 'realms');
 
       const isArtThemeMode = (this.options.gameplayMode === 'realms' || this.options.gameplayMode === 'botanical');
-      const customImg = isArtThemeMode ? (tile.customImage || (flora && flora.customImage) || null) : null;
+      const customImg = tile.customImage || (flora && flora.customImage) || null;
 
 
 

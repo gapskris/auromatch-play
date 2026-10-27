@@ -395,6 +395,42 @@ const THEME_TILE_DEFS = {
     { name: "Aqua Scalloped Crest", symbol: "🌊" },
     { name: "Periwinkle Droplet Cluster", symbol: "🫧" },
   ],
+  "standard_gold": [
+    { name: "Imperial Rosette", symbol: "🌸" },
+    { name: "Grand Palmette", symbol: "🦚" },
+    { name: "Radiant Starburst", symbol: "✨" },
+    { name: "Champa Fan", symbol: "🪷" },
+    { name: "Royal Finial", symbol: "⚜️" },
+    { name: "Jewel Mandala", symbol: "🏵️" },
+    { name: "Twin Lotus Buds", symbol: "🌷" },
+    { name: "Foliage Bough", symbol: "🌿" },
+    { name: "Cardinal Lotus", symbol: "🌺" },
+    { name: "Sunburst Daisy", symbol: "🌼" },
+    { name: "Shield Petal", symbol: "🛡️" },
+    { name: "Feather Plume", symbol: "🪶" },
+    { name: "Diamond Sprout", symbol: "🌾" },
+    { name: "Tulip Bell", symbol: "🔔" },
+    { name: "Slavic Medallion", symbol: "🌹" },
+    { name: "Spear Ray", symbol: "🗡️" },
+  ],
+  "standard_lapis": [
+    { name: "Imperial Rosette", symbol: "🌸" },
+    { name: "Grand Palmette", symbol: "🦚" },
+    { name: "Radiant Starburst", symbol: "✨" },
+    { name: "Champa Fan", symbol: "🪷" },
+    { name: "Royal Finial", symbol: "⚜️" },
+    { name: "Jewel Mandala", symbol: "🏵️" },
+    { name: "Twin Lotus Buds", symbol: "🌷" },
+    { name: "Foliage Bough", symbol: "🌿" },
+    { name: "Cardinal Lotus", symbol: "🌺" },
+    { name: "Sunburst Daisy", symbol: "🌼" },
+    { name: "Shield Petal", symbol: "🛡️" },
+    { name: "Feather Plume", symbol: "🪶" },
+    { name: "Diamond Sprout", symbol: "🌾" },
+    { name: "Tulip Bell", symbol: "🔔" },
+    { name: "Slavic Medallion", symbol: "🌹" },
+    { name: "Spear Ray", symbol: "🗡️" },
+  ],
 };
 
 export const BOTANICAL_CAMPAIGN = {
@@ -417,6 +453,30 @@ function buildCustomTilesForTheme(themeId) {
 }
 
 BOTANICAL_CAMPAIGN.customTiles = buildCustomTilesForTheme('botanical_art');
+
+export const STANDARD_THEMES = {
+  imperial_gold: {
+    id: 'standard_gold',
+    key: 'imperial_gold',
+    name: 'Imperial Gold & Jewel Reliquary',
+    shortName: 'Imperial Gold',
+    accent: '#fbbf24',
+    bgImage: './Assets/themes/standard_gold/background.png',
+    customTiles: null
+  },
+  royal_lapis: {
+    id: 'standard_lapis',
+    key: 'royal_lapis',
+    name: 'Royal Lapis & Golden Cloisonné',
+    shortName: 'Royal Lapis',
+    accent: '#00e5ff',
+    bgImage: './Assets/themes/standard_lapis/background.png',
+    customTiles: null
+  }
+};
+
+STANDARD_THEMES.imperial_gold.customTiles = buildCustomTilesForTheme('standard_gold');
+STANDARD_THEMES.royal_lapis.customTiles = buildCustomTilesForTheme('standard_lapis');
 
 export const REALMS = [
   {
@@ -1743,6 +1803,13 @@ export const REALMS = [
 ];
 
 export class ThemeManager {
+  /**
+   * Retrieves standard category theme definition ('imperial_gold' or 'royal_lapis')
+   */
+  static getStandardTheme(themeKey = 'imperial_gold') {
+    return STANDARD_THEMES[themeKey] || STANDARD_THEMES.imperial_gold;
+  }
+
   /**
    * Retrieves the active Botanical Art campaign definition for any level (1 - 200)
    */

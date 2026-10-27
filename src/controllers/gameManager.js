@@ -105,6 +105,7 @@ export function getBotanicalTileCount(levelNum) {
 export class GameManager {
   constructor(options = {}) {
     this.gameplayMode = (options.gameplayMode === 'classic') ? 'vita' : (options.gameplayMode || 'vita'); // 'vita' | 'tile_club'
+    this.standardTheme = this.loadStandardTheme(); // 'imperial_gold' | 'royal_lapis'
     this.seniorView = (options.seniorView !== undefined) 
       ? !!options.seniorView 
       : !!(profileState && profileState.settings && profileState.settings.seniorViewActive);
@@ -150,6 +151,68 @@ export class GameManager {
         localStorage.setItem('auromatch_player_profiles', JSON.stringify(profiles));
       }
     } catch (e) {}
+  }
+
+  loadStandardTheme() {
+    try {
+      if (typeof localStorage !== 'undefined') {
+        const saved = localStorage.getItem('auromatch_standard_theme');
+        if (saved === 'royal_lapis' || saved === 'imperial_gold') return saved;
+      }
+    } catch (e) {}
+    return 'imperial_gold';
+  }
+
+  setStandardTheme(themeKey) {
+    const valid = (themeKey === 'royal_lapis') ? 'royal_lapis' : 'imperial_gold';
+    this.standardTheme = valid;
+    try {
+      if (typeof localStorage !== 'undefined') {
+        localStorage.setItem('auromatch_standard_theme', valid);
+      }
+    } catch (e) {}
+
+    // If currently in standard mode (Pairs or Tile Club), refresh current stage tiles and background
+    if (this.gameplayMode === 'vita' || this.gameplayMode === 'tile_club') {
+      const stdTheme = ThemeManager.getStandardTheme(this.standardTheme);
+      const artTiles = stdTheme.customTiles;
+      const distinctFlora = Array.from(new Set(this.tiles.map(t => t.floraId)));
+      const floraToArtMap = {};
+      distinctFlora.forEach((fId, idx) => {
+        floraToArtMap[fId] = artTiles[idx % artTiles.length];
+      });
+
+      this.tiles.forEach(t => {
+        const art = floraToArtMap[t.floraId];
+        if (art) {
+          t.customImage = art.image;
+          t.thematicName = art.name;
+          t.thematicSymbol = art.symbol;
+          if (t.floraData) {
+            t.floraData = {
+              ...t.floraData,
+              customImage: art.image,
+              customName: art.name,
+              customSymbol: art.symbol
+            };
+          }
+        }
+      });
+
+      if (this.boardRenderer) {
+        this.boardRenderer.setTiles(this.tiles);
+      }
+
+      if (typeof document !== 'undefined') {
+        const stageCol = document.getElementById('center-stage-col');
+        if (stageCol) {
+          stageCol.style.backgroundImage = `url('${stdTheme.bgImage}')`;
+        }
+        document.body.setAttribute('data-theme', this.standardTheme);
+      }
+    }
+
+    this.notifyState();
   }
 
   loadPlayerState() {
@@ -315,6 +378,7 @@ export class GameManager {
     this.boardRenderer = new BoardRenderer(boardContainerId, {
       seniorView: this.seniorView,
       gameplayMode: this.gameplayMode,
+      standardTheme: this.standardTheme,
       onTileClick: this.handleTileClick.bind(this)
     });
 
@@ -416,22 +480,39 @@ export class GameManager {
         }
       });
     } else {
-      // In standard modes (Pairs, Tile Club, Classic): Apply the multi-material mixed deck!
-      // ~75% Classic Cream Ivory Tablet, ~15% Burnished Walnut Wood, ~10% Celadon Jade Tablet
+      // In standard modes (Pairs, Tile Club): Apply the active elevated shining 3D theme (Imperial Gold or Royal Lapis)
+      const stdTheme = ThemeManager.getStandardTheme(this.standardTheme);
+      const artTiles = stdTheme.customTiles;
       const distinctFlora = Array.from(new Set(this.tiles.map(t => t.floraId)));
+      const floraToArtMap = {};
       const floraToMaterialMap = {};
       distinctFlora.forEach((fId, idx) => {
+        floraToArtMap[fId] = artTiles[idx % artTiles.length];
         const ratio = (idx + 1) / distinctFlora.length;
         if (ratio > 0.88) {
-          floraToMaterialMap[fId] = 'celadon_jade'; // Translucent Celadon Jade
+          floraToMaterialMap[fId] = 'celadon_jade';
         } else if (ratio > 0.72) {
-          floraToMaterialMap[fId] = 'walnut_wood';  // Burnished Walnut Wood
+          floraToMaterialMap[fId] = 'walnut_wood';
         } else {
-          floraToMaterialMap[fId] = 'ivory';         // Classic Ivory Tablet
+          floraToMaterialMap[fId] = 'ivory';
         }
       });
 
       this.tiles.forEach(t => {
+        const art = floraToArtMap[t.floraId];
+        if (art) {
+          t.customImage = art.image;
+          t.thematicName = art.name;
+          t.thematicSymbol = art.symbol;
+          if (t.floraData) {
+            t.floraData = {
+              ...t.floraData,
+              customImage: art.image,
+              customName: art.name,
+              customSymbol: art.symbol
+            };
+          }
+        }
         t.archetype = floraToMaterialMap[t.floraId] || 'ivory';
       });
     }
@@ -468,7 +549,9 @@ export class GameManager {
           boardContainer.style.backgroundImage = '';
           if (stageCol) {
             stageCol.classList.remove('theme-realm-stage', 'theme-botanical-stage');
-            stageCol.style.backgroundImage = '';
+            stageCol.classList.add('theme-standard-stage');
+            const stdTheme = ThemeManager.getStandardTheme(this.standardTheme);
+            stageCol.style.backgroundImage = `url('${stdTheme.bgImage}')`;
           }
           const actBar = document.querySelector('.gameplay-action-bar');
           if (actBar) {

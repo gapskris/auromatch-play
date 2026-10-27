@@ -138,6 +138,20 @@ window.addEventListener('load', () => {
             }
         });
 
+        // 4b. Update Body data-theme & Theme Switcher Pill (Pic 3)
+        const curStdTheme = state.standardTheme || 'imperial_gold';
+        document.body.setAttribute('data-theme', curStdTheme);
+        const btnSwitcher = document.getElementById('btn-theme-switcher');
+        const switcherBar = document.getElementById('theme-switcher-bar');
+        if (btnSwitcher) {
+            const label = (curStdTheme === 'royal_lapis') ? 'ROYAL LAPIS' : 'IMPERIAL GOLD';
+            btnSwitcher.innerText = `🎴 THEME: ${label} (ACTIVE)`;
+        }
+        if (switcherBar) {
+            const isStdMode = (state.gameplayMode === 'vita' || state.gameplayMode === 'tile_club' || state.gameplayMode === 'classic');
+            switcherBar.style.display = isStdMode ? 'flex' : 'none';
+        }
+
         // 5. Remaining tiles status & HUD bar
         const statusText = document.getElementById('status-text');
         const statusTilesLeft = document.getElementById('status-tiles-left');
@@ -495,6 +509,14 @@ window.addEventListener('load', () => {
 
     // Initial state push for returning player welcome greeting & HUD sync
     activeGameManager.notifyState();
+
+    window.toggleStandardTheme = () => {
+        const cur = activeGameManager.standardTheme || 'imperial_gold';
+        const next = (cur === 'imperial_gold') ? 'royal_lapis' : 'imperial_gold';
+        activeGameManager.setStandardTheme(next);
+        const label = (next === 'imperial_gold') ? 'Imperial Gold & Jewel Reliquary' : 'Royal Lapis & Golden Cloisonné';
+        window.showToastMessage(`✨ Standard Theme Switched: ${label}`);
+    };
 
     window.switchGameplayMode = (mode) => {
         if (mode === 'botanical') {
