@@ -140,7 +140,7 @@
                 <span style="opacity: 0.5;">·</span>
                 <span id="welcome-badge-rank" style="font-size: 12px; color: #ffd700;">🌱 Aspirant</span>
                 <span style="opacity: 0.5;">·</span>
-                <span id="welcome-badge-sparks" style="font-size: 12px; color: #a7f3d0;">✨ 100</span>
+                <span id="welcome-badge-sparks" style="font-size: 12px; color: #ffd700;">✨ 100</span>
             </div>
 
             <button class="cta-btn" id="btn-begin-journey" onclick="window.handleBeginJourneyClick()">Begin Journey ➔</button>
@@ -220,7 +220,7 @@
                     <span class="hud-level-indicator" id="header-level-indicator" title="Click to Jump to Level" style="cursor: pointer;" onclick="window.openLevelJumpModal()">Level 1 / 200</span>
                     <span class="hud-sparks-count" id="header-sparks-count">✨ 100</span>
                     <span id="header-score-badge" style="font-size: 11px; font-weight: 800; color: #fde047; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); padding: 2px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 3px;" title="Cumulative Exploration Score">🏆 <span id="header-score-count">0</span></span>
-                    <span id="header-clean-solve-badge" style="font-size: 10px; font-weight: 700; color: #a7f3d0; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); padding: 2px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 3px;" title="No hints or reshuffles used yet (+5 Sparks bonus eligible)">✨ Clean Solve</span>
+                    <span id="header-clean-solve-badge" style="font-size: 10px; font-weight: 700; color: #ffd700; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); padding: 2px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 3px;" title="No hints or reshuffles used yet (+5 Sparks bonus eligible)">✨ Clean Solve</span>
                 </div>
                 <button class="hdr-btn" onclick="navTo('settings')">⚙</button>
             </header>
@@ -424,7 +424,7 @@
                 oninput="document.getElementById('reflection-char-count').innerText = this.value.length + ' / 300'"
                 onkeydown="if((event.ctrlKey || event.metaKey) && event.key==='Enter'){event.preventDefault();window.triggerConsecration();}"></textarea>
             <button class="cta-btn" id="consecrate-btn" onclick="triggerConsecration()">Consecrate Reflection</button>
-            <div style="font-size: 11px; color: #a7f3d0; margin-top: 10px; opacity: 0.9;">🔒 Private on device · Dissolved with reverent intention into the sacred flame</div>
+            <div style="font-size: 11px; color: #ffd700; margin-top: 10px; opacity: 0.9;">🔒 Private on device · Dissolved with reverent intention into the sacred flame</div>
         </div>
 
         <!-- Constellation Grid (Star Calendar) -->
@@ -611,7 +611,7 @@
 
         <!-- Player Name Entry Modal -->
         <div class="stage-clear-overlay" id="name-entry-modal" style="display: none; z-index: var(--z-overlay);">
-            <div class="stage-clear-card" style="max-width: min(380px, 92vw); width: 100%; box-sizing: border-box; text-align: left; padding: clamp(14px, 4vw, 20px); background: rgba(14, 78, 55, 0.98); max-height: min(88dvh, 88vh); overflow-y: auto;">
+            <div class="stage-clear-card" style="max-width: min(380px, 92vw); width: 100%; box-sizing: border-box; text-align: left; padding: clamp(14px, 4vw, 20px);  max-height: min(88dvh, 88vh); overflow-y: auto;">
                 <div style="font-size: 24px; text-align: center; margin-bottom: 2px;">✨</div>
                 <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: var(--accent-current); font-weight: 700; text-align: center;">Seeker Profile</div>
                 <h3 style="font-family: 'Playfair Display', serif; font-size: 18px; color: #ffffff; text-align: center; margin-bottom: 4px;" id="name-modal-title">Switch or Create Player</h3>
@@ -675,7 +675,7 @@
                     </div>
                     <div style="background: rgba(255,255,255,0.06); padding: 8px 14px; border-radius: 12px; border: 1px solid var(--border-current);" id="victory-bonus-box">
                         <div style="font-size: 11px; color: #c5a880;">Bonus</div>
-                        <div style="font-size: 13px; font-weight: 600; color: #a7f3d0;" id="victory-bonus-text">Clean Solve +5</div>
+                        <div style="font-size: 13px; font-weight: 600; color: #ffd700;" id="victory-bonus-text">Clean Solve +5</div>
                     </div>
                 </div>
                 <div id="victory-rank-up" style="display: none; font-size: 13px; font-weight: 700; color: #fde047;">Rank Promoted! +50 Sparks 💫</div>
@@ -686,7 +686,7 @@
 
         <!-- Tray Overflow Calm Modal (Mode B Anti-Stress Recovery) -->
         <div class="stage-clear-overlay" id="tray-overflow-modal" style="display: none; z-index: var(--z-overlay);">
-            <div class="stage-clear-card" style="max-width: 380px; text-align: center; padding: 24px; background: rgba(14, 78, 55, 0.98);">
+            <div class="stage-clear-card" style="max-width: 380px; text-align: center; padding: 24px; ">
                 <div style="font-size: 36px; margin-bottom: 4px;">📥</div>
                 <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #f59e0b; font-weight: 700;">Tray Capacity Reached</div>
                 <h3 style="font-family: 'Playfair Display', serif; font-size: 20px; color: #ffffff; margin-bottom: 8px;">Take a Breath</h3>
@@ -694,14 +694,14 @@
                     All 7 tray slots are filled without forming a triad. You can return the last tiles back to the board freely or refresh the stage.
                 </p>
                 <div style="display: flex; flex-direction: column; gap: 8px;">
-                    <button class="cta-btn" onclick="window.handleTrayFreeUndo()" style="margin: 0; padding: 12px; font-weight: 700; background: linear-gradient(135deg, #059669, #10b981);">
+                    <button class="cta-btn" onclick="window.handleTrayFreeUndo()" style="margin: 0; padding: 12px; font-weight: 700; background: var(--theme-accent-gradient, linear-gradient(135deg, #f59e0b, #d97706)); color: #100a06;">
                         ↩️ Return Last 2 Tiles (Free Undo)
                     </button>
                     <button class="cta-btn" onclick="window.handleTrayRestartStage()" style="margin: 0; padding: 10px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #ffffff;">
                         🔄 Restart Level Fresh
                     </button>
                 </div>
-                <div style="font-size: 11px; color: #a7f3d0; margin-top: 10px; opacity: 0.9;">🌱 Zero penalty · Sparks preserved · Infinite undos (Esc to undo)</div>
+                <div style="font-size: 11px; color: #ffd700; margin-top: 10px; opacity: 0.9;">🌱 Zero penalty · Sparks preserved · Infinite undos (Esc to undo)</div>
             </div>
         </div>
 

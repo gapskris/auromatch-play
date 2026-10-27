@@ -1073,7 +1073,7 @@ body {
 
     0% { transform: scale(1); filter: brightness(1); }
 
-    50% { transform: scale(1.12); filter: brightness(1.4) drop-shadow(0 0 10px #10b981); }
+    50% { transform: scale(1.12); filter: brightness(1.4) drop-shadow(0 0 12px var(--theme-accent, #ffd700)); }
 
     100% { transform: scale(0.7); opacity: 0; }
 
@@ -3745,9 +3745,9 @@ body {
 
 @keyframes hintPulse {
 
-    0% { box-shadow: 0 0 8px #10B981, 0 8px 0 #bfa075; }
+    0% { box-shadow: 0 0 8px var(--theme-accent, #ffd700), 0 8px 0 #bfa075; }
 
-    100% { box-shadow: 0 0 24px #34D399, 0 8px 0 #bfa075, 0 0 12px #FDE047; }
+    100% { box-shadow: 0 0 24px var(--theme-accent, #ffd700), 0 8px 0 #bfa075, 0 0 16px #fde047; }
 
 }
 
@@ -4137,7 +4137,7 @@ body {
 
     height: 100%;
 
-    background: rgba(4, 24, 18, 0.92);
+    background: var(--overlay-current, rgba(14, 8, 4, 0.85));
 
     backdrop-filter: blur(20px);
 
@@ -4165,7 +4165,7 @@ body {
 
 .realms-browser-card {
 
-    background: rgba(14, 78, 55, 0.96);
+    background: var(--panel-current, rgba(22, 13, 7, 0.97));
 
     border: 1px solid var(--accent-current);
 
@@ -4313,7 +4313,7 @@ body {
 
     font-size: 10px;
 
-    color: #a7f3d0;
+    color: #ffd700;
 
 }
 
@@ -4423,7 +4423,7 @@ body {
 
         padding: 20px 16px 16px 16px;
 
-        background: rgba(4, 24, 18, 0.97);
+        background: var(--panel-current, rgba(22, 13, 7, 0.97));
 
         backdrop-filter: blur(24px);
 
@@ -4473,7 +4473,7 @@ body {
 
         padding: 20px 16px 16px 16px;
 
-        background: rgba(4, 24, 18, 0.97);
+        background: var(--panel-current, rgba(22, 13, 7, 0.97));
 
         backdrop-filter: blur(24px);
 
@@ -4659,7 +4659,7 @@ body {
 
         z-index: 201 !important;
 
-        background: rgba(4, 24, 18, 0.9) !important;
+        background: var(--panel-current, rgba(22, 13, 7, 0.92)) !important;
 
         border: 1px solid var(--border-current) !important;
 
@@ -4729,7 +4729,7 @@ body {
 
     .drawer-toggle-right:hover {
 
-        background: rgba(14, 78, 55, 0.95) !important;
+        background: var(--theme-accent, #fbbf24) !important; color: #100a06 !important;
 
         color: #ffd700 !important;
 
@@ -5161,7 +5161,7 @@ body {
 
     height: 100%;
 
-    background: rgba(4, 24, 18, 0.88);
+    background: var(--overlay-current, rgba(14, 8, 4, 0.85));
 
     backdrop-filter: blur(16px);
 
@@ -5189,7 +5189,7 @@ body {
 
 .stage-clear-card {
 
-    background: rgba(14, 78, 55, 0.95);
+    background: var(--panel-current, rgba(22, 13, 7, 0.97));
 
     border: 1px solid var(--accent-current);
 
@@ -5845,7 +5845,7 @@ body {
 
 .realm-progress-bar-fill {
     height: 100%;
-    background: linear-gradient(90deg, #f59e0b, #10b981);
+    background: linear-gradient(90deg, var(--accent-current), #f59e0b);
     border-radius: 3px;
     transition: width 0.3s ease;
 }
@@ -6433,4 +6433,124 @@ body[data-theme="royal_lapis"] .settings-modal {
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.4);
     z-index: 10;
+}
+
+/* ==========================================================================
+   ✨ AuroMatch Unified Multi-Theme Modal, Dialog & Drawer Architecture
+   ========================================================================== */
+
+/* 1. Base Modal & Card Shells */
+.stage-clear-overlay,
+.realms-browser-overlay,
+.onboarding-overlay,
+.match-overlay,
+.modal-overlay {
+    backdrop-filter: blur(18px) !important;
+}
+
+.stage-clear-card,
+.realms-browser-card,
+.onboarding-card,
+.settings-modal {
+    border-radius: 24px !important;
+    transition: all 0.25s ease !important;
+}
+
+/* 2. Theme: Imperial Gold & Jewel Reliquary */
+[data-theme="imperial_gold"] .stage-clear-overlay,
+[data-theme="imperial_gold"] .realms-browser-overlay,
+[data-theme="imperial_gold"] .onboarding-overlay,
+[data-theme="imperial_gold"] .match-overlay,
+[data-theme="imperial_gold"] .modal-overlay {
+    background: rgba(14, 8, 4, 0.85) !important;
+}
+
+[data-theme="imperial_gold"] .stage-clear-card,
+[data-theme="imperial_gold"] .realms-browser-card,
+[data-theme="imperial_gold"] .onboarding-card,
+[data-theme="imperial_gold"] .settings-modal,
+[data-theme="imperial_gold"] #field-guide-col,
+[data-theme="imperial_gold"] #status-prahar-col,
+[data-theme="imperial_gold"] .drawer-toggle-left,
+[data-theme="imperial_gold"] .drawer-toggle-right {
+    background: rgba(24, 15, 8, 0.97) !important;
+    border-color: rgba(251, 191, 36, 0.5) !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85), 0 0 24px rgba(251, 191, 36, 0.2) !important;
+    color: #fdf6e2 !important;
+}
+
+[data-theme="imperial_gold"] .stage-clear-card .cta-btn,
+[data-theme="imperial_gold"] .realms-browser-card .cta-btn,
+[data-theme="imperial_gold"] #name-entry-modal #btn-submit-name {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: #100a06 !important;
+    font-weight: 700 !important;
+    border: 1px solid rgba(255, 215, 0, 0.6) !important;
+    box-shadow: 0 4px 14px rgba(245, 158, 11, 0.4) !important;
+}
+
+/* 3. Theme: Royal Lapis & Golden Cloisonne */
+[data-theme="royal_lapis"] .stage-clear-overlay,
+[data-theme="royal_lapis"] .realms-browser-overlay,
+[data-theme="royal_lapis"] .onboarding-overlay,
+[data-theme="royal_lapis"] .match-overlay,
+[data-theme="royal_lapis"] .modal-overlay {
+    background: rgba(2, 8, 20, 0.85) !important;
+}
+
+[data-theme="royal_lapis"] .stage-clear-card,
+[data-theme="royal_lapis"] .realms-browser-card,
+[data-theme="royal_lapis"] .onboarding-card,
+[data-theme="royal_lapis"] .settings-modal,
+[data-theme="royal_lapis"] #field-guide-col,
+[data-theme="royal_lapis"] #status-prahar-col,
+[data-theme="royal_lapis"] .drawer-toggle-left,
+[data-theme="royal_lapis"] .drawer-toggle-right {
+    background: rgba(4, 14, 32, 0.97) !important;
+    border-color: rgba(0, 229, 255, 0.5) !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85), 0 0 24px rgba(0, 229, 255, 0.2) !important;
+    color: #e0f2fe !important;
+}
+
+[data-theme="royal_lapis"] .stage-clear-card .cta-btn,
+[data-theme="royal_lapis"] .realms-browser-card .cta-btn,
+[data-theme="royal_lapis"] #name-entry-modal #btn-submit-name {
+    background: linear-gradient(135deg, #00e5ff, #0077b6) !important;
+    color: #040d1a !important;
+    font-weight: 700 !important;
+    border: 1px solid rgba(0, 229, 255, 0.6) !important;
+    box-shadow: 0 4px 14px rgba(0, 229, 255, 0.4) !important;
+}
+
+/* 4. Theme: Botanical Art Campaign */
+[data-theme="botanical"] .stage-clear-overlay,
+[data-theme="botanical"] .realms-browser-overlay,
+[data-theme="botanical"] .onboarding-overlay,
+[data-theme="botanical"] .match-overlay,
+[data-theme="botanical"] .modal-overlay {
+    background: rgba(6, 12, 22, 0.85) !important;
+}
+
+[data-theme="botanical"] .stage-clear-card,
+[data-theme="botanical"] .realms-browser-card,
+[data-theme="botanical"] .onboarding-card,
+[data-theme="botanical"] .settings-modal,
+[data-theme="botanical"] #field-guide-col,
+[data-theme="botanical"] #status-prahar-col,
+[data-theme="botanical"] .drawer-toggle-left,
+[data-theme="botanical"] .drawer-toggle-right {
+    background: rgba(10, 20, 36, 0.97) !important;
+    border-color: rgba(244, 114, 182, 0.45) !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85), 0 0 24px rgba(236, 72, 153, 0.2) !important;
+    color: #fdf2f8 !important;
+}
+
+[data-theme="botanical"] .stage-clear-card .cta-btn,
+[data-theme="botanical"] .realms-browser-card .cta-btn,
+[data-theme="botanical"] #name-entry-modal #btn-submit-name {
+    background: linear-gradient(135deg, #ec4899, #be185d) !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+    border: 1px solid rgba(244, 114, 182, 0.6) !important;
+    box-shadow: 0 4px 14px rgba(236, 72, 153, 0.4) !important;
 }
