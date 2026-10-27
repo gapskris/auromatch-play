@@ -299,37 +299,40 @@ export class BoardRenderer {
 
 
 
-    // Isometric depth compensation:
-
+    // Isometric depth compensation & exact bounding box centering:
     // Tiles have isoDx = -(tile.z * 2.5) and isoDy = -(tile.z * 3.5).
+    // Calculate the actual relative pixel bounds of the entire stage including isometric offsets
+    let minRelX = 0, maxRelX = (maxX - minX) * colSpacing + width;
+    let minRelY = 0, maxRelY = (maxY - minY) * rowSpacing + height;
 
-    // Ensure top-most & left-most layer tiles never clip or bleed above/left of container.
+    if (allStageTiles.length > 0) {
+      minRelX = Infinity; maxRelX = -Infinity;
+      minRelY = Infinity; maxRelY = -Infinity;
+      allStageTiles.forEach(t => {
+        const rx = (t.x - minX) * colSpacing - (t.z * 2.5);
+        if (rx < minRelX) minRelX = rx;
+        if (rx + width > maxRelX) maxRelX = rx + width;
+        const ry = (t.y - minY) * rowSpacing - (t.z * 3.5);
+        if (ry < minRelY) minRelY = ry;
+        if (ry + height > maxRelY) maxRelY = ry + height;
+      });
+    }
+
+    const actualBoardW = maxRelX - minRelX;
+    const actualBoardH = maxRelY - minRelY;
 
     const minSafeOffsetX = Math.ceil(maxZ * 2.5) + (isMobile ? 6 : 10);
-
     const minSafeOffsetY = Math.ceil(maxZ * 3.5) + (isMobile ? 14 : 14);
 
-
-
     let offsetX = minSafeOffsetX;
-
-    if (containerW && containerW > boardTotalW) {
-
-      offsetX = Math.max(minSafeOffsetX, Math.floor((containerW - boardTotalW) / 2));
-
+    if (containerW && containerW > actualBoardW) {
+      offsetX = Math.max(minSafeOffsetX, Math.floor((containerW - actualBoardW) / 2) - minRelX);
     }
-
-
 
     let offsetY = minSafeOffsetY;
-
-    if (containerH && containerH > boardTotalH) {
-
-      offsetY = Math.max(minSafeOffsetY, Math.floor((containerH - boardTotalH) / 2));
-
+    if (containerH && containerH > actualBoardH) {
+      offsetY = Math.max(minSafeOffsetY, Math.floor((containerH - actualBoardH) / 2) - minRelY);
     }
-
-
 
     return {
 

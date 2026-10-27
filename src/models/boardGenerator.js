@@ -11,16 +11,16 @@ export class VitaBoardGenerator {
   static isTileFree(tile, activeTiles) {
     if (tile.isMatched) return false;
 
-    // 1. Upper layer occlusion check (z + 1)
+    // 1. Upper layer occlusion check (any tile at z > tile.z)
     for (const other of activeTiles) {
       if (other.id === tile.id || other.isMatched) continue;
 
-      if (other.z === tile.z + 1) {
+      if (other.z > tile.z) {
         const dx = Math.abs(other.x - tile.x);
         const dy = Math.abs(other.y - tile.y);
-        // Overlap bounding box [x - 0.9, x + 0.9] x [y - 0.9, y + 0.9]
-        if (dx < 0.9 && dy < 0.9) {
-          return false; // Covered from above
+        // Overlap bounding box [x - 0.88, x + 0.88] x [y - 0.88, y + 0.88]
+        if (dx < 0.88 && dy < 0.88) {
+          return false; // Covered from above by a higher tier tile
         }
       }
     }
@@ -54,28 +54,163 @@ export class VitaBoardGenerator {
     return active.filter(t => this.isTileFree(t, active));
   }
 
-  // Helper: Scale layouts up to high tile counts (e.g. 72, 84, 96, 108) by stacking upper tiers
+  // Multi-Tier Stacking Engine: Preserves 3 to 7 layers with true underneath occlusions and stable foundations
   static _padToTarget(coords, targetCount) {
-    if (coords.length >= targetCount) {
-      return coords.slice(0, targetCount);
+    if (coords.length === targetCount) return coords;
+
+    // Upward expansion when targetCount exceeds base template
+    if (coords.length < targetCount) {
+      const result = [...coords];
+      const set = new Set(result.map(c => `${c.x}_${c.y}_${c.z}`));
+      let zTier = 1;
+      const maxTier = targetCount >= 72 ? 7 : (targetCount >= 48 ? 5 : 3);
+      while (result.length < targetCount && zTier <= maxTier) {
+        const currentLen = result.length;
+        for (let i = 0; i < currentLen && result.length < targetCount; i++) {
+          const base = result[i];
+          if (base.z === zTier - 1) {
+            const key = `${base.x}_${base.y}_${zTier}`;
+            if (!set.has(key)) {
+              set.add(key);
+              result.push({ x: base.x, y: base.y, z: zTier });
+            }
+          }
+        }
+        zTier++;
+      }
+      return result.slice(0, targetCount);
     }
-    const set = new Set(coords.map(c => `${c.x}_${c.y}_${c.z}`));
-    let zTier = 1;
-    while (coords.length < targetCount && zTier <= 5) {
-      const currentLen = coords.length;
-      for (let i = 0; i < currentLen && coords.length < targetCount; i++) {
-        const base = coords[i];
-        if (base.z === zTier - 1) {
-          const key = `${base.x}_${base.y}_${zTier}`;
-          if (!set.has(key)) {
-            set.add(key);
-            coords.push({ x: base.x, y: base.y, z: zTier });
+
+    // Smart Multi-Tier Quota Trimming: Enforces bilateral horizontal symmetry and protects upper layers & foundations
+    const minLayer0 = Math.ceil(targetCount * 0.45);
+    const maxLayer1 = Math.floor(targetCount * 0.32);
+    const maxLayer2 = Math.floor(targetCount * 0.18);
+    const maxLayer3 = Math.max(1, Math.floor(targetCount * 0.10));
+
+    let current = [...coords];
+    const minX0 = Math.min(...current.map(t => t.x));
+    const maxX0 = Math.max(...current.map(t => t.x));
+    const cx = (minX0 + maxX0) / 2;
+    const cy = current.reduce((sum, t) => sum + t.y, 0) / current.length;
+
+    while (current.length > targetCount) {
+      const layerCounts = {};
+      current.forEach(t => layerCounts[t.z] = (layerCounts[t.z] || 0) + 1);
+
+      // Tile is unsupporting if no other tile sits directly on top at z + 1
+      const isSupporting = (t) => current.some(u => u.z === t.z + 1 && Math.abs(u.x - t.x) <= 0.85 && Math.abs(u.y - t.y) <= 0.85);
+
+      const pairs = [];
+      const solos = [];
+      const visited = new Set();
+
+      for (let i = 0; i < current.length; i++) {
+        if (visited.has(i)) continue;
+        const t = current[i];
+        if (isSupporting(t)) continue;
+
+        const isCenter = Math.abs(t.x - cx) < 0.01;
+        if (isCenter) {
+          // Solo tile on symmetry axis
+          const dist = Math.hypot(t.x - cx, t.y - cy);
+          let score = dist;
+          if (t.z >= 3 && (layerCounts[t.z] || 0) > maxLayer3) score += 5000 + t.z * 100;
+          else if (t.z === 2 && (layerCounts[t.z] || 0) > maxLayer2) score += 5000 + t.z * 100;
+          else if (t.z === 1 && (layerCounts[t.z] || 0) > maxLayer1) score += 5000 + t.z * 100;
+          else if (t.z === 0) {
+            if ((layerCounts[0] || 0) <= minLayer0) score -= 2000;
+            else score += 1000;
+          } else {
+            score += (4 - t.z) * 500;
+          }
+          solos.push({ indices: [i], score, tiles: [t] });
+          visited.add(i);
+        } else {
+          // Find mirror partner: mirrorX = 2 * cx - t.x
+          const mirrorX = 2 * cx - t.x;
+          let partnerIdx = -1;
+          for (let j = i + 1; j < current.length; j++) {
+            if (visited.has(j)) continue;
+            const u = current[j];
+            if (u.z === t.z && Math.abs(u.y - t.y) < 0.01 && Math.abs(u.x - mirrorX) < 0.01) {
+              partnerIdx = j;
+              break;
+            }
+          }
+
+          if (partnerIdx !== -1) {
+            const partner = current[partnerIdx];
+            if (!isSupporting(partner)) {
+              const dist = Math.hypot(t.x - cx, t.y - cy);
+              let score = dist;
+              if (t.z >= 3 && (layerCounts[t.z] || 0) > maxLayer3) score += 5000 + t.z * 100;
+              else if (t.z === 2 && (layerCounts[t.z] || 0) > maxLayer2) score += 5000 + t.z * 100;
+              else if (t.z === 1 && (layerCounts[t.z] || 0) > maxLayer1) score += 5000 + t.z * 100;
+              else if (t.z === 0) {
+                if ((layerCounts[0] || 0) <= minLayer0) score -= 2000;
+                else score += 1000;
+              } else {
+                score += (4 - t.z) * 500;
+              }
+              pairs.push({ indices: [i, partnerIdx], score, tiles: [t, partner] });
+              visited.add(i);
+              visited.add(partnerIdx);
+            }
+          } else {
+            const dist = Math.hypot(t.x - cx, t.y - cy);
+            solos.push({ indices: [i], score: dist, tiles: [t] });
+            visited.add(i);
           }
         }
       }
-      zTier++;
+
+      pairs.sort((a, b) => b.score - a.score);
+      solos.sort((a, b) => b.score - a.score);
+
+      const diff = current.length - targetCount;
+      let removed = false;
+
+      // When diff >= 2, preferentially trim symmetric pairs to maintain 100% bilateral symmetry
+      if (diff >= 2 && pairs.length > 0) {
+        for (const pair of pairs) {
+          const testRemain = current.filter((_, idx) => !pair.indices.includes(idx));
+          const dummy = testRemain.map(c => ({ id: `${c.x}_${c.y}_${c.z}`, x: c.x, y: c.y, z: c.z, isMatched: false }));
+          const playable = dummy.filter(t => VitaBoardGenerator.isTileFree(t, dummy));
+          if (playable.length >= 2) {
+            const sortedIdx = [...pair.indices].sort((a, b) => b - a);
+            sortedIdx.forEach(idx => current.splice(idx, 1));
+            removed = true;
+            break;
+          }
+        }
+      }
+
+      // If no pair could be removed or diff is 1, trim solo axis or outer tile
+      if (!removed && solos.length > 0) {
+        for (const solo of solos) {
+          const testRemain = current.filter((_, idx) => !solo.indices.includes(idx));
+          const dummy = testRemain.map(c => ({ id: `${c.x}_${c.y}_${c.z}`, x: c.x, y: c.y, z: c.z, isMatched: false }));
+          const playable = dummy.filter(t => VitaBoardGenerator.isTileFree(t, dummy));
+          if (playable.length >= 2) {
+            current.splice(solo.indices[0], 1);
+            removed = true;
+            break;
+          }
+        }
+      }
+
+      if (!removed) {
+        const fallback = pairs.length > 0 ? pairs[0] : (solos.length > 0 ? solos[0] : null);
+        if (fallback) {
+          const sortedIdx = [...fallback.indices].sort((a, b) => b - a);
+          sortedIdx.forEach(idx => current.splice(idx, 1));
+        } else {
+          current.pop();
+        }
+      }
     }
-    return coords.slice(0, targetCount);
+
+    return current;
   }
 
   // 1. Pyramid (Shikhara - Concentric centered pyramid)
@@ -101,8 +236,9 @@ export class VitaBoardGenerator {
   // 2. Twin Pillars & Gateway Bridge (H-Gate - Watermelon Mahjong style!)
   static _genHGate(targetCount) {
     const coords = [];
-    const W = targetCount <= 36 ? 6 : (targetCount <= 60 ? 7 : 8);
+    const W = targetCount <= 36 ? 6 : 8;
     const H = 5;
+    const cx = (W - 1) / 2;
 
     // Corner pillar positions (4 corners, 2 tiles wide each: total 8 base slots)
     const cornerCols = [0, 1, W - 2, W - 1];
@@ -116,15 +252,15 @@ export class VitaBoardGenerator {
       }
     }
 
-    // Layer 1: 8 corner stacks + 2 bridge tiles
+    // Layer 1: 8 corner stacks + symmetric bridge tiles
     cornerCols.forEach(c => cornerRows.forEach(r => coords.push({ x: c * 1.0, y: r * 1.0, z: 1 })));
-    coords.push({ x: 2.5, y: 1.0, z: 1 });
-    coords.push({ x: 2.5, y: 3.0, z: 1 });
+    coords.push({ x: cx, y: 1.0, z: 1 });
+    coords.push({ x: cx, y: 3.0, z: 1 });
 
-    // Layer 2: 4 outer corner pillars + 2 bridge crests
+    // Layer 2: 4 outer corner pillars + 2 symmetric bridge crests
     [0, W - 1].forEach(c => cornerRows.forEach(r => coords.push({ x: c * 1.0, y: r * 1.0, z: 2 })));
     coords.push({ x: 2.0, y: 2.0, z: 2 });
-    coords.push({ x: W - 3, y: 2.0, z: 2 });
+    coords.push({ x: W - 1 - 2.0, y: 2.0, z: 2 });
 
     // Layer 3: 4 outer corner peaks (4 layers deep!)
     [0, W - 1].forEach(c => cornerRows.forEach(r => coords.push({ x: c * 1.0, y: r * 1.0, z: 3 })));
@@ -156,7 +292,7 @@ export class VitaBoardGenerator {
         const dx = Math.abs(c - cx);
         const dy = Math.abs(r - cy);
         if (dx + dy <= 3 && !(dx === 2 && dy === 2)) {
-          coords.push({ x: c * 1.0 + 0.5, y: r * 1.0 + 0.5, z: 1 });
+          coords.push({ x: c * 1.0, y: r * 1.0, z: 1 });
         }
       }
     }
@@ -367,10 +503,10 @@ export class VitaBoardGenerator {
         if (isLoop1 || isLoop2 || isCenter) coords.push({ x: c * 1.0, y: r * 1.0, z: 0 });
       }
     }
-    for (let c = 1; c < W - 1; c += 2) {
+    [1, 2, 5, 6].forEach(c => {
       coords.push({ x: c * 1.0, y: 0, z: 1 });
       coords.push({ x: c * 1.0, y: H - 1, z: 1 });
-    }
+    });
     for (let r = 1; r < H - 1; r++) {
       coords.push({ x: 0, y: r * 1.0, z: 1 });
       coords.push({ x: W - 1, y: r * 1.0, z: 1 });
