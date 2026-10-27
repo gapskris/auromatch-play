@@ -6344,3 +6344,93 @@ body[data-theme="royal_lapis"] .settings-modal {
     border-color: rgba(0, 229, 255, 0.5) !important;
     box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 229, 255, 0.2) !important;
 }
+
+/* ==========================================================================
+   ✨ AuroMatch Tile Club High-Fidelity 3D Tray Enhancements
+   ========================================================================== */
+.tray-slot {
+    flex: 1;
+    min-width: clamp(38px, 10vw, 56px);
+    max-width: 64px;
+    height: 68px;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1.5px dashed rgba(197, 168, 128, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    padding: 2px;
+}
+
+.tray-tile {
+    width: 100%;
+    max-width: 54px;
+    height: 100%;
+    max-height: 64px;
+    aspect-ratio: 44 / 58;
+    background: var(--cream-tile);
+    border: 1px solid #d4c7b3;
+    border-radius: 8px;
+    box-shadow: 0 3px 0 var(--cream-edge);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px;
+    animation: slideIntoTray 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+    user-select: none;
+    cursor: pointer;
+    position: relative;
+    overflow: visible;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.tray-tile-art {
+    background: #0f172a;
+    border: 1.5px solid rgba(251, 191, 36, 0.65) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), 0 0 10px rgba(251, 191, 36, 0.25) !important;
+    padding: 0 !important;
+}
+
+[data-theme="royal_lapis"] .tray-tile-art {
+    border-color: rgba(0, 229, 255, 0.65) !important;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 229, 255, 0.25) !important;
+}
+
+.tray-tile-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    border-radius: 6px;
+    pointer-events: none;
+}
+
+.tray-tile-fallback {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2px;
+    text-align: center;
+}
+
+.tray-pair-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: #000;
+    font-size: 8px;
+    font-weight: 900;
+    border-radius: 6px;
+    padding: 1px 4px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    z-index: 10;
+}

@@ -891,6 +891,10 @@ export class GameManager {
       this.player.score = (this.player.score || 0) + 250;
       this.savePlayerState();
 
+      const flora = (cleared.length > 0 && cleared[0].floraData)
+        ? cleared[0].floraData
+        : (typeof getFloraById === 'function' ? getFloraById(matchedFloraId) : null);
+
       if (this.onMatchSuccess) {
         this.onMatchSuccess({
           mode: 'tile_club',
@@ -971,15 +975,38 @@ export class GameManager {
     });
 
     let hintFound = false;
-    for (const fId in groups) {
-      if (groups[fId].length >= K) {
-        const hintIds = groups[fId].slice(0, K).map(t => t.id);
-        this.boardRenderer.highlightTiles(hintIds);
-        setTimeout(() => {
-          if (this.boardRenderer) this.boardRenderer.clearHighlights();
-        }, 2500);
-        hintFound = true;
-        break;
+    if (this.gameplayMode === 'tile_club') {
+      // Prioritize completing triads where tiles are already pending in tray
+      const trayCounts = {};
+      this.tray.forEach(t => {
+        trayCounts[t.floraId] = (trayCounts[t.floraId] || 0) + 1;
+      });
+      const sortedTrayFlora = Object.keys(trayCounts).sort((a, b) => trayCounts[b] - trayCounts[a]);
+      for (const fId of sortedTrayFlora) {
+        const needed = 3 - trayCounts[fId];
+        if (needed > 0 && groups[fId] && groups[fId].length >= needed) {
+          const hintIds = groups[fId].slice(0, needed).map(t => t.id);
+          this.boardRenderer.highlightTiles(hintIds);
+          setTimeout(() => {
+            if (this.boardRenderer) this.boardRenderer.clearHighlights();
+          }, 2500);
+          hintFound = true;
+          break;
+        }
+      }
+    }
+
+    if (!hintFound) {
+      for (const fId in groups) {
+        if (groups[fId].length >= K) {
+          const hintIds = groups[fId].slice(0, K).map(t => t.id);
+          this.boardRenderer.highlightTiles(hintIds);
+          setTimeout(() => {
+            if (this.boardRenderer) this.boardRenderer.clearHighlights();
+          }, 2500);
+          hintFound = true;
+          break;
+        }
       }
     }
 

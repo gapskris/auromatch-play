@@ -17,6 +17,7 @@ export const ragaDrone = {
 
 export function getAudioContext() {
     if (!audioCtx) {
+        if (typeof window === 'undefined') return null;
         const AudioContextClass = window.AudioContext || window.webkitAudioContext;
         if (AudioContextClass) {
             audioCtx = new AudioContextClass();

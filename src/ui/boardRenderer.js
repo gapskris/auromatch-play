@@ -559,7 +559,9 @@ export class BoardRenderer {
 
 
 
-      el.title = isFree ? `${flora.commonName} (${flora.domain})` : `${flora.commonName} (Blocked: clear covering tiles)`;
+      const tileName = tile.thematicName || (flora && flora.customName) || (flora && flora.commonName) || 'Tile';
+      const domainInfo = (flora && flora.domain) ? ` (${flora.domain})` : '';
+      el.title = isFree ? `${tileName}${domainInfo}` : `${tileName} (Blocked: clear covering tiles)`;
 
 
 

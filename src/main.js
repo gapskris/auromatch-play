@@ -117,22 +117,43 @@ window.addEventListener('load', () => {
                     const arch = f.archetype || 'ivory';
                     const countInTray = floraCounts[t.floraId] || 1;
                     const isPairInTray = countInTray === 2;
+                    const customImg = t.customImage || (f && f.customImage) || null;
+                    const tileName = t.thematicName || (f && f.customName) || (f && f.commonName) || 'Tile';
+                    const tileSym = t.thematicSymbol || (f && f.customSymbol) || (f && f.symbol) || '✨';
 
                     if (isPairInTray) {
                         slot.classList.add('tray-slot-pair-pending');
                     }
 
-                    slot.innerHTML = `
-                        <div class="tray-tile archetype-${arch} ${isPairInTray ? 'tray-pair-glow' : ''}"
-                             onclick="window.handleReturnTrayTile && window.handleReturnTrayTile('${t.id}')"
-                             title="Tap to return this tile to board"
-                             role="button"
-                             aria-label="${f.commonName || 'Tile'}, tap to return to board">
-                            <div class="tray-tile-symbol">${f.symbol || '🪷'}</div>
-                            <div class="tray-tile-label">${f.commonName || ''}</div>
-                            ${isPairInTray ? '<span class="tray-pair-badge">2/3</span>' : ''}
-                        </div>
-                    `;
+                    if (customImg) {
+                        slot.innerHTML = `
+                            <div class="tray-tile tray-tile-art ${isPairInTray ? 'tray-pair-glow' : ''}"
+                                 onclick="window.handleReturnTrayTile && window.handleReturnTrayTile('${t.id}')"
+                                 title="Tap to return ${tileName} to board"
+                                 role="button"
+                                 aria-label="${tileName}, tap to return to board">
+                                <img class="tray-tile-img" src="${customImg}" alt="${tileName}" draggable="false"
+                                     onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" />
+                                <div class="tray-tile-fallback" style="display: none;">
+                                    <span class="tray-tile-symbol">${tileSym}</span>
+                                    <span class="tray-tile-label">${tileName}</span>
+                                </div>
+                                ${isPairInTray ? '<span class="tray-pair-badge">2/3</span>' : ''}
+                            </div>
+                        `;
+                    } else {
+                        slot.innerHTML = `
+                            <div class="tray-tile archetype-${arch} ${isPairInTray ? 'tray-pair-glow' : ''}"
+                                 onclick="window.handleReturnTrayTile && window.handleReturnTrayTile('${t.id}')"
+                                 title="Tap to return ${tileName} to board"
+                                 role="button"
+                                 aria-label="${tileName}, tap to return to board">
+                                <div class="tray-tile-symbol">${tileSym}</div>
+                                <div class="tray-tile-label">${tileName}</div>
+                                ${isPairInTray ? '<span class="tray-pair-badge">2/3</span>' : ''}
+                            </div>
+                        `;
+                    }
                 }
             });
         }
