@@ -2,21 +2,19 @@
 
     /* Solar Evening / Sanctuary Palette */
 
-    --bg-evening: radial-gradient(circle at center, #0e4e37 0%, #041812 100%);
+    --bg-evening: radial-gradient(circle at center, #1e1302 0%, #0d0701 100%);
 
-    --panel-evening: rgba(4, 24, 18, 0.65);
+--panel-evening: rgba(19, 11, 2, 0.72);
 
-    --border-evening: rgba(255, 255, 255, 0.08);
+--border-evening: rgba(255, 215, 0, 0.22);
 
-    --text-evening: #f4f4f5;
+--text-evening: #fdf6e2;
 
-    --accent-evening: #c5a880; /* Spiritual Gold */
+--accent-evening: #f59e0b; /* Imperial Gold */
 
-    --glass-overlay-evening: rgba(4, 24, 18, 0.85);
+--glass-overlay-evening: rgba(19, 11, 2, 0.88);
 
-
-
-    /* Solar Morning / Sunrise Palette */
+/* Solar Morning / Sunrise Palette */
 
     --bg-morning: linear-gradient(135deg, #fdfcf7 0%, #f7f3e3 100%);
 
@@ -112,7 +110,7 @@ body {
 
     padding: 10px;
 
-    transition: background 2.0s ease, color 2.0s ease, border-color 2.0s ease;
+    transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 
 }
 
@@ -174,7 +172,7 @@ body {
 
     z-index: 5;
 
-    transition: background 2.0s ease, border-color 2.0s ease;
+    transition: background 0.3s ease, border-color 0.3s ease;
 
 }
 

@@ -1,4 +1,13 @@
 // Main Application Entry Module
+// Synchronous immediate theme application (Zero-FOUC on script execution)
+try {
+  const savedTheme = (typeof localStorage !== 'undefined') ? localStorage.getItem('auromatch_standard_theme') : null;
+  const initialTheme = (savedTheme === 'royal_lapis') ? 'royal_lapis' : 'imperial_gold';
+  if (typeof document !== 'undefined') {
+    if (document.documentElement) document.documentElement.setAttribute('data-theme', initialTheme);
+    if (document.body) document.body.setAttribute('data-theme', initialTheme);
+  }
+} catch (e) {}
 import { loadProfileState, saveProfileState, encryptAndExportBackup, decryptAndImportBackup, executeAbsolutePurge, profileState } from './controllers/storageAdapter.js';
 import { initAudioEngine, playAshramMeditationGong } from './audio/synthesizer.js';
 import { updateVolumeSetting, updateVoicePreference, updateSanctuaryMode, toggleSecularTerminology, updateExperienceMode } from './controllers/settings.js';

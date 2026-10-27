@@ -1,9 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="imperial_gold">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>AuroMatch - Triple Garden of Significances</title>
+
+    <!-- Immediate Theme Initialization (Zero-FOUC Frame 0 Boot) -->
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('auromatch_standard_theme');
+          var theme = (saved === 'royal_lapis') ? 'royal_lapis' : 'imperial_gold';
+          document.documentElement.setAttribute('data-theme', theme);
+          if (document.body) document.body.setAttribute('data-theme', theme);
+        } catch(e) {}
+      })();
+    </script>
 
     <!-- Cross-Platform PWA & Mobile Meta (Android, iOS, iPadOS, Tablets, PC) -->
     <meta name="mobile-web-app-capable" content="yes">
@@ -11,8 +23,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="AuroMatch">
     <meta name="application-name" content="AuroMatch">
-    <meta name="theme-color" content="#07382a">
-    <meta name="msapplication-TileColor" content="#021a12">
+    <meta name="theme-color" content="#1e1302">
+    <meta name="msapplication-TileColor" content="#0d0701">
 
     <!-- Multi-Platform App Icons (SVG, PNG, Apple Touch Icon, Manifest) -->
     <link rel="icon" type="image/svg+xml" href="./Assets/icons/logo.svg">
@@ -27,7 +39,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Outfit:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
 </head>
-<body>
+<body data-theme="imperial_gold">
 
     <!-- Drifting Stardust Canvas background -->
     <canvas id="stardust-canvas"></canvas>
@@ -45,9 +57,9 @@
             <svg class="logo-glowing-lotus" viewBox="0 0 512 512" aria-label="AuroMatch Emblem" role="img">
               <defs>
                 <linearGradient id="wel-bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stop-color="#021a12"/>
-                  <stop offset="45%" stop-color="#07382a"/>
-                  <stop offset="100%" stop-color="#0d4a37"/>
+                  <stop offset="0%" stop-color="#1e1302"/>
+                  <stop offset="45%" stop-color="#2d1b04"/>
+                  <stop offset="100%" stop-color="#452b08"/>
                 </linearGradient>
                 <linearGradient id="wel-gold-rim" x1="0%" y1="0%" x2="100%" y2="100%">
                   <stop offset="0%" stop-color="#fde68a"/>
@@ -68,9 +80,9 @@
                 </linearGradient>
                 <radialGradient id="wel-core-glow" cx="50%" cy="50%" r="50%">
                   <stop offset="0%" stop-color="#fde047" stop-opacity="0.8"/>
-                  <stop offset="40%" stop-color="#10b981" stop-opacity="0.35"/>
-                  <stop offset="75%" stop-color="#059669" stop-opacity="0.12"/>
-                  <stop offset="100%" stop-color="#021a12" stop-opacity="0"/>
+                  <stop offset="40%" stop-color="#f59e0b" stop-opacity="0.35"/>
+                  <stop offset="75%" stop-color="#b45309" stop-opacity="0.12"/>
+                  <stop offset="100%" stop-color="#0d0701" stop-opacity="0"/>
                 </radialGradient>
               </defs>
               <rect x="16" y="16" width="480" height="480" rx="108" fill="url(#wel-bg-grad)" stroke="url(#wel-gold-rim)" stroke-width="7"/>
