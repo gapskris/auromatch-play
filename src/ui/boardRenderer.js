@@ -145,6 +145,7 @@ export class BoardRenderer {
   computeStageMetrics(containerW, containerH) {
 
     const isRealmsMode = (this.options.gameplayMode === 'realms');
+    const isArtThemeMode = (this.options.gameplayMode === 'realms' || this.options.gameplayMode === 'botanical');
 
     const isTileClubMode = (this.options.gameplayMode === 'tile_club');
 
@@ -192,9 +193,9 @@ export class BoardRenderer {
 
 
 
-    const aspect = isRealmsMode ? 1.125 : 1.294;
+    const aspect = isArtThemeMode ? 1.125 : 1.294;
 
-    const spacingFactor = isRealmsMode ? 0.86 : 0.85;
+    const spacingFactor = isArtThemeMode ? 0.86 : 0.85;
 
 
 
@@ -248,7 +249,7 @@ export class BoardRenderer {
 
       minAllowed = isSenior ? 48 : 42;
 
-      maxAllowed = isSenior ? 84 : (isRealmsMode ? 82 : 72);
+      maxAllowed = isSenior ? 84 : (isArtThemeMode ? 82 : 72);
 
     } else if (isTablet) {
 
@@ -597,7 +598,8 @@ export class BoardRenderer {
 
       const isRealmsMode = (this.options.gameplayMode === 'realms');
 
-      const customImg = isRealmsMode ? (tile.customImage || (flora && flora.customImage) || null) : null;
+      const isArtThemeMode = (this.options.gameplayMode === 'realms' || this.options.gameplayMode === 'botanical');
+      const customImg = isArtThemeMode ? (tile.customImage || (flora && flora.customImage) || null) : null;
 
 
 
