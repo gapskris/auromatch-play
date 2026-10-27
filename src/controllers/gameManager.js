@@ -209,6 +209,7 @@ export class GameManager {
           stageCol.style.backgroundImage = `url('${stdTheme.bgImage}')`;
         }
         document.body.setAttribute('data-theme', this.standardTheme);
+        if (document.documentElement) document.documentElement.setAttribute('data-theme', this.standardTheme);
       }
     }
 
@@ -1116,7 +1117,8 @@ export class GameManager {
         activeRealm: (this.gameplayMode === 'realms') ? (this.activeRealm || ThemeManager.getRealmForLevel(this.player.currentLevel)) : null,
         rank: this.getRank(),
         isNewUser: !!this.player.isNewUser,
-        hintsUsedInStage: this.hintsUsedInStage
+        hintsUsedInStage: this.hintsUsedInStage,
+        standardTheme: this.standardTheme
       });
     }
   }

@@ -5985,3 +5985,364 @@ body {
     box-shadow: 0 0 15px rgba(0, 229, 255, 0.5);
     transform: scale(1.03);
 }
+
+
+/* ==========================================================================
+   COMPREHENSIVE GLOBAL THEME SYSTEM: IMPERIAL GOLD & ROYAL LAPIS
+   High-specificity full application skinning (Viewport, Header, HUD, Settings, Drawers)
+   ========================================================================== */
+
+/* 1. Root & High-Specificity Variables Override */
+html[data-theme="imperial_gold"],
+body[data-theme="imperial_gold"],
+body[data-theme="imperial_gold"] #app-wrapper,
+body[data-theme="imperial_gold"] .app-container {
+    --bg-current: radial-gradient(circle at center, #24140e 0%, #110805 100%) !important;
+    --panel-current: rgba(22, 13, 8, 0.88) !important;
+    --border-current: rgba(251, 191, 36, 0.38) !important;
+    --text-current: #fef3c7 !important;
+    --accent-current: #fbbf24 !important;
+    --overlay-current: rgba(14, 7, 5, 0.90) !important;
+    --theme-accent: #fbbf24;
+    --theme-accent-gradient: linear-gradient(135deg, #f59e0b, #d97706);
+    --theme-accent-glow: rgba(251, 191, 36, 0.45);
+}
+
+html[data-theme="royal_lapis"],
+body[data-theme="royal_lapis"],
+body[data-theme="royal_lapis"] #app-wrapper,
+body[data-theme="royal_lapis"] .app-container {
+    --bg-current: radial-gradient(circle at center, #0a1b38 0%, #020712 100%) !important;
+    --panel-current: rgba(4, 14, 32, 0.90) !important;
+    --border-current: rgba(0, 229, 255, 0.38) !important;
+    --text-current: #e0f2fe !important;
+    --accent-current: #00e5ff !important;
+    --overlay-current: rgba(2, 7, 18, 0.90) !important;
+    --theme-accent: #00e5ff;
+    --theme-accent-gradient: linear-gradient(135deg, #00b4d8, #0077b6);
+    --theme-accent-glow: rgba(0, 229, 255, 0.45);
+}
+
+html[data-theme="botanical"],
+body[data-theme="botanical"],
+body[data-theme="botanical"] #app-wrapper,
+body[data-theme="botanical"] .app-container {
+    --bg-current: radial-gradient(circle at center, #0a1728 0%, #030812 100%) !important;
+    --panel-current: rgba(8, 18, 32, 0.88) !important;
+    --border-current: rgba(244, 114, 182, 0.38) !important;
+    --text-current: #fdf2f8 !important;
+    --accent-current: #f472b6 !important;
+    --overlay-current: rgba(4, 9, 16, 0.90) !important;
+}
+
+/* 2. Outer Viewport Surrounding Canvas */
+html[data-theme="imperial_gold"],
+body[data-theme="imperial_gold"] {
+    background: radial-gradient(circle at 50% 45%, #2a1620 0%, #150b12 60%, #0a0509 100%) !important;
+}
+html[data-theme="royal_lapis"],
+body[data-theme="royal_lapis"] {
+    background: radial-gradient(circle at 50% 45%, #0d1e3d 0%, #060e1f 60%, #02060d 100%) !important;
+}
+html[data-theme="botanical"],
+body[data-theme="botanical"] {
+    background: radial-gradient(circle at 50% 45%, #0d1c33 0%, #060e1a 60%, #02050a 100%) !important;
+}
+
+/* 3. App Container Outer Shell */
+body[data-theme="imperial_gold"] .app-container {
+    background: rgba(20, 12, 7, 0.92) !important;
+    border-color: rgba(251, 191, 36, 0.45) !important;
+    box-shadow: 0 0 50px rgba(245, 158, 11, 0.20), 0 24px 64px rgba(0, 0, 0, 0.8) !important;
+}
+body[data-theme="royal_lapis"] .app-container {
+    background: rgba(4, 13, 30, 0.92) !important;
+    border-color: rgba(0, 229, 255, 0.45) !important;
+    box-shadow: 0 0 50px rgba(0, 229, 255, 0.20), 0 24px 64px rgba(0, 0, 0, 0.8) !important;
+}
+body[data-theme="botanical"] .app-container {
+    background: rgba(8, 18, 32, 0.92) !important;
+    border-color: rgba(244, 114, 182, 0.45) !important;
+    box-shadow: 0 0 50px rgba(236, 72, 153, 0.20), 0 24px 64px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* 4. App Header Bar & Brand Typography */
+body[data-theme="imperial_gold"] .app-header {
+    background: rgba(26, 16, 9, 0.92) !important;
+    border-bottom: 1px solid rgba(251, 191, 36, 0.35) !important;
+}
+body[data-theme="imperial_gold"] .hdr-btn {
+    background: rgba(251, 191, 36, 0.12) !important;
+    border: 1px solid rgba(251, 191, 36, 0.5) !important;
+    color: #fbbf24 !important;
+}
+body[data-theme="imperial_gold"] .hdr-btn:hover {
+    background: rgba(251, 191, 36, 0.25) !important;
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.4) !important;
+}
+body[data-theme="imperial_gold"] .brand-auromatch-title {
+    background: linear-gradient(135deg, #fef08a, #f59e0b) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+body[data-theme="imperial_gold"] .brand-umbrella-eyebrow {
+    color: #fde68a !important;
+    opacity: 0.85 !important;
+}
+body[data-theme="imperial_gold"] .brand-tagline-text {
+    color: #fef3c7 !important;
+    opacity: 0.75 !important;
+}
+
+body[data-theme="royal_lapis"] .app-header {
+    background: rgba(3, 11, 26, 0.92) !important;
+    border-bottom: 1px solid rgba(0, 229, 255, 0.35) !important;
+}
+body[data-theme="royal_lapis"] .hdr-btn {
+    background: rgba(0, 229, 255, 0.12) !important;
+    border: 1px solid rgba(0, 229, 255, 0.5) !important;
+    color: #00e5ff !important;
+}
+body[data-theme="royal_lapis"] .hdr-btn:hover {
+    background: rgba(0, 229, 255, 0.25) !important;
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.4) !important;
+}
+body[data-theme="royal_lapis"] .brand-auromatch-title {
+    background: linear-gradient(135deg, #e0f2fe, #00e5ff) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+}
+body[data-theme="royal_lapis"] .brand-umbrella-eyebrow {
+    color: #bae6fd !important;
+    opacity: 0.85 !important;
+}
+body[data-theme="royal_lapis"] .brand-tagline-text {
+    color: #e0f2fe !important;
+    opacity: 0.75 !important;
+}
+
+/* 5. HUD Progression Badges (Seeker, IQ, Rank, Level, Sparks, Score, Clean Solve) */
+body[data-theme="imperial_gold"] .hud-player-badge,
+body[data-theme="imperial_gold"] .hud-iq-badge,
+body[data-theme="imperial_gold"] .hud-rank-badge,
+body[data-theme="imperial_gold"] .hud-level-indicator,
+body[data-theme="imperial_gold"] .hud-sparks-count {
+    background: rgba(32, 19, 10, 0.85) !important;
+    border: 1px solid rgba(251, 191, 36, 0.45) !important;
+    color: #fde68a !important;
+}
+body[data-theme="imperial_gold"] #header-score-badge {
+    background: rgba(245, 158, 11, 0.20) !important;
+    border: 1px solid rgba(251, 191, 36, 0.6) !important;
+    color: #fde047 !important;
+}
+body[data-theme="imperial_gold"] #header-clean-solve-badge {
+    background: rgba(251, 191, 36, 0.15) !important;
+    border: 1px solid rgba(251, 191, 36, 0.5) !important;
+    color: #fef08a !important;
+}
+
+body[data-theme="royal_lapis"] .hud-player-badge,
+body[data-theme="royal_lapis"] .hud-iq-badge,
+body[data-theme="royal_lapis"] .hud-rank-badge,
+body[data-theme="royal_lapis"] .hud-level-indicator,
+body[data-theme="royal_lapis"] .hud-sparks-count {
+    background: rgba(5, 16, 36, 0.85) !important;
+    border: 1px solid rgba(0, 229, 255, 0.45) !important;
+    color: #e0f2fe !important;
+}
+body[data-theme="royal_lapis"] #header-score-badge {
+    background: rgba(0, 229, 255, 0.18) !important;
+    border: 1px solid rgba(0, 229, 255, 0.6) !important;
+    color: #38bdf8 !important;
+}
+body[data-theme="royal_lapis"] #header-clean-solve-badge {
+    background: rgba(0, 229, 255, 0.15) !important;
+    border: 1px solid rgba(0, 229, 255, 0.5) !important;
+    color: #e0f2fe !important;
+}
+
+/* 6. Mode Switcher Bar & Pills */
+body[data-theme="imperial_gold"] .mode-toggle-bar {
+    background: rgba(22, 13, 7, 0.75) !important;
+    border: 1px solid rgba(251, 191, 36, 0.3) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+}
+body[data-theme="imperial_gold"] .mode-btn {
+    background: rgba(38, 23, 13, 0.6) !important;
+    border: 1px solid rgba(251, 191, 36, 0.25) !important;
+    color: #fde68a !important;
+}
+body[data-theme="imperial_gold"] .mode-btn.active {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    border-color: #ffd700 !important;
+    color: #1a0f00 !important;
+    font-weight: 800 !important;
+    box-shadow: 0 0 12px rgba(251, 191, 36, 0.5) !important;
+}
+body[data-theme="imperial_gold"] .senior-toggle-btn {
+    background: rgba(38, 23, 13, 0.6) !important;
+    border: 1px solid rgba(251, 191, 36, 0.35) !important;
+    color: #fde68a !important;
+}
+body[data-theme="imperial_gold"] .senior-toggle-btn.active {
+    background: linear-gradient(135deg, #f59e0b, #d97706) !important;
+    color: #1a0f00 !important;
+}
+
+body[data-theme="royal_lapis"] .mode-toggle-bar {
+    background: rgba(4, 14, 32, 0.75) !important;
+    border: 1px solid rgba(0, 229, 255, 0.3) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+}
+body[data-theme="royal_lapis"] .mode-btn {
+    background: rgba(7, 22, 48, 0.6) !important;
+    border: 1px solid rgba(0, 229, 255, 0.25) !important;
+    color: #e0f2fe !important;
+}
+body[data-theme="royal_lapis"] .mode-btn.active {
+    background: linear-gradient(135deg, #00e5ff, #0077b6) !important;
+    border-color: #38bdf8 !important;
+    color: #030d1a !important;
+    font-weight: 800 !important;
+    box-shadow: 0 0 12px rgba(0, 229, 255, 0.5) !important;
+}
+body[data-theme="royal_lapis"] .senior-toggle-btn {
+    background: rgba(7, 22, 48, 0.6) !important;
+    border: 1px solid rgba(0, 229, 255, 0.35) !important;
+    color: #e0f2fe !important;
+}
+body[data-theme="royal_lapis"] .senior-toggle-btn.active {
+    background: linear-gradient(135deg, #00e5ff, #0077b6) !important;
+    color: #030d1a !important;
+}
+
+/* 7. Side Drawer Tabs (Guide & Align) */
+body[data-theme="imperial_gold"] .drawer-toggle-left,
+body[data-theme="imperial_gold"] .drawer-toggle-right {
+    background: rgba(28, 17, 9, 0.95) !important;
+    border-color: rgba(251, 191, 36, 0.55) !important;
+    color: #fde68a !important;
+}
+body[data-theme="imperial_gold"] .drawer-toggle-left:hover,
+body[data-theme="imperial_gold"] .drawer-toggle-right:hover {
+    background: rgba(45, 27, 14, 0.98) !important;
+    color: #ffd700 !important;
+    box-shadow: 0 0 15px rgba(251, 191, 36, 0.4) !important;
+}
+
+body[data-theme="royal_lapis"] .drawer-toggle-left,
+body[data-theme="royal_lapis"] .drawer-toggle-right {
+    background: rgba(4, 14, 32, 0.95) !important;
+    border-color: rgba(0, 229, 255, 0.55) !important;
+    color: #e0f2fe !important;
+}
+body[data-theme="royal_lapis"] .drawer-toggle-left:hover,
+body[data-theme="royal_lapis"] .drawer-toggle-right:hover {
+    background: rgba(8, 25, 55, 0.98) !important;
+    color: #00e5ff !important;
+    box-shadow: 0 0 15px rgba(0, 229, 255, 0.4) !important;
+}
+
+/* 8. Subtitle & In-Game Goal Banner */
+body[data-theme="imperial_gold"] .game-subtitle-pill,
+body[data-theme="imperial_gold"] #game-subtitle-container {
+    background: rgba(28, 17, 9, 0.85) !important;
+    border: 1px solid rgba(251, 191, 36, 0.4) !important;
+    color: #fde68a !important;
+}
+body[data-theme="royal_lapis"] .game-subtitle-pill,
+body[data-theme="royal_lapis"] #game-subtitle-container {
+    background: rgba(4, 14, 32, 0.85) !important;
+    border: 1px solid rgba(0, 229, 255, 0.4) !important;
+    color: #e0f2fe !important;
+}
+
+/* 9. Settings Screen (Cards, Form Inputs, Sliders, Buttons) */
+body[data-theme="imperial_gold"] #settings-screen {
+    background: transparent !important;
+}
+body[data-theme="imperial_gold"] .setting-section {
+    background: rgba(30, 18, 10, 0.70) !important;
+    border: 1px solid rgba(251, 191, 36, 0.28) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+body[data-theme="imperial_gold"] .setting-section h3 {
+    color: #fbbf24 !important;
+}
+body[data-theme="imperial_gold"] .setting-label {
+    color: #fef3c7 !important;
+}
+body[data-theme="imperial_gold"] input[type="text"],
+body[data-theme="imperial_gold"] input[type="number"],
+body[data-theme="imperial_gold"] input[type="password"],
+body[data-theme="imperial_gold"] select {
+    background: rgba(18, 10, 5, 0.8) !important;
+    border: 1px solid rgba(251, 191, 36, 0.45) !important;
+    color: #fff !important;
+}
+body[data-theme="imperial_gold"] input[type="range"] {
+    accent-color: #fbbf24 !important;
+}
+body[data-theme="imperial_gold"] .settings-btn,
+body[data-theme="imperial_gold"] .setting-section button {
+    background: rgba(251, 191, 36, 0.15) !important;
+    border: 1px solid rgba(251, 191, 36, 0.5) !important;
+    color: #fde68a !important;
+}
+body[data-theme="imperial_gold"] .setting-section button:hover {
+    background: rgba(251, 191, 36, 0.3) !important;
+    box-shadow: 0 0 10px rgba(251, 191, 36, 0.4) !important;
+}
+
+body[data-theme="royal_lapis"] #settings-screen {
+    background: transparent !important;
+}
+body[data-theme="royal_lapis"] .setting-section {
+    background: rgba(5, 18, 40, 0.70) !important;
+    border: 1px solid rgba(0, 229, 255, 0.28) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
+}
+body[data-theme="royal_lapis"] .setting-section h3 {
+    color: #00e5ff !important;
+}
+body[data-theme="royal_lapis"] .setting-label {
+    color: #e0f2fe !important;
+}
+body[data-theme="royal_lapis"] input[type="text"],
+body[data-theme="royal_lapis"] input[type="number"],
+body[data-theme="royal_lapis"] input[type="password"],
+body[data-theme="royal_lapis"] select {
+    background: rgba(3, 10, 24, 0.8) !important;
+    border: 1px solid rgba(0, 229, 255, 0.45) !important;
+    color: #fff !important;
+}
+body[data-theme="royal_lapis"] input[type="range"] {
+    accent-color: #00e5ff !important;
+}
+body[data-theme="royal_lapis"] .settings-btn,
+body[data-theme="royal_lapis"] .setting-section button {
+    background: rgba(0, 229, 255, 0.15) !important;
+    border: 1px solid rgba(0, 229, 255, 0.5) !important;
+    color: #e0f2fe !important;
+}
+body[data-theme="royal_lapis"] .setting-section button:hover {
+    background: rgba(0, 229, 255, 0.3) !important;
+    box-shadow: 0 0 10px rgba(0, 229, 255, 0.4) !important;
+}
+
+/* 10. Secondary Drawers & Modals (Field Guide, Alignment, Jump Modal) */
+body[data-theme="imperial_gold"] #field-guide-col,
+body[data-theme="imperial_gold"] #alignment-col,
+body[data-theme="imperial_gold"] .settings-modal {
+    background: rgba(22, 13, 7, 0.95) !important;
+    border-color: rgba(251, 191, 36, 0.5) !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 30px rgba(251, 191, 36, 0.2) !important;
+}
+body[data-theme="royal_lapis"] #field-guide-col,
+body[data-theme="royal_lapis"] #alignment-col,
+body[data-theme="royal_lapis"] .settings-modal {
+    background: rgba(4, 14, 32, 0.95) !important;
+    border-color: rgba(0, 229, 255, 0.5) !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 229, 255, 0.2) !important;
+}
