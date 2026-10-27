@@ -36,16 +36,13 @@ window.addEventListener('load', () => {
         // 1. Update Mode Switcher buttons
         const btnVita = document.getElementById('btn-mode-vita');
         const btnTileClub = document.getElementById('btn-mode-tileclub');
-        const btnClassic = document.getElementById('btn-mode-classic');
         const btnRealms = document.getElementById('btn-mode-realms');
-        [btnVita, btnTileClub, btnClassic, btnRealms].forEach(b => { if (b) b.classList.remove('active'); });
+        [btnVita, btnTileClub, btnRealms].forEach(b => { if (b) b.classList.remove('active'); });
 
-        if (state.gameplayMode === 'vita' && btnVita) {
+        if ((state.gameplayMode === 'vita' || state.gameplayMode === 'classic') && btnVita) {
             btnVita.classList.add('active');
         } else if (state.gameplayMode === 'tile_club' && btnTileClub) {
             btnTileClub.classList.add('active');
-        } else if (state.gameplayMode === 'classic' && btnClassic) {
-            btnClassic.classList.add('active');
         } else if (state.gameplayMode === 'realms' && btnRealms) {
             btnRealms.classList.add('active');
         }
@@ -62,9 +59,7 @@ window.addEventListener('load', () => {
             if (state.gameplayMode === 'realms') {
                 const realmName = state.activeRealm ? state.activeRealm.name : 'Thematic Realm';
                 promptEl.innerHTML = `<span>🗺️ ${realmName}${formBadge}</span>`;
-            } else if (state.gameplayMode === 'classic') {
-                promptEl.innerHTML = `<span>🏛️ Classic Solitaire${formBadge}</span>`;
-            } else if (state.gameplayMode === 'vita') {
+            } else if (state.gameplayMode === 'vita' || state.gameplayMode === 'classic') {
                 promptEl.innerHTML = `<span>✨ Match pairs (2)${formBadge}</span>`;
             } else {
                 promptEl.innerHTML = `<span>📥 Collect triads (3)${formBadge}</span>`;
@@ -182,8 +177,16 @@ window.addEventListener('load', () => {
         if (levelIndicator) {
             const isNarrow = (window.visualViewport ? window.visualViewport.width : window.innerWidth) < 420;
             const formStr = (!isNarrow && state.formationName) ? ` · ${state.formationName}` : '';
-            levelIndicator.innerText = `Level ${state.currentLevel || 1}${formStr}`;
-            levelIndicator.title = `Current Level: ${state.currentLevel || 1} (${state.formationName || 'Sanctuary Formation'})`;
+            if (state.gameplayMode === 'realms' && state.activeRealm) {
+                const realm = state.activeRealm;
+                const lvlName = realm.levelName ? `: ${realm.levelName}` : '';
+                levelIndicator.innerText = `Ch. ${realm.chapter || 1}: ${realm.name} · Lvl ${realm.masterLevelIndex || 1}/50${lvlName}${formStr}`;
+                levelIndicator.title = `Chapter ${realm.chapter || 1}: ${realm.name} · Level ${realm.masterLevelIndex || 1} of 15 (Click to Jump)`;
+            } else {
+                const total = state.totalLevels || 200;
+                levelIndicator.innerText = `Level ${state.currentLevel || 1} / ${total}${formStr}`;
+                levelIndicator.title = `Current Level: ${state.currentLevel || 1} of ${total} (${state.formationName || 'Sanctuary Formation'}) · Click to Jump`;
+            }
         }
         if (sparksCount) {
             sparksCount.innerText = `✨ ${state.sparks || 100}`;
@@ -191,6 +194,11 @@ window.addEventListener('load', () => {
         const scoreCount = document.getElementById('header-score-count');
         if (scoreCount) {
             scoreCount.innerText = `${(state.score || 0).toLocaleString()}`;
+        }
+
+        const iqCount = document.getElementById('header-iq-count');
+        if (iqCount && typeof state.focusIQ === 'number') {
+            iqCount.innerText = `${state.focusIQ}`;
         }
 
         // Action bar Hint badge affordance (dims when < 20 sparks)
@@ -359,7 +367,7 @@ window.addEventListener('load', () => {
         const vRankUp = document.getElementById('victory-rank-up');
 
         if (vTitle) vTitle.innerText = info.isMilestone ? `🌟 Milestone Level ${info.completedLevel} Cleared!` : `Level ${info.completedLevel} Cleared!`;
-        if (vSubtitle) vSubtitle.innerText = `${info.newRank.symbol} ${info.newRank.name} · Next: Level ${info.nextLevel}`;
+        if (vSubtitle) vSubtitle.innerText = `${info.newRank.symbol} ${info.newRank.name} · Next: Level ${info.nextLevel} / ${info.totalLevels || 200}`;
         if (vSparks) vSparks.innerText = `+${info.earnedSparks} ✨`;
         if (vBonusText) {
             let bonusStr = info.cleanSolve ? 'Clean Solve +5 ✨' : 'Standard Clear';
@@ -486,21 +494,17 @@ window.addEventListener('load', () => {
     window.switchGameplayMode = (mode) => {
         if (mode === 'realms') {
             activeGameManager.setGameplayMode('realms');
-            window.showToastMessage("🗺️ 13 Thematic Realms: 195 Levels with Dedicated 3D Artistic Tiles & Environmental Backdrops!");
+            window.showToastMessage("🗺️ 20 Grand Realms: 1,000 Levels (50 per Chapter) with Dedicated 3D Tile Sets & Environmental Sanctuaries!");
             window.openRealmsBrowser();
             return;
         }
-        if (mode === 'classic') {
-            activeGameManager.setGameplayMode('classic');
-            window.showToastMessage("🏛️ Classic Campaign: 200 progressive architectural puzzles with educational flora!");
+        if (mode === 'classic' || mode === 'vita') {
+            activeGameManager.setGameplayMode('vita');
+            window.showToastMessage("🪷 Pairs Campaign: 400 progressive architectural puzzles with vibrant hero game icons!");
             return;
         }
         activeGameManager.setGameplayMode(mode);
-        if (mode === 'vita') {
-            window.showToastMessage("🪷 Pairs: Click 2 matching free tiles on the board to dissolve them directly!");
-        } else {
-            window.showToastMessage("📥 Tile Club: Collect 3 identical tiles into the holding tray to clear!");
-        }
+        window.showToastMessage("📥 Tile Club: Collect 3 identical tiles into the holding tray to clear!");
     };
 
     window.openRealmsBrowser = () => {
@@ -508,20 +512,50 @@ window.addEventListener('load', () => {
         const container = document.getElementById('realms-grid-container');
         if (!modal || !container) return;
 
+        const modalH3 = modal.querySelector('h3');
+        if (modalH3) modalH3.innerText = '🗺️ The 20 Grand Realms (1,000 Levels)';
+        const modalSub = modal.querySelector('p');
+        if (modalSub) modalSub.innerText = '1,000 Levels (50 per Chapter) · 20 Dedicated 3D Tactile Tile Sets & Environmental Sanctuaries';
+
         const realms = ThemeManager.getAllRealms();
         const currentLvl = activeGameManager.player.currentLevel || 1;
-        const currentRealm = ThemeManager.getRealmForLevel(currentLvl);
+        const highestUnlocked = activeGameManager.player.highestUnlockedRealm || Math.max(1, Math.floor((currentLvl - 1) / 50) + 1);
 
         container.innerHTML = realms.map(r => {
-            const isActive = (r.id === currentRealm.id);
+            const isUnlocked = (r.chapter === 1) || (r.chapter <= highestUnlocked);
+            const progress = ThemeManager.getRealmProgress(r.id, currentLvl);
+            const isActive = isUnlocked && (currentLvl >= r.levelStart && currentLvl <= r.levelEnd);
+            const currentLevelInThisRealm = isActive ? (((currentLvl - 1) % 50) + 1) : (isUnlocked ? 1 : 1);
+            const currentLevelName = (r.levelNames && r.levelNames[currentLevelInThisRealm - 1]) ? r.levelNames[currentLevelInThisRealm - 1] : `Level ${currentLevelInThisRealm}`;
+
+            if (!isUnlocked) {
+                return `
+                    <div class="realm-card-item locked" style="display: flex; flex-direction: column; position: relative;">
+                        <div class="realm-card-lock-badge">🔒 Ch ${r.chapter} Locked</div>
+                        <div class="realm-card-thumb" style="width: 100%; height: 96px; border-radius: 8px; margin-bottom: 8px; background: url('${r.mockupImage || r.bgImage}') center/cover no-repeat; border: 1px solid rgba(255,255,255,0.15);"></div>
+                        <div class="realm-card-chapter" style="font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase;">Chapter ${r.chapter}</div>
+                        <div class="realm-card-title" style="font-size: 13px; font-weight: 700; line-height: 1.25; margin: 4px 0 2px 0; color: #cbd5e1;">${r.name}</div>
+                        <div class="realm-card-subtitle" style="font-size: 11px; opacity: 0.7; color: #94a3b8; margin-bottom: 6px;">${r.subtitle}</div>
+                        <div class="realm-card-levels" style="margin-bottom: 10px; font-size: 11px; color: #f59e0b; font-weight: 600;">🔒 Clear Ch ${r.chapter - 1} (Lvl ${(r.chapter - 1) * 50}) to Unlock</div>
+                        <button class="c-btn" disabled style="padding: 6px 8px; font-size: 11px; width: 100%; background: rgba(255,255,255,0.08); color: #64748b; font-weight: 700; border-radius: 8px; margin-top: auto; cursor: not-allowed; border: 1px solid rgba(255,255,255,0.1);">
+                            🔒 Locked
+                        </button>
+                    </div>
+                `;
+            }
+
             return `
-                <div class="realm-card-item ${isActive ? 'active' : ''}">
-                    <div class="realm-card-icon">${r.icon}</div>
-                    <div class="realm-card-chapter">Chapter ${r.chapter}</div>
-                    <div class="realm-card-title">${r.name}</div>
-                    <div class="realm-card-levels" style="margin-bottom: 8px; font-size: 11px; color: #c5a880;">15 Thematic Levels</div>
-                    <button class="c-btn" onclick="window.selectRealm('${r.id}', ${r.levelStart})" style="padding: 6px 8px; font-size: 11px; width: 100%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 700; border-radius: 8px;">
-                        ▶ Enter Realm
+                <div class="realm-card-item ${isActive ? 'active' : ''}" style="display: flex; flex-direction: column;">
+                    <div class="realm-card-thumb" style="width: 100%; height: 96px; border-radius: 8px; margin-bottom: 8px; background: url('${r.mockupImage || r.bgImage}') center/cover no-repeat; border: 1px solid rgba(255,215,0,0.35); box-shadow: 0 4px 12px rgba(0,0,0,0.45);"></div>
+                    <div class="realm-card-chapter" style="font-size: 11px; font-weight: 700; color: #f59e0b; text-transform: uppercase; letter-spacing: 0.5px;">Chapter ${r.chapter} · ${progress.isCompleted ? '✅ Complete' : `${progress.completedLevels}/50 Cleared`}</div>
+                    <div class="realm-card-title" style="font-size: 13px; font-weight: 700; line-height: 1.25; margin: 4px 0 2px 0;">${r.name}</div>
+                    <div class="realm-card-subtitle" style="font-size: 11px; opacity: 0.85; color: #c5a880; margin-bottom: 4px;">${r.subtitle}</div>
+                    <div class="realm-progress-bar-bg">
+                        <div class="realm-progress-bar-fill" style="width: ${progress.percent}%;"></div>
+                    </div>
+                    <div class="realm-card-levels" style="margin-bottom: 10px; font-size: 11px; color: #ffd700; font-weight: 600;">Lvl ${currentLevelInThisRealm}: ${currentLevelName}</div>
+                    <button class="c-btn" onclick="window.selectRealm('${r.id}', ${isActive ? currentLvl : r.levelStart})" style="padding: 6px 8px; font-size: 11px; width: 100%; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; font-weight: 700; border-radius: 8px; margin-top: auto;">
+                        ▶ Enter Sanctuary
                     </button>
                 </div>
             `;
@@ -536,9 +570,63 @@ window.addEventListener('load', () => {
     };
 
     window.selectRealm = (realmId, startLevel) => {
+        const currentLvl = activeGameManager.player.currentLevel || 1;
+        const highestUnlocked = activeGameManager.player.highestUnlockedRealm || Math.max(1, Math.floor((currentLvl - 1) / 50) + 1);
+        const realm = REALMS.find(r => r.id === realmId);
+        if (realm && realm.chapter > highestUnlocked) {
+            window.showToastMessage(`🔒 Chapter ${realm.chapter} is locked! Complete Chapter ${realm.chapter - 1} first.`);
+            return;
+        }
         window.closeRealmsBrowser();
         activeGameManager.loadLevel(startLevel);
-        window.showToastMessage(`🗺️ Entered Chapter ${realmId}: Level ${startLevel}`);
+        window.showToastMessage(`🗺️ Entered Chapter ${realm ? realm.chapter : ''}: Level ${startLevel}`);
+    };
+
+    window.openLevelJumpModal = () => {
+        const modal = document.getElementById('level-jump-modal');
+        const input = document.getElementById('quick-jump-level-input');
+        const title = document.getElementById('jump-modal-title');
+        const sub = document.getElementById('jump-modal-subtitle');
+        if (!modal) return;
+        const curLvl = activeGameManager.player.currentLevel || 1;
+        const total = activeGameManager.getTotalLevels();
+        if (input) {
+            input.value = curLvl;
+            input.max = total;
+        }
+        if (title) title.innerText = `Select Level (1–${total})`;
+        if (sub) sub.innerText = `Jump directly to any level in the ${total}-Level Campaign`;
+        modal.style.display = 'flex';
+    };
+
+    window.closeLevelJumpModal = () => {
+        const modal = document.getElementById('level-jump-modal');
+        if (modal) modal.style.display = 'none';
+    };
+
+    window.adjustJumpLevel = (delta) => {
+        const input = document.getElementById('quick-jump-level-input');
+        if (!input) return;
+        const total = activeGameManager.getTotalLevels();
+        let val = (parseInt(input.value, 10) || 1) + delta;
+        val = Math.max(1, Math.min(total, val));
+        input.value = val;
+    };
+
+    window.executeQuickLevelJump = () => {
+        const input = document.getElementById('quick-jump-level-input');
+        const total = activeGameManager.getTotalLevels();
+        let lvl = parseInt(input ? input.value : 1, 10) || 1;
+        lvl = Math.max(1, Math.min(total, lvl));
+        window.closeLevelJumpModal();
+        window.jumpToLevel(lvl);
+    };
+
+    window.jumpToLevel = (levelNum) => {
+        const total = activeGameManager.getTotalLevels();
+        const safeLvl = Math.max(1, Math.min(total, levelNum));
+        activeGameManager.loadLevel(safeLvl);
+        window.showToastMessage(`🚀 Loaded Level ${safeLvl} / ${total} (${activeGameManager.currentFormationName || 'Sanctuary'})`);
     };
 
     window.handleShuffleBoard = () => {
@@ -633,7 +721,7 @@ window.addEventListener('load', () => {
         });
     };
 
-    window.submitPlayerName = () => {
+    window.submitPlayerName = (andBegin = true) => {
         const input = document.getElementById('player-name-input');
         const enteredName = (input ? input.value : '').trim() || 'Seeker';
         const profile = activeGameManager.switchPlayer(enteredName, activeSelectedAvatar);
@@ -641,9 +729,13 @@ window.addEventListener('load', () => {
 
         const rank = activeGameManager.getRank();
         if (profile.isNewUser) {
-            window.showToastMessage(`✨ Welcome, ${activeSelectedAvatar} ${enteredName}! New profile ready at Level 1`);
+            window.showToastMessage(`✨ Welcome, ${activeSelectedAvatar} ${enteredName}! Beginning Level 1`);
         } else {
-            window.showToastMessage(`✨ Welcome back, ${activeSelectedAvatar} ${enteredName}! Resuming Level ${profile.currentLevel} (${rank.symbol} ${rank.name})`);
+            window.showToastMessage(`✨ Welcome back, ${activeSelectedAvatar} ${enteredName}! Continuing at Level ${profile.currentLevel} (${rank.symbol} ${rank.name})`);
+        }
+
+        if (andBegin) {
+            window.beginDirectJourney();
         }
     };
 
@@ -829,7 +921,7 @@ window.addEventListener('load', () => {
         const val = document.getElementById('set-experience-mode').value;
         updateExperienceMode(val);
         if (val === 'ashram_sanctuary') {
-            window.showToastMessage("🪷 V2 Ashram Sanctuary mode activated. 15 Sacred Gardens available!");
+            window.showToastMessage("🪷 V2 Ashram Sanctuary mode activated. 20 Grand Realms available!");
         } else {
             window.showToastMessage("🌟 V1 General Knowledge Quest activated (520 Levels).");
         }
@@ -997,6 +1089,42 @@ window.addEventListener('load', () => {
 
         requestAnimationFrame(updateViewportMetrics);
     }
+
+    // ─── Immersive Off-Canvas Drawer Logic ─────────────────────────────────────
+    // Sidebars (field-guide-col, status-prahar-col) are position:fixed overlays.
+    // They do NOT affect the board's clientWidth, so no metrics invalidation needed.
+
+    window.toggleFieldGuide = () => {
+        const col = document.getElementById('field-guide-col');
+        const backdrop = document.getElementById('drawer-backdrop');
+        if (!col || !backdrop) return;
+        const isOpen = col.classList.toggle('drawer-open');
+        // Only one drawer open at a time
+        const right = document.getElementById('status-prahar-col');
+        if (right) right.classList.remove('drawer-open');
+        backdrop.classList.toggle('active', isOpen);
+    };
+
+    window.toggleAlignmentPanel = () => {
+        const col = document.getElementById('status-prahar-col');
+        const backdrop = document.getElementById('drawer-backdrop');
+        if (!col || !backdrop) return;
+        const isOpen = col.classList.toggle('drawer-open');
+        // Only one drawer open at a time
+        const left = document.getElementById('field-guide-col');
+        if (left) left.classList.remove('drawer-open');
+        backdrop.classList.toggle('active', isOpen);
+    };
+
+    window.closeAllDrawers = () => {
+        const left = document.getElementById('field-guide-col');
+        const right = document.getElementById('status-prahar-col');
+        const backdrop = document.getElementById('drawer-backdrop');
+        if (left) left.classList.remove('drawer-open');
+        if (right) right.classList.remove('drawer-open');
+        if (backdrop) backdrop.classList.remove('active');
+    };
+    // ───────────────────────────────────────────────────────────────────────────
 
     initDynamicScreenAdjuster();
 });

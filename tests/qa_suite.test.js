@@ -225,8 +225,8 @@ describe("AuroMatch Vita Mahjong & Accessibility QA Suite", () => {
   });
 
   // TC-VM-04
-  test("TC-VM-04: Desktop Viewport (>= 1024px) renders fluid 3-column layout without overflow", () => {
-    // Read and verify CSS contains 3-column sanctuary grid media query
+  test("TC-VM-04: Desktop Viewport (>= 1024px) renders immersive full-screen board with off-canvas drawers", () => {
+    // Read and verify CSS contains immersive drawer layout (Option A)
     const candidatePaths = [
       path.resolve(import.meta.dirname, '../styles/main.css'),
       path.resolve('AuroMatch/styles/main.css'),
@@ -236,11 +236,15 @@ describe("AuroMatch Vita Mahjong & Accessibility QA Suite", () => {
     const css = fs.readFileSync(cssPath, 'utf-8');
 
     assert.ok(css.includes('@media (min-width: 1024px)'), "CSS must include desktop min-width: 1024px breakpoint");
-    assert.ok(css.includes('grid-template-columns: minmax(280px, 380px) minmax(460px, 1fr) minmax(280px, 380px)'), 
-      "CSS must declare fluid 3-column sanctuary grid");
     assert.ok(css.includes('#field-guide-col'), "CSS must define #field-guide-col rules");
-    assert.ok(css.includes('#center-stage-col'), "CSS must define #center-stage-col rules");
     assert.ok(css.includes('#status-prahar-col'), "CSS must define #status-prahar-col rules");
+    // Verify off-canvas drawer architecture: sidebars are position:fixed overlays (not grid columns)
+    assert.ok(css.includes('position: fixed !important'), "Desktop sidebars must be position:fixed off-canvas drawers");
+    assert.ok(css.includes('translateX(-100%)'), "Left drawer must use translateX(-100%) slide-in transition");
+    assert.ok(css.includes('translateX(100%)'), "Right drawer must use translateX(100%) slide-in transition");
+    assert.ok(css.includes('.drawer-backdrop'), "CSS must define .drawer-backdrop overlay");
+    assert.ok(css.includes('.drawer-toggle-left'), "CSS must define .drawer-toggle-left floating tab button");
+    assert.ok(css.includes('.drawer-toggle-right'), "CSS must define .drawer-toggle-right floating tab button");
     assert.ok(css.includes('overflow: hidden'), "Desktop layout must prevent horizontal viewport scrolling");
   });
 
@@ -511,6 +515,14 @@ describe("AuroMatch Vita Mahjong & Accessibility QA Suite", () => {
     gm.reshuffleRemaining();
     const afterCount = gm.tiles.filter(t => !t.isMatched).length;
     assert.strictEqual(afterCount, beforeCount, "Reshuffle must preserve active tile count");
+
+    // Verify Multi-Material Deck breakdown (Ivory, Walnut Wood, Celadon Jade)
+    const gmMat = new GameManager({ gameplayMode: 'vita' });
+    gmMat.loadLevel(1);
+    const archSet = new Set(gmMat.tiles.map(t => t.archetype));
+    assert.ok(archSet.has('ivory'), "Board must include Classic Ivory tiles");
+    assert.ok(archSet.has('walnut_wood'), "Board must include Walnut Wood tiles");
+    assert.ok(archSet.has('celadon_jade'), "Board must include Celadon Jade tiles");
   });
 
   // TC-VM-14
@@ -518,14 +530,14 @@ describe("AuroMatch Vita Mahjong & Accessibility QA Suite", () => {
     const { TOTAL_LEVELS, getTileCountForLevel } = await import('../src/controllers/gameManager.js');
     assert.strictEqual(TOTAL_LEVELS, 520, "Total levels must be configured to at least 520");
 
-    // S-curve density progression checks
-    assert.strictEqual(getTileCountForLevel(1), 24, "Level 1 tutorial must have 24 tiles");
-    assert.strictEqual(getTileCountForLevel(5), 36, "Level 5 must have 36 tiles");
-    assert.strictEqual(getTileCountForLevel(20), 48, "Level 20 must have 48 tiles");
-    assert.strictEqual(getTileCountForLevel(50), 60, "Level 50 must have 60 tiles");
-    assert.strictEqual(getTileCountForLevel(100), 72, "Level 100 must have 72 tiles");
-    assert.strictEqual(getTileCountForLevel(200), 84, "Level 200 must have 84 tiles");
-    assert.strictEqual(getTileCountForLevel(350), 96, "Level 350 must have 96 tiles");
+    // S-curve density progression checks (expanded starting footprint from 36 to 108)
+    assert.strictEqual(getTileCountForLevel(1), 36, "Level 1 starting footprint must have 36 tiles");
+    assert.strictEqual(getTileCountForLevel(5), 48, "Level 5 must have 48 tiles");
+    assert.strictEqual(getTileCountForLevel(20), 60, "Level 20 must have 60 tiles");
+    assert.strictEqual(getTileCountForLevel(50), 72, "Level 50 must have 72 tiles");
+    assert.strictEqual(getTileCountForLevel(100), 84, "Level 100 must have 84 tiles");
+    assert.strictEqual(getTileCountForLevel(200), 96, "Level 200 must have 96 tiles");
+    assert.strictEqual(getTileCountForLevel(350), 108, "Level 350 must have 108 tiles");
     assert.strictEqual(getTileCountForLevel(500), 108, "Level 500 must have 108 tiles");
 
     // Milestone bonus check on Level 10
@@ -543,6 +555,19 @@ describe("AuroMatch Vita Mahjong & Accessibility QA Suite", () => {
     gm.checkStageCompletion();
     assert.strictEqual(milestoneRecorded, true, "Level 10 must be recognized as milestone level");
     assert.strictEqual(gm.player.sparks, 135, "Milestone level clean solve must award +35 sparks (10 base + 5 clean + 20 milestone)");
+
+    // Unified 400-Level Campaign checks for Pairs (Classic merged into Pairs)
+    const { TOTAL_PAIRS_LEVELS, TOTAL_CLASSIC_LEVELS } = await import('../src/controllers/gameManager.js');
+    assert.strictEqual(TOTAL_PAIRS_LEVELS, 400, "Pairs campaign must have exactly 400 levels");
+    assert.strictEqual(TOTAL_CLASSIC_LEVELS, 400, "Classic alias must map to 400 levels");
+
+    const gmPairs = new GameManager({ gameplayMode: 'vita' });
+    gmPairs.loadLevel(400);
+    assert.strictEqual(gmPairs.player.currentLevel, 400);
+    assert.strictEqual(gmPairs.tiles.length, 108);
+    assert.strictEqual(gmPairs.getTotalLevels(), 400);
+    assert.strictEqual(typeof gmPairs.player.focusIQ, 'number', "Focus IQ must be tracked as numeric index");
+    assert.ok(gmPairs.player.focusIQ >= 80, "Baseline Focus IQ must start at >= 80");
   });
 
   // TC-VM-15
@@ -650,14 +675,14 @@ describe("AuroMatch Vita Mahjong & Accessibility QA Suite", () => {
     const gm = new GameManager();
     gm.loadLevel(2);
     assert.strictEqual(gm.currentFormationName, 'Twin Pillars (H-Gate)');
-    assert.strictEqual(gm.tiles.length, 36);
+    assert.strictEqual(gm.tiles.length, 48);
   });
 
   // TC-VM-18
-  test("TC-VM-18: 13 Secular Realms (195 Levels: 15 per realm with 16 3D Tile Skins) & Classic Mode (200 Levels)", () => {
-    // 1. Verify 13 Realms catalog completeness
-    assert.strictEqual(REALMS.length, 13, "Must feature exactly 13 secular realms");
-    assert.strictEqual(TOTAL_REALM_LEVELS, 195, "Total campaign levels must be exactly 195 levels (15 levels * 13 realms)");
+  test("TC-VM-18: 20 Secular Realms (1000 Levels: 50 per realm with 16 3D Tile Skins) & Classic Mode (200 Levels)", () => {
+    // 1. Verify 20 Realms catalog completeness
+    assert.strictEqual(REALMS.length, 20, "Must feature exactly 20 secular realms");
+    assert.strictEqual(TOTAL_REALM_LEVELS, 1000, "Total campaign levels must be exactly 1000 levels (50 levels * 20 realms)");
 
     // 2. Strict secularization assertion: ZERO mentions of 'Ashram', 'Auroville', 'Samadhi', 'The Mother', 'Sri Aurobindo'
     const forbiddenKeywords = ['ashram', 'auroville', 'samadhi', 'mother', 'aurobindo'];
@@ -670,13 +695,13 @@ describe("AuroMatch Vita Mahjong & Accessibility QA Suite", () => {
       });
     });
 
-    // 3. Verify all 13 clean background images exist on disk
+    // 3. Verify all 20 clean background images exist on disk
     REALMS.forEach(r => {
       const imgPath = path.join(process.cwd(), r.bgImage.replace('./', ''));
       assert.ok(fs.existsSync(imgPath), `Background image for realm '${r.id}' must exist at ${imgPath}`);
     });
 
-    // 4. Verify all 16 dedicated 3D artistic tiles exist on disk for all 13 realms (208 tiles)
+    // 4. Verify all 16 dedicated 3D artistic tiles exist on disk for all 20 realms (320 tiles)
     REALMS.forEach(r => {
       assert.strictEqual(r.customTiles.length, 16, `Realm '${r.id}' must provide exactly 16 dedicated artistic tiles`);
       r.customTiles.forEach(t => {
@@ -685,12 +710,12 @@ describe("AuroMatch Vita Mahjong & Accessibility QA Suite", () => {
       });
     });
 
-    // 5. Test level-to-realm mapping across all 195 levels
+    // 5. Test level-to-realm mapping across all 1000 levels
     for (let lvl = 1; lvl <= TOTAL_REALM_LEVELS; lvl++) {
       const realmInfo = ThemeManager.getRealmForLevel(lvl);
       assert.ok(realmInfo, `Level ${lvl} must map to a valid realm`);
-      assert.ok(realmInfo.chapter >= 1 && realmInfo.chapter <= 13, `Level ${lvl} must have valid chapter (1-13)`);
-      assert.ok(realmInfo.levelInRealm >= 1 && realmInfo.levelInRealm <= 15, `Level ${lvl} must have levelInRealm (1-15)`);
+      assert.ok(realmInfo.chapter >= 1 && realmInfo.chapter <= 20, `Level ${lvl} must have valid chapter (1-20)`);
+      assert.ok(realmInfo.levelInRealm >= 1 && realmInfo.levelInRealm <= 50, `Level ${lvl} must have levelInRealm (1-50)`);
       assert.strictEqual(realmInfo.isMasterArtLevel, true, `Level ${lvl} must feature authentic 3D tile art`);
       assert.ok(realmInfo.archetype, `Level ${lvl} must define a tactile tile archetype`);
     }
@@ -700,7 +725,7 @@ describe("AuroMatch Vita Mahjong & Accessibility QA Suite", () => {
     gm.setGameplayMode('realms');
     assert.strictEqual(gm.gameplayMode, 'realms');
 
-    // Test Level 1 (Whispering Pines - 16 dedicated 3D tiles)
+    // Test Level 1 (Service Tree Sanctuary - Whispering Pines 16 dedicated 3D tiles)
     gm.loadLevel(1);
     assert.strictEqual(gm.activeRealm.id, 'whispering_pines');
     assert.strictEqual(gm.activeRealm.isMasterArtLevel, true);
@@ -710,13 +735,13 @@ describe("AuroMatch Vita Mahjong & Accessibility QA Suite", () => {
     const tilesWithArt = gm.tiles.filter(t => t.customImage && t.customImage.includes('Assets/themes/whispering_pines'));
     assert.strictEqual(tilesWithArt.length, gm.tiles.length, "All tiles in realm level must receive dedicated artistic skins");
 
-    // 7. Test GameManager Classic mode (Pure Mahjong Solitaire Campaign)
+    // 7. Test GameManager Classic mode (Aliases seamlessly to Pairs / vita)
     gm.setGameplayMode('classic');
-    assert.strictEqual(gm.gameplayMode, 'classic');
+    assert.strictEqual(gm.gameplayMode, 'vita', "Classic mode must alias seamlessly to Pairs (vita)");
     gm.loadLevel(2);
-    assert.strictEqual(gm.tiles.length, 36);
+    assert.strictEqual(gm.tiles.length, 48);
     assert.strictEqual(gm.currentFormationName, 'Twin Pillars (H-Gate)');
-    assert.strictEqual(gm.activeRealm, null, "Classic mode must not activate thematic realm wallpaper");
+    assert.strictEqual(gm.activeRealm, null, "Pairs mode must not activate thematic realm wallpaper");
 
     // Initial score check
     assert.strictEqual(typeof gm.player.score, 'number');
@@ -731,6 +756,132 @@ describe("AuroMatch Vita Mahjong & Accessibility QA Suite", () => {
     gm.handleVitaMatch2Click(firstTile);
     gm.handleVitaMatch2Click(matchTile);
     assert.ok(gm.player.score >= initialScore + 100, "Pair match must increment score by at least +100");
+  });
+
+  test("TC-VM-19: Mobile Viewport (<480px) Vertical Centering & Zero Collision for Tile Club Stack and Holding Tray", async () => {
+    // 1. Verify CSS mobile responsive architecture in styles/main.css
+    const candidatePaths = [
+      path.resolve(import.meta.dirname, '../styles/main.css'),
+      path.resolve('AuroMatch/styles/main.css'),
+      path.resolve('styles/main.css')
+    ];
+    const cssPath = candidatePaths.find(p => fs.existsSync(p)) || candidatePaths[0];
+    const css = fs.readFileSync(cssPath, 'utf-8');
+
+    assert.ok(css.includes('@media (max-width: 1023px)'), "CSS must include mobile breakpoint (<1024px)");
+    assert.ok(css.includes('.tile-layout'), "CSS must define mobile .tile-layout rules");
+    assert.ok(css.includes('min-height: 0 !important'), "Mobile .tile-layout must eliminate the 520px min-height floor");
+    assert.ok(css.includes('#center-stage-col'), "Mobile #center-stage-col must be defined");
+    assert.ok(css.includes('justify-content: center !important'), "Mobile #center-stage-col must center its children vertically");
+
+    // 2. Verify BoardRenderer mobile centering mathematics in Tile Club mode
+    const { BoardRenderer } = await import('../src/ui/boardRenderer.js');
+    global.document = { getElementById: () => null };
+
+    // Standard 36-tile Pyramid with 4 vertical layers (z = 0 to 3)
+    const mockPyramidTiles = [
+      { id: 't1', x: 0, y: 0, z: 0 },
+      { id: 't2', x: 4, y: 3, z: 0 },
+      { id: 't3', x: 2, y: 1, z: 3 } // Topmost peak tile
+    ];
+    const renderer = new BoardRenderer(null, mockPyramidTiles, { gameplayMode: 'tile_club' });
+
+    // Test on a 390px x 480px mobile canvas
+    const metrics = renderer.computeStageMetrics(390, 480);
+    assert.ok(metrics.width <= 76, "Mobile Tile Club tile width must be scaled appropriately");
+    assert.ok(metrics.offsetY >= 22, "Mobile offsetY must account for highest isometric layer rise");
+
+    // Peak tile: layer z=3 has isoDy = -(3 * 3.5) = -10.5px
+    const peakTileY = metrics.offsetY - (3 * 3.5);
+    assert.ok(peakTileY >= 10, `Peak tile Y coordinate (${peakTileY}px) must be >= 10px inside board (no bleed into header)`);
+
+    // Board bottom boundary check
+    const boardBottom = metrics.offsetY + metrics.boardTotalH;
+    assert.ok(boardBottom <= 480, `Board bottom (${boardBottom}px) must fit within available container height (480px)`);
+  });
+
+  test("TC-VM-20: Sizing Parity: Tile stack dimensions remain 100% identical between Pairs and Tile Club on Desktop and Mobile", async () => {
+    const { BoardRenderer } = await import('../src/ui/boardRenderer.js');
+    global.document = {
+      getElementById: (id) => (id === 'center-stage-col' ? { clientHeight: 820, clientWidth: 1200 } : null)
+    };
+
+    // Mock Citadel Fortress: 6x6 coords
+    const mockTiles = [];
+    for (let x = 0; x < 6; x++) {
+      for (let y = 0; y < 6; y++) {
+        mockTiles.push({ id: `t_${x}_${y}`, x, y, z: 0 });
+      }
+    }
+
+    // 1. Desktop Test: Pairs vs Tile Club
+    const pairsDesktop = new BoardRenderer(null, mockTiles, { gameplayMode: 'vita' });
+    const tcDesktop = new BoardRenderer(null, mockTiles, { gameplayMode: 'tile_club' });
+
+    const pairsMetricsD = pairsDesktop.computeStageMetrics(1200, 676);
+    const tcMetricsD = tcDesktop.computeStageMetrics(1200, 676);
+
+    assert.strictEqual(
+      tcMetricsD.width,
+      pairsMetricsD.width,
+      `Desktop tile width must be identical in Pairs (${pairsMetricsD.width}px) and Tile Club (${tcMetricsD.width}px)`
+    );
+    assert.strictEqual(
+      tcMetricsD.height,
+      pairsMetricsD.height,
+      `Desktop tile height must be identical in Pairs (${pairsMetricsD.height}px) and Tile Club (${tcMetricsD.height}px)`
+    );
+    assert.strictEqual(
+      tcMetricsD.boardTotalH,
+      pairsMetricsD.boardTotalH,
+      `Desktop total board height must be identical in Pairs and Tile Club`
+    );
+    assert.strictEqual(
+      tcMetricsD.offsetX,
+      pairsMetricsD.offsetX,
+      `Desktop offsetX must remain centered and identical between Pairs and Tile Club`
+    );
+
+    // 2. Mobile Test: Pairs vs Tile Club (390px width)
+    const pairsMobile = pairsDesktop.computeStageMetrics(390, 510);
+    const tcMobile = tcDesktop.computeStageMetrics(390, 510);
+
+    assert.strictEqual(
+      tcMobile.width,
+      pairsMobile.width,
+      `Mobile tile width must be identical in Pairs (${pairsMobile.width}px) and Tile Club (${tcMobile.width}px)`
+    );
+    assert.strictEqual(
+      tcMobile.height,
+      pairsMobile.height,
+      `Mobile tile height must be identical in Pairs (${pairsMobile.height}px) and Tile Club (${tcMobile.height}px)`
+    );
+    assert.strictEqual(
+      tcMobile.boardTotalH,
+      pairsMobile.boardTotalH,
+      `Mobile total board height must be identical in Pairs and Tile Club`
+    );
+  });
+
+  test('TC-VM-21: AuroMind Series Unified Franchise Brand Stack & Eyebrow Presence', () => {
+    const html = fs.readFileSync(new URL('../index.html', import.meta.url), 'utf8');
+    const css = fs.readFileSync(new URL('../styles/main.css', import.meta.url), 'utf8');
+
+    // 1. Check Google Fonts includes Cinzel
+    assert.match(html, /family=Cinzel:wght@600;700;800;900/, 'index.html must load Cinzel serif font');
+
+    // 2. Check Welcome screen has AUROMIND SERIES eyebrow
+    assert.match(html, /<span class="brand-umbrella-eyebrow">AUROMIND SERIES<\/span>/, 'Welcome screen must include AUROMIND SERIES eyebrow');
+
+    // 3. Check Game screen header has brand lockup
+    assert.match(html, /class="brand-auromatch-title"/, 'Game header must include brand-auromatch-title');
+    assert.match(html, /class="header-brand"/, 'Header must include header-brand lockup');
+
+    // 4. Check CSS definitions exist
+    assert.match(css, /\.brand-umbrella-eyebrow\s*\{/, 'main.css must define .brand-umbrella-eyebrow');
+    assert.match(css, /\.brand-auromatch-title\s*\{/, 'main.css must define .brand-auromatch-title');
+    assert.match(css, /\.welcome-brand-stack\s*\{/, 'main.css must define .welcome-brand-stack');
+    assert.match(css, /\.theme-morning \.brand-umbrella-eyebrow/, 'main.css must support theme-morning contrast');
   });
 });
 

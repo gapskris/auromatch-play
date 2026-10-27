@@ -6099,9 +6099,8 @@ body {
 
             <!-- Mode Switcher HUD Bar -->
             <div class="mode-toggle-bar">
-                <button class="mode-btn active" id="btn-mode-vita" onclick="window.switchGameplayMode('vita')" title="Pairs Campaign (200 Levels)">🪷 Pairs</button>
+                <button class="mode-btn active" id="btn-mode-vita" onclick="window.switchGameplayMode('vita')" title="Pairs Campaign (400 Levels)">🪷 Pairs</button>
                 <button class="mode-btn" id="btn-mode-tileclub" onclick="window.switchGameplayMode('tile_club')" title="Tile Club Triad Match-3">📥 Tile Club</button>
-                <button class="mode-btn mode-btn-classic" id="btn-mode-classic" onclick="window.switchGameplayMode('classic')" title="Classic Mahjong Solitaire Campaign (200 Levels)">🏛️ Classic</button>
                 <button class="mode-btn mode-btn-realms" id="btn-mode-realms" onclick="window.switchGameplayMode('realms')" title="20 Thematic Realms (1,000 Levels)">🗺️ Realms</button>
                 <button class="senior-toggle-btn" id="btn-toggle-senior" onclick="window.toggleSeniorViewMode()">[Aa] Senior</button>
             </div>
@@ -56214,7 +56213,7 @@ function renderConstellationCalendar(gridId, svgId) {
 
 const TOTAL_REALM_LEVELS = 1000; // 20 Themes * 50 Levels per Theme
 const LEVELS_PER_REALM = 50;
-const TOTAL_CLASSIC_LEVELS = 200; // Dedicated Classic Solitaire Campaign
+const TOTAL_CLASSIC_LEVELS = 400; // Dedicated Classic Solitaire Campaign
 
 // 16 distinct emblems with symbolic labels for each theme
 const THEME_TILE_DEFS = {
@@ -57996,7 +57995,7 @@ class ThemeManager {
 
 
 const TOTAL_LEVELS = 520;
-const TOTAL_PAIRS_LEVELS = 200;
+const TOTAL_PAIRS_LEVELS = 400;
 
 
 const RANKS = [
@@ -59248,16 +59247,13 @@ window.addEventListener('load', () => {
         // 1. Update Mode Switcher buttons
         const btnVita = document.getElementById('btn-mode-vita');
         const btnTileClub = document.getElementById('btn-mode-tileclub');
-        const btnClassic = document.getElementById('btn-mode-classic');
         const btnRealms = document.getElementById('btn-mode-realms');
-        [btnVita, btnTileClub, btnClassic, btnRealms].forEach(b => { if (b) b.classList.remove('active'); });
+        [btnVita, btnTileClub, btnRealms].forEach(b => { if (b) b.classList.remove('active'); });
 
-        if (state.gameplayMode === 'vita' && btnVita) {
+        if ((state.gameplayMode === 'vita' || state.gameplayMode === 'classic') && btnVita) {
             btnVita.classList.add('active');
         } else if (state.gameplayMode === 'tile_club' && btnTileClub) {
             btnTileClub.classList.add('active');
-        } else if (state.gameplayMode === 'classic' && btnClassic) {
-            btnClassic.classList.add('active');
         } else if (state.gameplayMode === 'realms' && btnRealms) {
             btnRealms.classList.add('active');
         }

@@ -26,7 +26,7 @@ import {
 import { ThemeManager, REALMS, TOTAL_REALM_LEVELS, TOTAL_CLASSIC_LEVELS } from './themeManager.js';
 
 export const TOTAL_LEVELS = 520;
-export const TOTAL_PAIRS_LEVELS = 200;
+export const TOTAL_PAIRS_LEVELS = 400; // Unified Pairs (Mahjong Solitaire) Campaign
 export { TOTAL_CLASSIC_LEVELS };
 
 export const RANKS = [
@@ -84,7 +84,7 @@ export function getRealmTileCount(levelNum) {
 
 export class GameManager {
   constructor(options = {}) {
-    this.gameplayMode = options.gameplayMode || 'vita'; // 'vita' | 'tile_club'
+    this.gameplayMode = (options.gameplayMode === 'classic') ? 'vita' : (options.gameplayMode || 'vita'); // 'vita' | 'tile_club'
     this.seniorView = (options.seniorView !== undefined) 
       ? !!options.seniorView 
       : !!(profileState && profileState.settings && profileState.settings.seniorViewActive);
@@ -283,10 +283,9 @@ export class GameManager {
   }
 
   getTotalLevels() {
-    if (this.gameplayMode === 'vita') return TOTAL_PAIRS_LEVELS; // 200 Levels (Pairs Campaign)
-    if (this.gameplayMode === 'classic') return TOTAL_CLASSIC_LEVELS; // 200 Levels (Classic Campaign)
-    if (this.gameplayMode === 'realms') return TOTAL_REALM_LEVELS; // 195 Levels (Thematic Realms)
-    return 200;
+    if (this.gameplayMode === 'vita' || this.gameplayMode === 'classic') return TOTAL_PAIRS_LEVELS; // 400 Levels (Pairs Campaign)
+    if (this.gameplayMode === 'realms') return TOTAL_REALM_LEVELS; // 1,000 Levels (Thematic Realms)
+    return TOTAL_PAIRS_LEVELS;
   }
 
   init(boardContainerId, stageContainerId = null) {
@@ -449,6 +448,7 @@ export class GameManager {
   }
 
   setGameplayMode(mode) {
+    if (mode === 'classic') mode = 'vita'; // Backward compatibility alias
     if (this.gameplayMode === mode) return;
     this.gameplayMode = mode;
     if (mode === 'realms') {
@@ -930,7 +930,7 @@ export class GameManager {
 
       const oldRank = this.getRank();
 
-      // Advance level up to the mode's campaign ceiling (200 for Pairs & Classic)
+      // Advance level up to the mode's campaign ceiling (400 for Pairs)
       const maxLevels = this.getTotalLevels();
       this.player.currentLevel = Math.min(maxLevels, this.player.currentLevel + 1);
       const newRank = this.getRank();
