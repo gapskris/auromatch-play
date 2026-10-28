@@ -238,9 +238,9 @@
             <div class="mode-toggle-bar">
                 <button class="mode-btn active" id="btn-mode-vita" onclick="window.switchGameplayMode('vita')" title="Pairs Campaign (400 Levels)">🪷 Pairs</button>
                 <button class="mode-btn" id="btn-mode-tileclub" onclick="window.switchGameplayMode('tile_club')" title="Tile Club Triad Match-3">📥 Tile Club</button>
-                <button class="mode-btn mode-btn-botanical" id="btn-mode-botanical" onclick="window.switchGameplayMode('botanical')" title="🌸 Botanical Art Campaign (200 Levels)">🌸 Botanical Art</button>
+                <button class="mode-btn mode-btn-botanical" id="btn-mode-botanical" onclick="window.switchGameplayMode('botanical')" title="🌸 Botanical Art Campaign (200 Levels)">🌸 Botanical<span class="mode-word-art"> Art</span></button>
                 <button class="mode-btn mode-btn-realms" id="btn-mode-realms" onclick="window.switchGameplayMode('realms')" title="20 Thematic Realms (1,000 Levels)">🗺️ Realms</button>
-                <button class="senior-toggle-btn" id="btn-toggle-senior" onclick="window.toggleSeniorViewMode()">[Aa] Senior</button>
+                <button class="senior-toggle-btn" id="btn-toggle-senior" onclick="window.toggleSeniorViewMode()" title="Toggle Senior View (aA)" aria-label="Toggle Senior View aA">aA</button>
             </div>
 
             <!-- Desktop 3-Column Sanctuary Grid -->
@@ -385,11 +385,7 @@
 
             </div>
 
-            <!-- Game Screen Footer (Mobile) -->
-            <footer class="app-footer" style="padding: 10px; border-top: 1px solid var(--border-current);">
-                <span class="footer-text" id="status-text" style="font-size: 11px;">Tiles left: 36</span>
-                <button class="footer-btn" onclick="reshuffleBoard()" style="padding: 4px 10px; font-size: 10px;">Reshuffle Board</button>
-            </footer>
+
         </div>
 
         <!-- Consecration Jar Screen -->

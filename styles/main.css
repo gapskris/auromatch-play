@@ -3977,7 +3977,7 @@ body {
 
     cursor: pointer;
 
-    margin-left: auto;
+    margin-left: 0;
 
     white-space: nowrap;
 
@@ -3991,6 +3991,38 @@ body {
 
     color: #0b1215;
 
+}
+
+@media (max-width: 600px) {
+    .mode-word-art {
+        display: none;
+    }
+    .mode-toggle-bar {
+        justify-content: center;
+        max-width: 98%;
+        width: max-content;
+        margin: 2px auto;
+        padding: 2px 4px;
+        gap: 2px;
+        box-sizing: border-box;
+    }
+    .mode-btn {
+        padding: 3px 4px !important;
+        font-size: 9px !important;
+        letter-spacing: -0.2px;
+    }
+    .senior-toggle-btn {
+        min-width: 22px !important;
+        padding: 3px 4px !important;
+        font-weight: 800 !important;
+        text-align: center;
+        font-size: 9px !important;
+        margin-left: 0 !important;
+    }
+}
+
+#game-screen .app-footer {
+    display: none !important;
 }
 
 

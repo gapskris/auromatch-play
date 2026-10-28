@@ -140,4 +140,44 @@ describe('🧩 Tile Club & 3D Standard Themes Overhaul QA Suite', () => {
     assert.strictEqual(title, 'Imperial Rosette (Atmosphere)');
   });
 
+  test('TC-TC-07: Reshuffle alters tile payloads & customImages preserving solvability, aA button, and zero game footer', () => {
+    const gm = new GameManager({ gameplayMode: 'botanical' });
+    gm.startNewStage(1);
+
+    const activeBefore = gm.tiles.filter(t => !t.isMatched);
+    assert.ok(activeBefore.length > 10, 'Stage should have active tiles');
+
+    const countsBefore = {};
+    activeBefore.forEach(t => {
+      countsBefore[t.floraId] = (countsBefore[t.floraId] || 0) + 1;
+      assert.ok(t.customImage, 'Botanical mode tiles must have customImage');
+    });
+
+    // Mark one tile as selected to test unselect on reshuffle
+    activeBefore[0].isSelected = true;
+
+    // Reshuffle remaining tiles
+    gm.reshuffleRemaining();
+
+    const activeAfter = gm.tiles.filter(t => !t.isMatched);
+    assert.strictEqual(activeAfter.length, activeBefore.length, 'Tile count must remain identical after reshuffle');
+
+    const countsAfter = {};
+    activeAfter.forEach(t => {
+      countsAfter[t.floraId] = (countsAfter[t.floraId] || 0) + 1;
+      assert.strictEqual(t.isSelected, false, 'Tile selection must be cleared on reshuffle');
+      assert.ok(t.customImage, 'Custom image must persist with the payload on reshuffled tile');
+    });
+
+    // Verify all set counts match 100% (solvability preservation)
+    Object.keys(countsBefore).forEach(k => {
+      assert.strictEqual(countsAfter[k], countsBefore[k], `Count for ${k} must be preserved`);
+    });
+
+    // Check index.html for aA button text and no redundant footer
+    const htmlContent = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf-8');
+    assert.ok(htmlContent.includes('>aA</button>'), 'Senior toggle button must have concise label aA');
+    assert.ok(!htmlContent.includes('onclick="reshuffleBoard()"'), 'Redundant reshuffle button in game footer must be removed');
+  });
+
 });

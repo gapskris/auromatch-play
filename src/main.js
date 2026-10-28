@@ -716,9 +716,12 @@ window.addEventListener('load', () => {
     window.handleShuffleBoard = () => {
         if (activeGameManager) {
             activeGameManager.reshuffleRemaining();
-            window.showToastMessage("🔀 Active tiles reshuffled!");
+            if (typeof window.showToastMessage === 'function') {
+                window.showToastMessage("🔀 Active tiles reshuffled!");
+            }
         }
     };
+    window.reshuffleBoard = window.handleShuffleBoard;
 
     window.toggleSeniorViewMode = () => {
         activeGameManager.toggleSeniorView();
@@ -901,9 +904,7 @@ window.addEventListener('load', () => {
         routeToScreen(targetScreen);
     };
 
-    window.reshuffleBoard = () => {
-        activeGameManager.restartStage();
-    };
+    window.reshuffleBoard = window.handleShuffleBoard;
 
     window.closeMatchCard = () => {
         stopSpeechSynthesis();

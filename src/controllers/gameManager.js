@@ -661,17 +661,34 @@ export class GameManager {
     const active = this.tiles.filter(t => !t.isMatched);
     if (active.length <= 1) return;
 
-    // Reshuffle active tile contents among current active positions
-    const floras = active.map(t => ({ id: t.floraId, data: t.floraData }));
-    floras.sort(() => Math.random() - 0.5);
+    // Reshuffle active tile contents, custom artwork, and metadata among active positions
+    const payloads = active.map(t => ({
+      floraId: t.floraId,
+      floraData: t.floraData,
+      customImage: t.customImage,
+      thematicName: t.thematicName,
+      thematicSymbol: t.thematicSymbol,
+      archetype: t.archetype
+    }));
+
+    // Fisher-Yates shuffle
+    for (let i = payloads.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [payloads[i], payloads[j]] = [payloads[j], payloads[i]];
+    }
 
     active.forEach((t, i) => {
-      t.floraId = floras[i].id;
-      t.floraData = floras[i].data;
+      t.floraId = payloads[i].floraId;
+      t.floraData = payloads[i].floraData;
+      t.customImage = payloads[i].customImage;
+      t.thematicName = payloads[i].thematicName;
+      t.thematicSymbol = payloads[i].thematicSymbol;
+      t.archetype = payloads[i].archetype;
       t.isSelected = false;
     });
 
     this.selectedTile = null;
+    playTileSmashWhoosh();
     if (this.boardRenderer) this.boardRenderer.render();
     this.notifyState();
   }
