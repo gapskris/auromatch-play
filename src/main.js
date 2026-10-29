@@ -1251,6 +1251,16 @@ window.addEventListener('load', () => {
 
     window.updateGatewayUI = () => {
         const player = activeGameManager ? activeGameManager.player : null;
+        const gateScreen = document.getElementById('gate-screen');
+        const doors = document.getElementById('sanctuary-doors');
+        if (doors) doors.classList.remove('doors-opening');
+        if (gateScreen) {
+            gateScreen.style.display = 'flex';
+            gateScreen.style.opacity = '1';
+            gateScreen.style.pointerEvents = 'auto';
+            gateScreen.style.transition = '';
+        }
+
         const btnEnter = document.getElementById('gate-btn-enter');
         const btnResume = document.getElementById('gate-btn-resume');
         const txtResume = document.getElementById('gate-resume-text');
@@ -1278,17 +1288,50 @@ window.addEventListener('load', () => {
         }
     };
 
+    /**
+     * Stage 1.5 3D Door Opening Ceremony: Identical timing and sequence to VAK
+     * (T=0 chime, T=150ms 3D doors swing, T=3850ms mount target screen, T=3900ms golden dissolve, T=4500ms completion)
+     */
     window.executeDoorOpeningCeremony = (callback) => {
+        const doors = document.getElementById('sanctuary-doors');
+        const gateScreen = document.getElementById('gate-screen');
+
+        // 1. T = 0ms: Play Sacred Singing Bowl Soundscape & Medallion Radiant Pulse
         if (typeof play432HzBowlChime === 'function') {
             play432HzBowlChime();
         }
-        const doors = document.getElementById('sanctuary-doors');
-        if (doors) doors.classList.add('doors-opening');
 
+        // 2. T = 150ms: 3D Double Doors Swing Outward majestically (1.5s cubic-bezier ease)
+        // Simultaneously dissolve the center medallion into radiant light
+        setTimeout(() => {
+            if (doors) doors.classList.add('doors-opening');
+        }, 150);
+
+        // 3. T = 3850ms: Mount target screen underneath WHILE gate screen is still completely opaque
+        // (150ms start + 1500ms majestic door swing + 2200ms serene quote contemplation = 3850ms)
+        setTimeout(() => {
+            if (typeof callback === 'function') callback();
+        }, 3850);
+
+        // 4. T = 3900ms: Graceful dissolve begins (600ms golden fade), seamlessly revealing pre-mounted target screen
+        setTimeout(() => {
+            if (gateScreen) {
+                gateScreen.style.transition = 'opacity 0.6s ease-out';
+                gateScreen.style.opacity = '0';
+                gateScreen.style.pointerEvents = 'none';
+            }
+        }, 3900);
+
+        // 5. T = 4500ms: Door fully dissolved, hide gate screen (4.5s Deep Temple Immersion)
         setTimeout(() => {
             if (doors) doors.classList.remove('doors-opening');
-            if (typeof callback === 'function') callback();
-        }, 2200);
+            if (gateScreen) {
+                gateScreen.style.display = 'none';
+                gateScreen.style.opacity = '';
+                gateScreen.style.pointerEvents = '';
+                gateScreen.style.transition = '';
+            }
+        }, 4500);
     };
 
     window.handleGatewayEnter = () => {

@@ -94,7 +94,7 @@ describe('🏛️ VAK Architecture & Alignment Master Test Suite for AuroMatch',
     assert.ok(mainJsContent.includes('⚡ ${player.sparks'), 'Resume text must show player sparks');
   });
 
-  test('TC-VAK-04: Stage 1.5 2.2s Meditative Opening Ceremony & 432Hz Audio Synthesis with Working 3D Doors', () => {
+  test('TC-VAK-04: Stage 1.5 Sanctuary Door Opening Ceremony & 432Hz Synthesis with Identical VAK Delays', () => {
     // 1. Verify play432HzBowlChime export and mathematical frequency tuning
     assert.ok(typeof synth.play432HzBowlChime === 'function', 'play432HzBowlChime must be exported from synthesizer');
     assert.ok(synthJsContent.includes('const f0 = 432.0;'), 'Fundamental frequency must be mathematically set to exactly 432.0 Hz');
@@ -102,15 +102,17 @@ describe('🏛️ VAK Architecture & Alignment Master Test Suite for AuroMatch',
     // 2. Verify natural acoustic harmonic series of Tibetan singing bowl
     assert.ok(synthJsContent.includes('harmonics = [1.0, 1.5, 2.0, 2.76, 3.0, 4.24]'), 'Harmonic ratios must match singing bowl spectrum');
 
-    // 3. Verify door opening animation and 2.2s ceremony timing in main.js
+    // 3. Verify door opening animation and identical VAK ceremony timing sequence in main.js
     assert.ok(mainJsContent.includes('executeDoorOpeningCeremony'), 'executeDoorOpeningCeremony must be defined');
     assert.ok(mainJsContent.includes('doors.classList.add(\'doors-opening\')'), 'Ceremony must add doors-opening class');
-    assert.ok(mainJsContent.includes('2200'), 'Opening ceremony duration must be exactly 2200ms (2.2s)');
+    assert.ok(mainJsContent.includes('3850'), 'Target screen mount delay must be exactly 3850ms (150ms start + 1500ms swing + 2200ms contemplation)');
+    assert.ok(mainJsContent.includes('4500'), 'Total immersion duration must be exactly 4500ms (4.5s Deep Temple Immersion)');
 
-    // 4. Verify CSS selector matches BOTH .sanctuary-double-doors.doors-opening and #sanctuary-doors.doors-opening (Pic 2 fix)
+    // 4. Verify CSS selector matches BOTH .sanctuary-double-doors.doors-opening and #sanctuary-doors.doors-opening
     assert.ok(cssContent.includes('.sanctuary-double-doors.doors-opening') || cssContent.includes('#sanctuary-doors.doors-opening'), 'CSS selector must match sanctuary-double-doors or #sanctuary-doors with doors-opening');
     assert.ok(cssContent.includes('rotateY(-105deg)'), 'Left door must swing -105 degrees');
     assert.ok(cssContent.includes('rotateY(105deg)'), 'Right door must swing +105 degrees');
+    assert.ok(cssContent.includes('1.5s cubic-bezier'), 'Door panels must swing with majestic 1.5s cubic-bezier ease');
   });
 
   test('TC-VAK-05: Stage 2 Dedicated Sacred Realm Selection Screen Cards & Navigation', () => {
