@@ -529,3 +529,42 @@ export function playTileSettleSound() {
         try { osc.disconnect(); gain.disconnect(); } catch(e){}
     }, 100);
 }
+
+/**
+ * 432Hz Sacred Singing Bowl Chime: Meditative ceremonial harmonic bell for Gateway entrance
+ */
+export function play432HzBowlChime() {
+    const ctx = getAudioContext();
+    if (!ctx) return;
+    unlockAudioContext();
+
+    const now = ctx.currentTime;
+    const f0 = 432.0; // Sacred 432Hz fundamental
+    const harmonics = [1.0, 1.5, 2.0, 2.76, 3.0, 4.24];
+    const gains = [0.40, 0.22, 0.15, 0.08, 0.05, 0.02];
+
+    harmonics.forEach((h, i) => {
+        const osc = ctx.createOscillator();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(f0 * h, now);
+
+        const gain = ctx.createGain();
+        gain.gain.setValueAtTime(0, now);
+        gain.gain.linearRampToValueAtTime(gains[i] * (ragaDrone.gongVolume || 0.65), now + 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 3.2);
+
+        osc.connect(gain);
+        if (gongGainNode) {
+            gain.connect(gongGainNode);
+        } else {
+            gain.connect(ctx.destination);
+        }
+
+        osc.start(now);
+        osc.stop(now + 3.3);
+
+        setTimeout(() => {
+            try { osc.disconnect(); gain.disconnect(); } catch(e){}
+        }, 3400);
+    });
+}

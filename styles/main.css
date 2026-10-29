@@ -6586,3 +6586,780 @@ body[data-theme="royal_lapis"] .settings-modal {
     border: 1px solid rgba(244, 114, 182, 0.6) !important;
     box-shadow: 0 4px 14px rgba(236, 72, 153, 0.4) !important;
 }
+
+
+/* ==========================================================================
+   AUROMIND SERIES: VAK ARCHITECTURE ALIGNMENT (STAGES 0, 1, 1.5, 2, 3 & EPIPHANY)
+   ========================================================================== */
+
+/* Universal Sacred Geometry Dot Grid */
+.sanctuary-dot-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: radial-gradient(rgba(212, 175, 55, 0.20) 1.5px, transparent 1.5px);
+    background-size: 24px 24px;
+    opacity: 0.85;
+    z-index: 1;
+}
+
+body[data-theme="royal_lapis"] .sanctuary-dot-grid {
+    background-image: radial-gradient(rgba(0, 229, 255, 0.22) 1.5px, transparent 1.5px);
+}
+
+body[data-theme="botanical"] .sanctuary-dot-grid {
+    background-image: radial-gradient(rgba(244, 114, 182, 0.22) 1.5px, transparent 1.5px);
+}
+
+/* STAGE 0: BRAND SPLASH SCREEN */
+.landing-view {
+    position: relative;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    text-align: center;
+    cursor: pointer;
+    padding: 24px;
+    background: var(--bg-current);
+}
+
+.landing-view.active-screen {
+    display: flex !important;
+}
+
+.landing-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    max-width: 480px;
+    animation: fadeInScale 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.landing-emblem-wrap {
+    width: 110px;
+    height: 110px;
+    margin-bottom: 4px;
+}
+
+.landing-emblem {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 0 24px rgba(245, 158, 11, 0.55));
+    animation: emblemBreathe 4s ease-in-out infinite alternate;
+}
+
+.landing-brand-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.landing-eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 3.5px;
+    color: var(--accent-current);
+    opacity: 0.9;
+    text-transform: uppercase;
+}
+
+.landing-title-3d {
+    font-family: 'Cinzel', 'Playfair Display', serif;
+    font-size: clamp(28px, 6vw, 42px);
+    font-weight: 800;
+    letter-spacing: clamp(4px, 1.2vw, 8px);
+    background: linear-gradient(135deg, #fffbeb 0%, #fde047 35%, #f59e0b 70%, #d97706 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.6));
+    margin: 0;
+    text-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
+}
+
+.landing-tagline {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: var(--text-current);
+    opacity: 0.85;
+    margin: 0;
+}
+
+.landing-enter-pill {
+    margin-top: 18px;
+    padding: 10px 24px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-current);
+    color: var(--text-current);
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+    animation: pillBreatheGlow 2.5s ease-in-out infinite;
+    transition: all 0.2s ease;
+}
+
+.landing-enter-pill:hover {
+    background: var(--accent-current);
+    color: #100a06;
+    border-color: #ffd700;
+}
+
+@keyframes emblemBreathe {
+    0% { transform: scale(0.96); filter: drop-shadow(0 0 18px rgba(245, 158, 11, 0.4)); }
+    100% { transform: scale(1.04); filter: drop-shadow(0 0 32px rgba(251, 191, 36, 0.75)); }
+}
+
+@keyframes pillBreatheGlow {
+    0% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.2); }
+    50% { box-shadow: 0 0 22px rgba(251, 191, 36, 0.6); }
+    100% { box-shadow: 0 0 8px rgba(245, 158, 11, 0.2); }
+}
+
+/* STAGE 1 & 1.5: SANCTUARY GATEWAY DOOR SCREEN */
+.gate-view {
+    position: relative;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    padding: 20px 16px 24px;
+    box-sizing: border-box;
+    text-align: center;
+    background: var(--bg-current);
+    overflow-y: auto;
+}
+
+.gate-view.active-screen {
+    display: flex !important;
+}
+
+.gate-header {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    max-width: 500px;
+    margin-bottom: 8px;
+}
+
+.gate-header-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 14px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-current);
+    font-size: 10.5px;
+    font-weight: 700;
+    color: var(--accent-current);
+    letter-spacing: 1.2px;
+}
+
+.gate-title {
+    font-family: 'Cinzel', 'Playfair Display', serif;
+    font-size: clamp(18px, 4.5vw, 26px);
+    font-weight: 700;
+    color: var(--text-current);
+    margin: 2px 0;
+    letter-spacing: 1px;
+}
+
+.gate-quote {
+    font-size: 11.5px;
+    font-style: italic;
+    color: var(--text-current);
+    opacity: 0.85;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.gate-quote cite {
+    display: block;
+    margin-top: 3px;
+    font-size: 10px;
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: 1px;
+    color: var(--accent-current);
+}
+
+/* 3D Matrimandir Double Doors Stage */
+.sanctuary-door-stage {
+    position: relative;
+    z-index: 2;
+    perspective: 1200px;
+    width: min(290px, 80vw);
+    height: clamp(230px, 42vh, 320px);
+    margin: 6px auto;
+    cursor: pointer;
+}
+
+.sanctuary-double-doors {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    transform-style: preserve-3d;
+    transition: transform 0.4s ease;
+}
+
+.door-panel {
+    flex: 1;
+    height: 100%;
+    background: linear-gradient(135deg, #fdfcf7 0%, #f4ede1 100%);
+    border: 3px solid #d4af37;
+    box-shadow: inset 0 0 20px rgba(180, 83, 9, 0.15), 0 12px 32px rgba(0, 0, 0, 0.5);
+    transition: transform 2.2s cubic-bezier(0.25, 1, 0.5, 1);
+    box-sizing: border-box;
+    padding: 8px;
+}
+
+body[data-theme="royal_lapis"] .door-panel {
+    background: linear-gradient(135deg, #071630 0%, #030d1a 100%);
+    border-color: #00e5ff;
+    box-shadow: inset 0 0 20px rgba(0, 229, 255, 0.2), 0 12px 32px rgba(0, 0, 0, 0.6);
+}
+
+.door-panel-left {
+    border-radius: 20px 0 0 20px;
+    border-right: 1.5px solid rgba(180, 83, 9, 0.35);
+    transform-origin: left center;
+}
+
+.door-panel-right {
+    border-radius: 0 20px 20px 0;
+    border-left: 1.5px solid rgba(180, 83, 9, 0.35);
+    transform-origin: right center;
+}
+
+.door-inner-bevel {
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgba(180, 83, 9, 0.25);
+    border-radius: 12px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+body[data-theme="royal_lapis"] .door-inner-bevel {
+    border-color: rgba(0, 229, 255, 0.3);
+}
+
+.door-groove-line {
+    width: 80%;
+    height: 70%;
+    border: 1px dashed rgba(180, 83, 9, 0.2);
+    border-radius: 8px;
+}
+
+.door-medallion {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 72px;
+    height: 72px;
+    z-index: 10;
+    pointer-events: none;
+    filter: drop-shadow(0 4px 16px rgba(0, 0, 0, 0.5));
+    transition: transform 1.8s ease, opacity 1.5s ease;
+}
+
+.medallion-svg {
+    width: 100%;
+    height: 100%;
+}
+
+.door-light-beam {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    background: radial-gradient(circle at center, rgba(255, 245, 180, 0.95) 0%, rgba(245, 158, 11, 0.45) 45%, transparent 75%);
+    transition: opacity 0.8s ease;
+    z-index: 5;
+}
+
+/* Door Opening Animation Triggered in Stage 1.5 */
+.sanctuary-doors.doors-opening .door-panel-left {
+    transform: rotateY(-105deg);
+}
+
+.sanctuary-doors.doors-opening .door-panel-right {
+    transform: rotateY(105deg);
+}
+
+.sanctuary-doors.doors-opening .door-medallion {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.6);
+}
+
+.sanctuary-doors.doors-opening .door-light-beam {
+    opacity: 1;
+}
+
+/* Gate Action Buttons Area */
+.gate-actions {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    max-width: 360px;
+    margin-top: 4px;
+}
+
+.gate-cta-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
+    padding: 13px 20px;
+    border-radius: 28px;
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    border: 1px solid #ffd700;
+    color: #100a06;
+    font-size: 13.5px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gate-cta-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.55);
+}
+
+.gate-sparks-badge {
+    padding: 3px 8px;
+    border-radius: 12px;
+    background: rgba(0, 0, 0, 0.25);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.gate-cta-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 11px 18px;
+    border-radius: 26px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-current);
+    color: var(--text-current);
+    font-size: 12.5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.gate-cta-secondary:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: var(--accent-current);
+}
+
+.gate-switch-player button {
+    background: transparent;
+    border: none;
+    color: var(--text-current);
+    opacity: 0.75;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    transition: opacity 0.2s ease;
+}
+
+.gate-switch-player button:hover {
+    opacity: 1;
+    color: var(--accent-current);
+}
+
+/* STAGE 2: DEDICATED SACRED REALM SELECTION SCREEN */
+.realms-hub-view {
+    position: relative;
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    padding: 16px 20px 24px;
+    box-sizing: border-box;
+    background: var(--bg-current);
+}
+
+.realms-hub-view.active-screen {
+    display: flex !important;
+}
+
+.realms-hub-header {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border-current);
+}
+
+.hub-nav-btn {
+    padding: 6px 14px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-current);
+    color: var(--text-current);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.hub-nav-btn:hover {
+    background: var(--accent-current);
+    color: #100a06;
+}
+
+.hub-title-stack {
+    text-align: center;
+}
+
+.hub-eyebrow {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2.5px;
+    color: var(--accent-current);
+    text-transform: uppercase;
+}
+
+.hub-title {
+    font-family: 'Cinzel', 'Playfair Display', serif;
+    font-size: clamp(16px, 3.8vw, 22px);
+    font-weight: 700;
+    color: var(--text-current);
+    margin: 2px 0 0 0;
+    letter-spacing: 1px;
+}
+
+.realms-hub-scroll-container {
+    position: relative;
+    z-index: 2;
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.realms-hub-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.realm-hub-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 18px;
+    border-radius: 18px;
+    background: var(--panel-current);
+    border: 1px solid var(--border-current);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.realm-hub-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45);
+    border-color: var(--accent-current);
+}
+
+.rh-card-icon-wrap {
+    width: 52px;
+    height: 52px;
+    min-width: 52px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+.rh-card-icon {
+    font-size: 26px;
+}
+
+.rh-card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.rh-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+}
+
+.rh-card-title {
+    font-family: 'Cinzel', 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text-current);
+    margin: 0;
+    letter-spacing: 0.5px;
+}
+
+.rh-card-badge {
+    padding: 2px 8px;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--accent-current);
+    white-space: nowrap;
+}
+
+.rh-card-desc {
+    font-size: 11.5px;
+    color: var(--text-current);
+    opacity: 0.8;
+    margin: 0;
+    line-height: 1.35;
+}
+
+.rh-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-top: 6px;
+}
+
+.rh-progress-wrap {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.rh-progress-bar {
+    width: 100%;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.12);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.rh-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #f59e0b, #ffd700);
+    border-radius: 6px;
+    transition: width 0.3s ease;
+}
+
+.rh-progress-label {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: var(--text-current);
+    opacity: 0.75;
+}
+
+.rh-card-enter-btn {
+    padding: 6px 14px;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border: 1px solid #ffd700;
+    color: #100a06;
+    font-size: 10.5px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: transform 0.15s ease;
+}
+
+.rh-card-enter-btn:hover {
+    transform: scale(1.04);
+}
+
+.rh-theme-pill {
+    padding: 7px 14px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid var(--border-current);
+    color: var(--text-current);
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.rh-theme-pill:hover {
+    background: var(--accent-current);
+    color: #100a06;
+}
+
+/* STAGE 3: INTERACTIVE IN-GAME HEADER DROPDOWN PILL */
+.gameplay-prompt-dropdown {
+    cursor: pointer !important;
+    transition: transform 0.15s ease, background 0.2s ease !important;
+    background: rgba(245, 158, 11, 0.18) !important;
+    border: 1px solid var(--accent-current) !important;
+}
+
+.gameplay-prompt-dropdown:hover {
+    transform: scale(1.02);
+    background: rgba(245, 158, 11, 0.32) !important;
+}
+
+/* ✨ SACRED EPIPHANY REVEAL MODAL & ROTATING AURA WHEEL */
+.epiphany-card {
+    position: relative;
+    max-width: 440px;
+    width: 90%;
+    padding: 28px 24px;
+    border-radius: 24px;
+    background: var(--panel-current);
+    border: 2px solid var(--accent-current);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 32px rgba(245, 158, 11, 0.35);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    overflow: hidden;
+    animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.epiphany-icon {
+    font-size: 38px;
+    filter: drop-shadow(0 0 16px rgba(251, 191, 36, 0.7));
+}
+
+.epiphany-eyebrow {
+    font-size: 10.5px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    color: var(--accent-current);
+    text-transform: uppercase;
+}
+
+.epiphany-title {
+    font-family: 'Cinzel', 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-current);
+    margin: 0;
+}
+
+.epiphany-quote {
+    font-size: 13px;
+    font-style: italic;
+    color: var(--text-current);
+    opacity: 0.9;
+    margin: 4px 0 10px;
+    line-height: 1.5;
+}
+
+.epiphany-quote cite {
+    display: block;
+    margin-top: 6px;
+    font-size: 10.5px;
+    font-style: normal;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    color: var(--accent-current);
+}
+
+.epiphany-reward-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 16px;
+    border-radius: 20px;
+    background: rgba(245, 158, 11, 0.2);
+    border: 1px solid var(--accent-current);
+    font-size: 12px;
+    font-weight: 800;
+    color: #ffd700;
+}
+
+.epiphany-multiplier-tag {
+    padding: 2px 6px;
+    border-radius: 8px;
+    background: #ffd700;
+    color: #100a06;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.epiphany-claim-btn {
+    width: 100%;
+    margin-top: 6px;
+    padding: 12px;
+    font-size: 13px;
+    font-weight: 800;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border: 1px solid #ffd700;
+    color: #100a06;
+    box-shadow: 0 4px 16px rgba(245, 158, 11, 0.4);
+    cursor: pointer;
+}
+
+/* In-Game Rotating Golden Aura Wheel */
+.epiphany-aura-wheel {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: min(520px, 92vw);
+    height: min(520px, 92vw);
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, rgba(251, 191, 36, 0.14), rgba(245, 158, 11, 0.02), rgba(251, 191, 36, 0.14));
+    animation: auraWheelSpin 20s linear infinite;
+    pointer-events: none;
+    z-index: 2;
+    filter: blur(12px);
+}
+
+@keyframes auraWheelSpin {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes fadeInScale {
+    0% { opacity: 0; transform: scale(0.92); }
+    100% { opacity: 1; transform: scale(1); }
+}

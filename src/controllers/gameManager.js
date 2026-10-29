@@ -128,6 +128,11 @@ export class GameManager {
     this.isPaused = false;
     this.isStageCompleted = false;
 
+    // Sacred Epiphany System tracking (Periodic 6-12 Level Window)
+    this.levelsSinceLastEpiphany = 0;
+    this.nextEpiphanyTarget = Math.floor(Math.random() * 7) + 6; // 6 to 12
+    this.isEpiphanyActive = false;
+
     // Callbacks
     this.onStateChange = options.onStateChange || null;
     this.onMatchSuccess = options.onMatchSuccess || null;
@@ -656,6 +661,18 @@ export class GameManager {
     }
   }
 
+  triggerSacredEpiphany() {
+    this.isEpiphanyActive = true;
+    this.player.sparks += 60;
+    this.savePlayerState();
+    this.notifyState();
+  }
+
+  dismissEpiphany() {
+    this.isEpiphanyActive = false;
+    this.notifyState();
+  }
+
   reshuffleRemaining() {
     if (this.isPaused || this.isStageCompleted) return;
     const active = this.tiles.filter(t => !t.isMatched);
@@ -1115,6 +1132,17 @@ export class GameManager {
       const iqBonus = cleanSolve ? 3 : 2;
       this.player.focusIQ = (this.player.focusIQ || 80) + iqBonus;
 
+      // Sacred Epiphany System tracking (Periodic 6-12 level window)
+      this.levelsSinceLastEpiphany = (this.levelsSinceLastEpiphany || 0) + 1;
+      let sacredEpiphanyTriggered = false;
+      if (this.levelsSinceLastEpiphany >= (this.nextEpiphanyTarget || 8)) {
+        sacredEpiphanyTriggered = true;
+        this.levelsSinceLastEpiphany = 0;
+        this.nextEpiphanyTarget = Math.floor(Math.random() * 7) + 6;
+        this.isEpiphanyActive = true;
+        earnedSparks += 60; // +60 Triple Sparks Epiphany Bonus
+      }
+
       this.player.sparks += earnedSparks;
       this.savePlayerState();
 
@@ -1162,7 +1190,9 @@ export class GameManager {
         rank: this.getRank(),
         isNewUser: !!this.player.isNewUser,
         hintsUsedInStage: this.hintsUsedInStage,
-        standardTheme: this.standardTheme
+        standardTheme: this.standardTheme,
+        isEpiphanyActive: !!this.isEpiphanyActive,
+        levelsSinceLastEpiphany: this.levelsSinceLastEpiphany || 0
       });
     }
   }
@@ -1235,12 +1265,13 @@ export function routeToScreen(screenId) {
   if (typeof document === 'undefined') return;
   const screens = document.querySelectorAll('.screen-view');
   screens.forEach(s => s.classList.remove('active-screen'));
-  const target = document.getElementById(screenId + '-screen');
+  const elId = (screenId === 'realms_hub' || screenId === 'realms-hub') ? 'realms-hub-screen' : screenId + '-screen';
+  const target = document.getElementById(elId);
   if (target) target.classList.add('active-screen');
 
   const tabs = document.querySelectorAll('.nav-tab');
   tabs.forEach(t => t.classList.remove('active-tab'));
-  if (screenId === 'welcome' || screenId === 'selector') {
+  if (screenId === 'welcome' || screenId === 'selector' || screenId === 'landing' || screenId === 'gate' || screenId === 'realms_hub' || screenId === 'realms-hub') {
     if (tabs[0]) tabs[0].classList.add('active-tab');
   } else if (screenId === 'oracle') {
     if (tabs[1]) tabs[1].classList.add('active-tab');
@@ -1252,7 +1283,7 @@ export function routeToScreen(screenId) {
 
   const appNav = document.getElementById('app-nav');
   if (appNav) {
-    if (screenId === 'game') {
+    if (screenId === 'game' || screenId === 'landing' || screenId === 'gate' || screenId === 'realms_hub' || screenId === 'realms-hub') {
       appNav.style.display = 'none';
     } else {
       appNav.style.display = 'flex';
