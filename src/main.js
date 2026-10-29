@@ -751,7 +751,9 @@ window.addEventListener('load', () => {
         }
     };
 
-    window.openNameModal = () => {
+    let pendingNameModalCallback = null;
+    window.openNameModal = (onConfirm) => {
+        pendingNameModalCallback = typeof onConfirm === 'function' ? onConfirm : null;
         const modal = document.getElementById('name-entry-modal');
         const input = document.getElementById('player-name-input');
         if (input) input.value = activeGameManager.player.name || '';
@@ -795,6 +797,7 @@ window.addEventListener('load', () => {
     window.closeNameModal = () => {
         const modal = document.getElementById('name-entry-modal');
         if (modal) modal.style.display = 'none';
+        pendingNameModalCallback = null;
     };
 
     let activeSelectedAvatar = '🦉';
@@ -816,13 +819,22 @@ window.addEventListener('load', () => {
         const input = document.getElementById('player-name-input');
         const enteredName = (input ? input.value : '').trim() || 'Seeker';
         const profile = activeGameManager.switchPlayer(enteredName, activeSelectedAvatar);
-        window.closeNameModal();
+        
+        const modal = document.getElementById('name-entry-modal');
+        if (modal) modal.style.display = 'none';
 
         const rank = activeGameManager.getRank();
         if (profile.isNewUser) {
             window.showToastMessage(`✨ Welcome, ${activeSelectedAvatar} ${enteredName}! Beginning Level 1`);
         } else {
             window.showToastMessage(`✨ Welcome back, ${activeSelectedAvatar} ${enteredName}! Continuing at Level ${profile.currentLevel} (${rank.symbol} ${rank.name})`);
+        }
+
+        if (pendingNameModalCallback) {
+            const cb = pendingNameModalCallback;
+            pendingNameModalCallback = null;
+            cb(profile);
+            return;
         }
 
         if (andBegin) {
@@ -1264,23 +1276,24 @@ window.addEventListener('load', () => {
             gateScreen.style.transition = '';
         }
 
-        const btnEnter = document.getElementById('gate-btn-enter');
-        const btnResume = document.getElementById('gate-btn-resume');
+        const newActions = document.getElementById('gate-actions-new-user');
+        const retActions = document.getElementById('gate-actions-returning-user');
         const txtResume = document.getElementById('gate-resume-text');
         const sparksResume = document.getElementById('gate-resume-sparks');
         const lblPlayer = document.getElementById('gate-player-label');
 
-        const isNew = !player || !player.name || (player.currentLevel <= 1 && !player.score);
+        const hasVisited = localStorage.getItem('auromatch_has_entered_sanctuary') === 'true';
+        const isReturning = hasVisited || (player && player.name && (player.currentLevel > 1 || player.score > 0));
 
-        if (isNew) {
-            if (btnEnter) btnEnter.style.display = 'flex';
-            if (btnResume) btnResume.style.display = 'none';
+        if (!isReturning) {
+            if (newActions) newActions.style.display = 'flex';
+            if (retActions) retActions.style.display = 'none';
         } else {
-            if (btnEnter) btnEnter.style.display = 'none';
-            if (btnResume) btnResume.style.display = 'flex';
+            if (newActions) newActions.style.display = 'none';
+            if (retActions) retActions.style.display = 'flex';
             if (txtResume) {
                 const formation = activeGameManager.currentFormationName || 'Sanctuary';
-                txtResume.innerText = `Resume: Level ${player.currentLevel} (${formation})`;
+                txtResume.innerText = `Resume: Level ${player.currentLevel || 1} (${formation})`;
             }
             if (sparksResume) {
                 sparksResume.innerText = `⚡ ${player.sparks || 100}`;
@@ -1347,9 +1360,17 @@ window.addEventListener('load', () => {
     };
 
     window.handleGatewayEnter = () => {
-        if (activeGameManager && !activeGameManager.player.name) {
-            window.openNameModal();
+        const hasName = activeGameManager && activeGameManager.player && activeGameManager.player.name;
+        if (!hasName) {
+            window.openNameModal(() => {
+                localStorage.setItem('auromatch_has_entered_sanctuary', 'true');
+                window.executeDoorOpeningCeremony(() => {
+                    routeToScreen('realms_hub');
+                    window.updateHubCardsUI();
+                });
+            });
         } else {
+            localStorage.setItem('auromatch_has_entered_sanctuary', 'true');
             window.executeDoorOpeningCeremony(() => {
                 routeToScreen('realms_hub');
                 window.updateHubCardsUI();
@@ -1358,9 +1379,16 @@ window.addEventListener('load', () => {
     };
 
     window.handleGatewayResume = () => {
-        if (activeGameManager && !activeGameManager.player.name) {
-            window.openNameModal();
+        const hasName = activeGameManager && activeGameManager.player && activeGameManager.player.name;
+        if (!hasName) {
+            window.openNameModal(() => {
+                localStorage.setItem('auromatch_has_entered_sanctuary', 'true');
+                window.executeDoorOpeningCeremony(() => {
+                    window.beginDirectJourney();
+                });
+            });
         } else {
+            localStorage.setItem('auromatch_has_entered_sanctuary', 'true');
             window.executeDoorOpeningCeremony(() => {
                 window.beginDirectJourney();
             });

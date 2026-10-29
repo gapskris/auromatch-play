@@ -67,30 +67,34 @@ describe('🏛️ VAK Architecture & Alignment Master Test Suite for AuroMatch',
   });
 
   test('TC-VAK-03: User Status Conditional Branching (New User vs Returning User)', () => {
-    // Verify updateGatewayUI logic in main.js
+    // 1. Verify index.html isolates new user actions from returning user actions (Pic 2 Parity)
+    assert.ok(htmlContent.includes('id="gate-actions-new-user"'), 'index.html must have #gate-actions-new-user');
+    assert.ok(htmlContent.includes('id="gate-actions-returning-user"'), 'index.html must have #gate-actions-returning-user');
+
+    // 2. Verify updateGatewayUI logic in main.js
     assert.ok(mainJsContent.includes('window.updateGatewayUI = () =>'), 'updateGatewayUI must be defined');
 
     // Test new user branching logic
-    const evalUserStatus = (player) => {
-      const isNew = !player || !player.name || (player.currentLevel <= 1 && !player.score);
+    const evalUserStatus = (player, hasVisited = false) => {
+      const isReturning = Boolean(hasVisited || (player && player.name && (player.currentLevel > 1 || player.score > 0)));
       return {
-        showEnter: isNew,
-        showResume: !isNew
+        showNewActions: !isReturning,
+        showReturningActions: isReturning
       };
     };
 
-    // Case A: Fresh new user (no name, level 1, score 0)
-    const newUserState = evalUserStatus({ name: '', currentLevel: 1, score: 0 });
-    assert.strictEqual(newUserState.showEnter, true, 'New user must see [Enter the Sanctuary]');
-    assert.strictEqual(newUserState.showResume, false, 'New user must NOT see Resume button');
+    // Case A: Fresh new user (no name, level 1, score 0, has not visited)
+    const newUserState = evalUserStatus({ name: '', currentLevel: 1, score: 0 }, false);
+    assert.strictEqual(newUserState.showNewActions, true, 'New user must see single [ENTER THE SANCTUARY] CTA');
+    assert.strictEqual(newUserState.showReturningActions, false, 'New user must NOT see returning user actions');
 
     // Case B: Returning user (name set, level > 1)
-    const returningUserState = evalUserStatus({ name: 'Seeker', currentLevel: 7, score: 1200, sparks: 280 });
-    assert.strictEqual(returningUserState.showEnter, false, 'Returning user must NOT see Enter button');
-    assert.strictEqual(returningUserState.showResume, true, 'Returning user must see [Resume: Level X]');
+    const returningUserState = evalUserStatus({ name: 'Seeker', currentLevel: 7, score: 1200, sparks: 280 }, true);
+    assert.strictEqual(returningUserState.showNewActions, false, 'Returning user must NOT see single new user CTA');
+    assert.strictEqual(returningUserState.showReturningActions, true, 'Returning user must see [Resume] and [Explore Realms]');
 
     // Verify resume text string formatting
-    assert.ok(mainJsContent.includes('Resume: Level ${player.currentLevel}'), 'Resume text must interpolate currentLevel');
+    assert.ok(mainJsContent.includes('Resume: Level ${player.currentLevel'), 'Resume text must interpolate currentLevel');
     assert.ok(mainJsContent.includes('⚡ ${player.sparks'), 'Resume text must show player sparks');
   });
 
@@ -317,4 +321,20 @@ describe('🏛️ VAK Architecture & Alignment Master Test Suite for AuroMatch',
     assert.ok(playMainJs.includes('executeDoorOpeningCeremony'), 'play main.js must have executeDoorOpeningCeremony');
   });
 
+  test('TC-VAK-15: Callback-Driven Name Modal & Zero Premature Game Launch (Pic 2 Parity)', () => {
+    // 1. Verify openNameModal supports onConfirm callback
+    assert.ok(mainJsContent.includes('pendingNameModalCallback'), 'main.js must track pendingNameModalCallback');
+    assert.ok(mainJsContent.includes('window.openNameModal = (onConfirm) =>'), 'openNameModal must accept onConfirm callback');
+
+    // 2. Verify submitPlayerName delegates to callback if present
+    assert.ok(mainJsContent.includes('if (pendingNameModalCallback)'), 'submitPlayerName must check pendingNameModalCallback');
+  });
+
+  test('TC-VAK-16: First-Time User Journey Alignment: Doorway -> Theme Selector -> Game (Pic 2 Parity)', () => {
+    // 1. Verify handleGatewayEnter routes to realms_hub via executeDoorOpeningCeremony
+    assert.ok(mainJsContent.includes('handleGatewayEnter'), 'main.js must define handleGatewayEnter');
+    assert.ok(mainJsContent.includes("routeToScreen('realms_hub')"), 'handleGatewayEnter must route to realms_hub');
+    assert.ok(mainJsContent.includes('window.updateHubCardsUI()'), 'handleGatewayEnter must update hub cards UI');
+    assert.ok(mainJsContent.includes("auromatch_has_entered_sanctuary"), 'handleGatewayEnter must track entered sanctuary status');
+  });
 });

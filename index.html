@@ -144,27 +144,27 @@
 
             <!-- Gate Action Buttons Area -->
             <div class="gate-actions">
-                <!-- New User CTA (shown when player is new) -->
-                <button class="gate-cta-primary" id="gate-btn-enter" onclick="window.handleGatewayEnter()" style="display: none;">
-                    Enter the Sanctuary 🪷
-                </button>
-
-                <!-- Returning User CTA (shown when player is returning) -->
-                <button class="gate-cta-primary" id="gate-btn-resume" onclick="window.handleGatewayResume()">
-                    <span id="gate-resume-text">Resume: Level 1 (Sanctuary)</span>
-                    <span class="gate-sparks-badge" id="gate-resume-sparks">⚡ 100</span>
-                </button>
-
-                <!-- Secondary CTA: Explore Realms / Switch Theme -->
-                <button class="gate-cta-secondary" id="gate-btn-explore" onclick="window.handleGatewayExplore()">
-                    Explore Realms / Switch Theme 🪷
-                </button>
-
-                <!-- Switch Player Pill -->
-                <div class="gate-switch-player" id="gate-switch-player">
-                    <button type="button" onclick="window.openNameModal()">
-                        <span>👤</span> <span id="gate-player-label">Seeker</span> · Switch Player
+                <!-- New User Container (Pic 2 Parity) -->
+                <div id="gate-actions-new-user" style="display: flex; flex-direction: column; width: 100%; align-items: center;">
+                    <button class="gate-cta-primary" id="gate-btn-enter" onclick="window.handleGatewayEnter()">
+                        ENTER THE SANCTUARY 🪷
                     </button>
+                </div>
+
+                <!-- Returning User Container -->
+                <div id="gate-actions-returning-user" style="display: none; flex-direction: column; width: 100%; align-items: center; gap: 8px;">
+                    <button class="gate-cta-primary" id="gate-btn-resume" onclick="window.handleGatewayResume()">
+                        <span id="gate-resume-text">Resume: Level 1 (Sanctuary)</span>
+                        <span class="gate-sparks-badge" id="gate-resume-sparks">⚡ 100</span>
+                    </button>
+                    <button class="gate-cta-secondary" id="gate-btn-explore" onclick="window.handleGatewayExplore()">
+                        Explore Realms / Switch Theme 🪷
+                    </button>
+                    <div class="gate-switch-player" id="gate-switch-player">
+                        <button type="button" onclick="window.openNameModal()">
+                            <span>👤</span> <span id="gate-player-label">Seeker</span> · Switch Player
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
