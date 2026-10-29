@@ -1269,6 +1269,12 @@ export function routeToScreen(screenId) {
   const target = document.getElementById(elId);
   if (target) target.classList.add('active-screen');
 
+  // Cleanly manage gate screen inline styles to prevent split-screen overlap
+  const gateScreen = document.getElementById('gate-screen');
+  if (gateScreen && screenId !== 'gate' && !gateScreen.classList.contains('dissolving')) {
+    gateScreen.style.display = 'none';
+  }
+
   const tabs = document.querySelectorAll('.nav-tab');
   tabs.forEach(t => t.classList.remove('active-tab'));
   if (screenId === 'welcome' || screenId === 'selector' || screenId === 'landing' || screenId === 'gate' || screenId === 'realms_hub' || screenId === 'realms-hub') {

@@ -1253,8 +1253,11 @@ window.addEventListener('load', () => {
         const player = activeGameManager ? activeGameManager.player : null;
         const gateScreen = document.getElementById('gate-screen');
         const doors = document.getElementById('sanctuary-doors');
+        const innerPortal = document.getElementById('door-inner-revelation-portal');
         if (doors) doors.classList.remove('doors-opening');
+        if (innerPortal) innerPortal.classList.remove('revelation-active');
         if (gateScreen) {
+            gateScreen.classList.remove('dissolving');
             gateScreen.style.display = 'flex';
             gateScreen.style.opacity = '1';
             gateScreen.style.pointerEvents = 'auto';
@@ -1295,6 +1298,7 @@ window.addEventListener('load', () => {
     window.executeDoorOpeningCeremony = (callback) => {
         const doors = document.getElementById('sanctuary-doors');
         const gateScreen = document.getElementById('gate-screen');
+        const innerPortal = document.getElementById('door-inner-revelation-portal');
 
         // 1. T = 0ms: Play Sacred Singing Bowl Soundscape & Medallion Radiant Pulse
         if (typeof play432HzBowlChime === 'function') {
@@ -1307,6 +1311,11 @@ window.addEventListener('load', () => {
             if (doors) doors.classList.add('doors-opening');
         }, 150);
 
+        // 2b. T = 350ms: Inner Revelation Chamber glows with warm radiant sunbeams
+        setTimeout(() => {
+            if (innerPortal) innerPortal.classList.add('revelation-active');
+        }, 350);
+
         // 3. T = 3850ms: Mount target screen underneath WHILE gate screen is still completely opaque
         // (150ms start + 1500ms majestic door swing + 2200ms serene quote contemplation = 3850ms)
         setTimeout(() => {
@@ -1316,6 +1325,7 @@ window.addEventListener('load', () => {
         // 4. T = 3900ms: Graceful dissolve begins (600ms golden fade), seamlessly revealing pre-mounted target screen
         setTimeout(() => {
             if (gateScreen) {
+                gateScreen.classList.add('dissolving');
                 gateScreen.style.transition = 'opacity 0.6s ease-out';
                 gateScreen.style.opacity = '0';
                 gateScreen.style.pointerEvents = 'none';
@@ -1325,7 +1335,9 @@ window.addEventListener('load', () => {
         // 5. T = 4500ms: Door fully dissolved, hide gate screen (4.5s Deep Temple Immersion)
         setTimeout(() => {
             if (doors) doors.classList.remove('doors-opening');
+            if (innerPortal) innerPortal.classList.remove('revelation-active');
             if (gateScreen) {
+                gateScreen.classList.remove('dissolving');
                 gateScreen.style.display = 'none';
                 gateScreen.style.opacity = '';
                 gateScreen.style.pointerEvents = '';
@@ -1360,6 +1372,10 @@ window.addEventListener('load', () => {
     };
 
     window.handleGatewayExplore = () => {
+        const gateScreen = document.getElementById('gate-screen');
+        if (gateScreen) {
+            gateScreen.style.display = 'none';
+        }
         window.updateHubCardsUI();
         routeToScreen('realms_hub');
     };

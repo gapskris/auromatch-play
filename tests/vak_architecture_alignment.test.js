@@ -226,4 +226,95 @@ describe('🏛️ VAK Architecture & Alignment Master Test Suite for AuroMatch',
     }
   });
 
+  test('TC-VAK-09: Gate Screen Overlay Architecture & Zero Document Flow Split (Pics 1 & 3 Parity)', () => {
+    // 1. Verify .gate-view is styled as an absolute overlay
+    assert.ok(cssContent.includes('.gate-view') && cssContent.includes('position: absolute;'), '.gate-view must be position: absolute');
+    assert.ok(cssContent.includes('inset: 0;'), '.gate-view must specify inset: 0');
+    assert.ok(cssContent.includes('z-index: 100;'), '.gate-view must specify z-index: 100');
+
+    // 2. Verify .app-container enforces overflow: hidden and position: relative to encapsulate overlay
+    assert.ok(cssContent.includes('.app-container') && cssContent.includes('overflow: hidden;'), '.app-container must have overflow: hidden');
+    assert.ok(cssContent.includes('position: relative;'), '.app-container must have position: relative');
+  });
+
+  test('TC-VAK-10: Inner Revelation Portal DOM & Inscription Integrity (Pic 2 Parity)', () => {
+    // 1. Verify Inner Revelation Chamber container exists in index.html
+    assert.ok(htmlContent.includes('id="door-inner-revelation-portal"'), '#door-inner-revelation-portal must exist');
+    assert.ok(htmlContent.includes('door-inner-revelation-portal'), 'door-inner-revelation-portal class must exist');
+    assert.ok(htmlContent.includes('inner-portal-sunbeam'), 'inner-portal-sunbeam must exist for radiant glow');
+
+    // 2. Verify sacred inscriptions & typography
+    assert.ok(htmlContent.includes('ENTER IN PEACE'), 'Inner portal must feature title: ENTER IN PEACE');
+    assert.ok(htmlContent.includes('All life is yoga.'), 'Inner portal quote must feature: All life is yoga.');
+    assert.ok(htmlContent.includes('Sri Aurobindo'), 'Inner portal citation must feature Sri Aurobindo');
+    assert.ok(htmlContent.includes('inner-portal-symbol'), 'inner-portal-symbol container must exist');
+
+    // 3. Verify CSS styling for inner portal & sunbeam animation
+    assert.ok(cssContent.includes('.door-inner-revelation-portal'), 'CSS must define .door-inner-revelation-portal');
+    assert.ok(cssContent.includes('.inner-portal-sunbeam'), 'CSS must define .inner-portal-sunbeam');
+    assert.ok(cssContent.includes('@keyframes sunbeamPulse'), 'CSS must define @keyframes sunbeamPulse');
+  });
+
+  test('TC-VAK-11: 3D Beveled Door Leaves & Filigree Inlay Architecture (Pic 2 Parity)', () => {
+    // 1. Verify filigree panels exist in index.html inside both door panels
+    assert.ok(htmlContent.includes('class="door-filigree-panel"'), 'door-filigree-panel must exist inside door panels');
+
+    // 2. Verify filigree CSS and 3D swing transforms
+    assert.ok(cssContent.includes('.door-filigree-panel'), 'CSS must define .door-filigree-panel');
+    assert.ok(cssContent.includes('border-radius: 26px;'), 'Door leaves must feature 26px rounded contours');
+    assert.ok(cssContent.includes('transform: rotateY(-105deg);'), 'Left door leaf must swing outward in 3D');
+    assert.ok(cssContent.includes('transform: rotateY(105deg);'), 'Right door leaf must swing outward in 3D');
+  });
+
+  test('TC-VAK-12: Screen Routing Lifecycle & Zero Inline Specificity Conflict (Pics 1 & 3 Parity)', () => {
+    const gmJsPath = path.resolve(__dirname, '../src/controllers/gameManager.js');
+    const gmJsContent = fs.readFileSync(gmJsPath, 'utf8');
+
+    // 1. Verify routeToScreen manages #gate-screen inline display
+    assert.ok(gmJsContent.includes("document.getElementById('gate-screen')"), 'routeToScreen must reference #gate-screen');
+    assert.ok(gmJsContent.includes("gateScreen.style.display = 'none'"), 'routeToScreen must hide gate-screen on exit');
+
+    // 2. Verify handleGatewayExplore clears gate screen
+    assert.ok(mainJsContent.includes('handleGatewayExplore'), 'main.js must define handleGatewayExplore');
+    assert.ok(mainJsContent.includes("routeToScreen('realms_hub')"), 'handleGatewayExplore must route to realms_hub');
+
+    // 3. Verify executeDoorOpeningCeremony handles dissolving class and cleanup
+    assert.ok(mainJsContent.includes("gateScreen.classList.add('dissolving')"), 'Ceremony must add dissolving class');
+    assert.ok(mainJsContent.includes("gateScreen.classList.remove('dissolving')"), 'Ceremony must remove dissolving class');
+  });
+
+  test('TC-VAK-13: Gateway Buttons Alignment & Touch Target Conformance', () => {
+    // 1. Verify gate-actions container styling
+    assert.ok(cssContent.includes('.gate-actions'), 'CSS must define .gate-actions');
+    assert.ok(cssContent.includes('max-width: 360px;'), '.gate-actions must enforce max-width: 360px');
+
+    // 2. Verify primary and secondary CTA styling
+    assert.ok(cssContent.includes('.gate-cta-primary'), 'CSS must define .gate-cta-primary');
+    assert.ok(cssContent.includes('.gate-cta-secondary'), 'CSS must define .gate-cta-secondary');
+    assert.ok(cssContent.includes('border-radius: 28px;'), '.gate-cta-primary must have pill border-radius');
+  });
+
+  test('TC-VAK-14: Dual Repository Exact File Parity (AuroMatch vs auromatch-play)', () => {
+    const playHtmlPath = path.resolve(__dirname, '../../auromatch-play/index.html');
+    const playCssPath = path.resolve(__dirname, '../../auromatch-play/styles/main.css');
+    const playMainJsPath = path.resolve(__dirname, '../../auromatch-play/src/main.js');
+    const playGmJsPath = path.resolve(__dirname, '../../auromatch-play/src/controllers/gameManager.js');
+
+    assert.ok(fs.existsSync(playHtmlPath), 'auromatch-play index.html must exist');
+    assert.ok(fs.existsSync(playCssPath), 'auromatch-play styles/main.css must exist');
+    assert.ok(fs.existsSync(playMainJsPath), 'auromatch-play src/main.js must exist');
+    assert.ok(fs.existsSync(playGmJsPath), 'auromatch-play src/controllers/gameManager.js must exist');
+
+    const playHtml = fs.readFileSync(playHtmlPath, 'utf8');
+    const playCss = fs.readFileSync(playCssPath, 'utf8');
+    const playMainJs = fs.readFileSync(playMainJsPath, 'utf8');
+
+    // Verify key architectural additions are identical in auromatch-play
+    assert.ok(playHtml.includes('id="door-inner-revelation-portal"'), 'play index.html must have #door-inner-revelation-portal');
+    assert.ok(playHtml.includes('door-filigree-panel'), 'play index.html must have door-filigree-panel');
+    assert.ok(playCss.includes('.door-inner-revelation-portal'), 'play main.css must have .door-inner-revelation-portal');
+    assert.ok(playCss.includes('.door-filigree-panel'), 'play main.css must have .door-filigree-panel');
+    assert.ok(playMainJs.includes('executeDoorOpeningCeremony'), 'play main.js must have executeDoorOpeningCeremony');
+  });
+
 });
