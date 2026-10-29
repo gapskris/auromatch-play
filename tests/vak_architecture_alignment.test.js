@@ -337,4 +337,29 @@ describe('🏛️ VAK Architecture & Alignment Master Test Suite for AuroMatch',
     assert.ok(mainJsContent.includes('window.updateHubCardsUI()'), 'handleGatewayEnter must update hub cards UI');
     assert.ok(mainJsContent.includes("auromatch_has_entered_sanctuary"), 'handleGatewayEnter must track entered sanctuary status');
   });
+
+  test('TC-VAK-17: Zero Generic Native Dialogs (alert, confirm, prompt) & Enriched Purge Modal Architecture', () => {
+    const srcDir = path.resolve(__dirname, '../src');
+    const constellationPath = path.resolve(srcDir, 'ui/constellation.js');
+    const constellationContent = fs.readFileSync(constellationPath, 'utf8');
+
+    // 1. Verify ZERO native popups in main.js and constellation.js
+    const nativePopupPattern = /\b(alert|confirm|prompt)\s*\(/;
+    assert.strictEqual(nativePopupPattern.test(mainJsContent), false, 'src/main.js must have 0 native alert/confirm/prompt calls');
+    assert.strictEqual(nativePopupPattern.test(constellationContent), false, 'src/ui/constellation.js must have 0 native alert/confirm/prompt calls');
+
+    // 2. Verify enriched #purge-modal in index.html
+    assert.ok(htmlContent.includes('id="purge-modal"'), 'index.html must contain #purge-modal');
+    assert.ok(htmlContent.includes('id="purge-confirm-input"'), 'index.html must contain #purge-confirm-input');
+    assert.ok(htmlContent.includes('id="btn-confirm-purge"'), 'index.html must contain #btn-confirm-purge');
+
+    // 3. Verify modal controllers in main.js
+    assert.ok(mainJsContent.includes('window.closePurgeModal'), 'main.js must define closePurgeModal');
+    assert.ok(mainJsContent.includes('window.confirmPurgeReset'), 'main.js must define confirmPurgeReset');
+    assert.ok(mainJsContent.includes('executeAbsolutePurge()'), 'confirmPurgeReset must invoke executeAbsolutePurge');
+
+    // 4. Verify constellation uses showToastMessage
+    assert.ok(constellationContent.includes('window.showToastMessage("✨ Ashram Milestone Day:'), 'constellation.js must use showToastMessage for milestones');
+    assert.ok(constellationContent.includes('window.showToastMessage(`📜 Reflection'), 'constellation.js must use showToastMessage for reflections');
+  });
 });

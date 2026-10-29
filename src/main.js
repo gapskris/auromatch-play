@@ -1114,13 +1114,44 @@ window.addEventListener('load', () => {
     };
 
     window.triggerPurgeReset = () => {
-        const val = prompt("Type 'PURGE' verbatim to drop keys and reset the application storage:");
-        if (val === 'PURGE') {
-            executeAbsolutePurge();
-            window.showToastMessage("All keys dropped. Reloading...");
-            setTimeout(() => window.location.reload(), 600);
-        } else {
+        const modal = document.getElementById('purge-modal');
+        const input = document.getElementById('purge-confirm-input');
+        if (modal) {
+            if (input) input.value = '';
+            modal.style.display = 'flex';
+            setTimeout(() => { if (input) input.focus(); }, 100);
+        }
+    };
+
+    window.closePurgeModal = () => {
+        const modal = document.getElementById('purge-modal');
+        if (modal) modal.style.display = 'none';
+        if (window.showToastMessage) {
             window.showToastMessage("Purge action cancelled.");
+        }
+    };
+
+    window.confirmPurgeReset = () => {
+        const input = document.getElementById('purge-confirm-input');
+        const val = input ? input.value.trim() : '';
+        if (val === 'PURGE') {
+            const modal = document.getElementById('purge-modal');
+            if (modal) modal.style.display = 'none';
+            executeAbsolutePurge();
+            if (window.showToastMessage) {
+                window.showToastMessage("🌿 Sanctuary Cleansed · All storage purged successfully.");
+            }
+            setTimeout(() => {
+                window.location.reload();
+            }, 800);
+        } else {
+            if (window.showToastMessage) {
+                window.showToastMessage("⚠️ Please type 'PURGE' verbatim to confirm wipe.");
+            }
+            if (input) {
+                input.focus();
+                input.select();
+            }
         }
     };
 
@@ -1133,7 +1164,7 @@ window.addEventListener('load', () => {
     });
 
     // Backdrop dismissal for auxiliary overlays
-    ['glossary-modal', 'onboarding-modal', 'darshan-modal'].forEach((modalId) => {
+    ['glossary-modal', 'onboarding-modal', 'darshan-modal', 'purge-modal'].forEach((modalId) => {
         const el = document.getElementById(modalId);
         if (el) {
             el.addEventListener('click', (e) => {

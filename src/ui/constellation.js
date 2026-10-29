@@ -58,12 +58,18 @@ export function renderConstellationCalendar(gridId, svgId) {
         if (isMilestone) {
             nodeDiv.classList.add('event-halo');
             nodeDiv.onclick = () => {
-                alert("Ashram Milestone Day: Concentrating on the Divine Presence.");
+                if (window.showToastMessage) {
+                    window.showToastMessage("✨ Ashram Milestone Day: Concentrating on the Divine Presence.", 3500);
+                }
             };
         } else if (active) {
             nodeDiv.onclick = () => {
                 const entry = profileState.reflections[idx];
-                alert(`Reflection logged on ${new Date(entry.timestamp).toLocaleDateString()}:\n"${entry.input_text}"`);
+                const dateStr = entry && entry.timestamp ? new Date(entry.timestamp).toLocaleDateString() : '';
+                const text = entry && entry.input_text ? entry.input_text : '';
+                if (window.showToastMessage) {
+                    window.showToastMessage(`📜 Reflection (${dateStr}): "${text}"`, 4000);
+                }
             };
         }
         
