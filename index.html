@@ -76,7 +76,7 @@
                 </div>
                 <div class="landing-brand-stack">
                     <span class="landing-eyebrow">AUROMIND SERIES</span>
-                    <h1 class="landing-title-3d">A U R O M A T C H</h1>
+                    <h1 class="landing-title-3d">AUROMATCH</h1>
                     <p class="landing-tagline">ZEN TILE SOLITAIRE & SACRED GEOMETRY</p>
                 </div>
                 <button class="landing-enter-pill" id="landing-tap-prompt">TAP ANYWHERE TO ENTER</button>
@@ -439,6 +439,13 @@
                         </div>
                     </div>
                 </div>
+                <div class="header-center-group">
+                    <button class="header-realm-dropdown-pill" id="header-realm-dropdown-pill" onclick="window.openRealmsHubFromGame()" title="Switch Theme or Mode (Tap to open Realm Hub)">
+                        <span id="hdr-realm-icon">💎</span>
+                        <span id="hdr-realm-text">Theme: Royal Lapis</span>
+                        <span class="hdr-dropdown-arrow">▾</span>
+                    </button>
+                </div>
                 <div class="hud-progression-bar">
                     <span class="hud-player-badge" id="header-player-badge" title="Player Name">👤 <span id="header-player-name">Seeker</span></span>
                     <span class="hud-iq-badge" id="header-iq-badge" title="Focus IQ: Cognitive concentration and sharpness index">🧠 IQ: <span id="header-iq-count">80</span></span>
@@ -447,6 +454,7 @@
                     <span class="hud-sparks-count" id="header-sparks-count">✨ 100</span>
                     <span id="header-score-badge" style="font-size: 11px; font-weight: 800; color: #fde047; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); padding: 2px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 3px;" title="Cumulative Exploration Score">🏆 <span id="header-score-count">0</span></span>
                     <span id="header-clean-solve-badge" style="font-size: 10px; font-weight: 700; color: #ffd700; background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.35); padding: 2px 8px; border-radius: 12px; display: inline-flex; align-items: center; gap: 3px;" title="No hints or reshuffles used yet (+5 Sparks bonus eligible)">✨ Clean Solve</span>
+                    <button class="senior-toggle-btn" id="btn-toggle-senior" onclick="window.toggleSeniorViewMode()" title="Toggle Senior View (aA)" aria-label="Toggle Senior View aA" style="margin-left: 4px;">aA</button>
                 </div>
                 <button class="hdr-btn" onclick="navTo('settings')">⚙</button>
             </header>

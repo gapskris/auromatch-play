@@ -264,6 +264,10 @@ window.addEventListener('load', () => {
             iqCount.innerText = `${state.focusIQ}`;
         }
 
+        if (typeof window.updateHeaderRealmDropdown === 'function') {
+            window.updateHeaderRealmDropdown();
+        }
+
         // Action bar Hint badge affordance (dims when < 20 sparks)
         const hintBtnBadge = document.querySelector('#btn-action-hint .action-btn-badge');
         if (hintBtnBadge) {
@@ -847,6 +851,9 @@ window.addEventListener('load', () => {
             } else {
                 activeGameManager.startNewStage(activeGameManager.player.currentLevel);
             }
+            if (typeof window.updateHeaderRealmDropdown === 'function') {
+                window.updateHeaderRealmDropdown();
+            }
         }
     };
 
@@ -1224,21 +1231,23 @@ window.addEventListener('load', () => {
     // AUROMIND SERIES: VAK ARCHITECTURE ALIGNMENT (STAGES 0, 1, 1.5, 2, 3 & EPIPHANY)
     // =========================================================================
 
-    // Stage 0: 1.6s Auto-Advance Timer with Tap-to-Skip
-    let landingTimer = setTimeout(() => {
-        if (typeof window.handleLandingTap === 'function') {
-            window.handleLandingTap();
-        }
-    }, 1600);
-
+    // Stage 0: 3D Splash Cover Screen (Interactive: awaits user tap/click/Space/Enter without premature auto-dismissal)
+    let hasSkippedLanding = false;
     window.handleLandingTap = () => {
-        if (landingTimer) {
-            clearTimeout(landingTimer);
-            landingTimer = null;
-        }
+        if (hasSkippedLanding) return;
+        hasSkippedLanding = true;
         window.updateGatewayUI();
         routeToScreen('gate');
     };
+
+    window.addEventListener('keydown', (e) => {
+        const landingScreen = document.getElementById('landing-screen');
+        if (landingScreen && landingScreen.classList.contains('active-screen')) {
+            if (e.code === 'Space' || e.key === ' ' || e.key === 'Enter') {
+                window.handleLandingTap();
+            }
+        }
+    });
 
     window.updateGatewayUI = () => {
         const player = activeGameManager ? activeGameManager.player : null;
@@ -1339,6 +1348,41 @@ window.addEventListener('load', () => {
         const bLapis = document.getElementById('hub-btn-lapis');
         if (bGold) bGold.classList.toggle('active', themeKey === 'imperial_gold');
         if (bLapis) bLapis.classList.toggle('active', themeKey === 'royal_lapis');
+    };
+
+    window.updateHeaderRealmDropdown = () => {
+        const iconEl = document.getElementById('hdr-realm-icon');
+        const textEl = document.getElementById('hdr-realm-text');
+        if (!textEl) return;
+
+        if (!activeGameManager) {
+            if (iconEl) iconEl.textContent = '💎';
+            textEl.textContent = 'Theme: Royal Lapis';
+            return;
+        }
+
+        const mode = activeGameManager.gameplayMode;
+        if (mode === 'tile_club') {
+            if (iconEl) iconEl.textContent = '📥';
+            textEl.textContent = 'Tile Club (Triad)';
+        } else if (mode === 'botanical') {
+            if (iconEl) iconEl.textContent = '🌸';
+            textEl.textContent = 'Botanical Art';
+        } else if (mode === 'realms') {
+            if (iconEl) iconEl.textContent = '🗺️';
+            const realm = activeGameManager.currentRealm;
+            textEl.textContent = realm ? `Realm: ${realm.name}` : '20 Sacred Realms';
+        } else {
+            // Pairs (vita)
+            const themeKey = activeGameManager.standardTheme || 'royal_lapis';
+            if (themeKey === 'imperial_gold') {
+                if (iconEl) iconEl.textContent = '👑';
+                textEl.textContent = 'Theme: Imperial Gold';
+            } else {
+                if (iconEl) iconEl.textContent = '💎';
+                textEl.textContent = 'Theme: Royal Lapis';
+            }
+        }
     };
 
     window.openRealmsHubFromGame = () => {

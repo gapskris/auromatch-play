@@ -24,7 +24,7 @@ describe('🏛️ VAK Architecture & Alignment Master Test Suite for AuroMatch',
   const synthJsPath = path.resolve(__dirname, '../src/audio/synthesizer.js');
   const synthJsContent = fs.readFileSync(synthJsPath, 'utf8');
 
-  test('TC-VAK-01: Stage 0 3D Splash Screen DOM & 1.6s Auto-Advance / Tap-to-Skip', () => {
+  test('TC-VAK-01: Stage 0 3D Splash Screen DOM & Interactive Cover Pacing (No Auto-Advance)', () => {
     // 1. Verify #landing-screen container
     assert.ok(htmlContent.includes('id="landing-screen"'), '#landing-screen container must exist in index.html');
     assert.ok(htmlContent.includes('landing-view'), 'landing-view CSS class must be present');
@@ -36,10 +36,13 @@ describe('🏛️ VAK Architecture & Alignment Master Test Suite for AuroMatch',
     assert.ok(htmlContent.includes('id="landing-tap-prompt"'), '#landing-tap-prompt must exist');
     assert.ok(htmlContent.includes('TAP ANYWHERE TO ENTER'), 'Prompt text must instruct TAP ANYWHERE TO ENTER');
 
-    // 3. Verify auto-timer (1.6s) and tap-to-skip in src/main.js
+    // 3. Verify title CSS has white-space: nowrap to prevent AUROMATC / H line splitting (Pic 1 fix)
+    assert.ok(cssContent.includes('.landing-title-3d') && cssContent.includes('white-space: nowrap;'), 'landing-title-3d must enforce white-space: nowrap');
+
+    // 4. Verify interactive cover pacing: NO premature auto-advance timer, awaits user tap or keyboard Space/Enter (Pic 1 fix)
     assert.ok(mainJsContent.includes('handleLandingTap'), 'handleLandingTap must be defined in main.js');
-    assert.ok(mainJsContent.includes('landingTimer = setTimeout('), 'landingTimer setTimeout must be initialized');
-    assert.ok(mainJsContent.includes('1600'), 'landingTimer auto-advance duration must be exactly 1600ms (1.6s)');
+    assert.ok(!mainJsContent.includes('landingTimer = setTimeout('), 'Must NOT contain automatic landingTimer auto-dismissal');
+    assert.ok(mainJsContent.includes('window.addEventListener(\'keydown\''), 'Must listen for keyboard Space/Enter interaction');
   });
 
   test('TC-VAK-02: Stage 1 Sanctuary Gateway Double Doors & Medallion Structure', () => {
@@ -91,7 +94,7 @@ describe('🏛️ VAK Architecture & Alignment Master Test Suite for AuroMatch',
     assert.ok(mainJsContent.includes('⚡ ${player.sparks'), 'Resume text must show player sparks');
   });
 
-  test('TC-VAK-04: Stage 1.5 2.2s Meditative Opening Ceremony & 432Hz Audio Synthesis', () => {
+  test('TC-VAK-04: Stage 1.5 2.2s Meditative Opening Ceremony & 432Hz Audio Synthesis with Working 3D Doors', () => {
     // 1. Verify play432HzBowlChime export and mathematical frequency tuning
     assert.ok(typeof synth.play432HzBowlChime === 'function', 'play432HzBowlChime must be exported from synthesizer');
     assert.ok(synthJsContent.includes('const f0 = 432.0;'), 'Fundamental frequency must be mathematically set to exactly 432.0 Hz');
@@ -104,7 +107,8 @@ describe('🏛️ VAK Architecture & Alignment Master Test Suite for AuroMatch',
     assert.ok(mainJsContent.includes('doors.classList.add(\'doors-opening\')'), 'Ceremony must add doors-opening class');
     assert.ok(mainJsContent.includes('2200'), 'Opening ceremony duration must be exactly 2200ms (2.2s)');
 
-    // 4. Verify 3D door rotation CSS (-105deg and +105deg)
+    // 4. Verify CSS selector matches BOTH .sanctuary-double-doors.doors-opening and #sanctuary-doors.doors-opening (Pic 2 fix)
+    assert.ok(cssContent.includes('.sanctuary-double-doors.doors-opening') || cssContent.includes('#sanctuary-doors.doors-opening'), 'CSS selector must match sanctuary-double-doors or #sanctuary-doors with doors-opening');
     assert.ok(cssContent.includes('rotateY(-105deg)'), 'Left door must swing -105 degrees');
     assert.ok(cssContent.includes('rotateY(105deg)'), 'Right door must swing +105 degrees');
   });
@@ -139,13 +143,20 @@ describe('🏛️ VAK Architecture & Alignment Master Test Suite for AuroMatch',
     assert.strictEqual(gm.gameplayMode, 'realms');
   });
 
-  test('TC-VAK-06: Stage 3 In-Game Header Dropdown Pill & Seamless Routing', () => {
-    // 1. Verify #gameplay-prompt is an interactive dropdown pill button
-    assert.ok(htmlContent.includes('id="gameplay-prompt"'), '#gameplay-prompt must exist');
-    assert.ok(htmlContent.includes('gameplay-prompt-dropdown'), 'gameplay-prompt-dropdown class must be present');
+  test('TC-VAK-06: Stage 3 In-Game Top-Center Header Dropdown Pill & Clean Zen Layout (Pic 3 Parity)', () => {
+    // 1. Verify #header-realm-dropdown-pill exists in .app-header (Pic 3 Parity)
+    assert.ok(htmlContent.includes('id="header-realm-dropdown-pill"'), '#header-realm-dropdown-pill must exist in header');
+    assert.ok(htmlContent.includes('header-realm-dropdown-pill'), 'header-realm-dropdown-pill class must be present');
     assert.ok(htmlContent.includes('onclick="window.openRealmsHubFromGame()"'), 'Clicking header pill must call openRealmsHubFromGame');
 
-    // 2. Verify routeToScreen handles realms_hub and hides #app-nav
+    // 2. Verify CSS hides redundant mode-toggle-bar and footer-theme-selector in gameplay screen (Pic 3 Parity)
+    assert.ok(cssContent.includes('#game-screen .mode-toggle-bar') && cssContent.includes('display: none'), '#game-screen must hide redundant mode-toggle-bar');
+    assert.ok(cssContent.includes('#game-screen #footer-theme-selector') && cssContent.includes('display: none'), '#game-screen must hide redundant footer-theme-selector');
+
+    // 3. Verify updateHeaderRealmDropdown function exists in main.js
+    assert.ok(mainJsContent.includes('window.updateHeaderRealmDropdown = () =>'), 'updateHeaderRealmDropdown must be defined in main.js');
+
+    // 4. Verify routeToScreen handles realms_hub and hides #app-nav
     assert.ok(mainJsContent.includes('openRealmsHubFromGame'), 'openRealmsHubFromGame must be defined in main.js');
     assert.ok(mainJsContent.includes('routeToScreen(\'realms_hub\')'), 'openRealmsHubFromGame must route to realms_hub');
   });
