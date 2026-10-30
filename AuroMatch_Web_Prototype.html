@@ -7722,6 +7722,48 @@ body[data-theme="royal_lapis"] .header-realm-dropdown-pill {
     z-index: 10 !important;
 }
 
+/* =========================================================================
+   TABLET PORTRAIT FRAME ADJUSTMENTS (601px - 1023px)
+   Eliminates 412px pillarbox gap; expands canvas for senior tile sizing
+   ========================================================================= */
+@media (min-width: 601px) and (max-width: 1023px) {
+    .app-container {
+        width: 92vw !important;
+        max-width: clamp(540px, 86vw, 680px) !important;
+        height: 94dvh !important;
+        height: var(--app-height, 94dvh) !important;
+        max-height: 1100px !important;
+        border-radius: 24px !important;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75), 0 0 40px rgba(251, 191, 36, 0.15) !important;
+    }
+
+    /* Scale Sanctuary Doors proportionally to tablet width */
+    .sanctuary-door-stage {
+        max-width: 440px !important;
+        height: 380px !important;
+    }
+    
+    /* Scale Realm Selection cards */
+    .realm-hub-card {
+        padding: 1rem 1.25rem !important;
+    }
+}
+
+/* =========================================================================
+   CROSS-VIEWPORT MODAL OVERLAYS VIEWPORT SAFETY (DVH BOUNDS)
+   ========================================================================= */
+.stage-clear-card,
+.settings-modal,
+.onboarding-card,
+.realms-browser-card,
+.epiphany-parchment-card {
+    max-height: min(90dvh, 90vh) !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+
 </style>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
