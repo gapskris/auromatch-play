@@ -17,17 +17,16 @@ import {
   setTuningScale,
   unlockAudioContext
 } from '../audio/synthesizer.js';
-import { profileState, saveProfileState } from './storageAdapter.js';
+import { profileState, saveProfileState, isPurgeActive, setItemAsync } from './storageAdapter.js';
 import {
   triggerTileSparkleDissolve,
   triggerTileConvergenceSmash,
   triggerTrayTriadSparkle
 } from '../ui/particles.js';
-import { ThemeManager, REALMS, TOTAL_REALM_LEVELS, TOTAL_CLASSIC_LEVELS, TOTAL_BOTANICAL_LEVELS } from './themeManager.js';
+import { ThemeManager, REALMS, TOTAL_REALM_LEVELS, TOTAL_CLASSIC_LEVELS, TOTAL_BOTANICAL_LEVELS, TOTAL_PAIRS_LEVELS } from './themeManager.js';
 
 export const TOTAL_LEVELS = 520;
-export const TOTAL_PAIRS_LEVELS = 400; // Unified Pairs (Mahjong Solitaire) Campaign
-export { TOTAL_CLASSIC_LEVELS, TOTAL_BOTANICAL_LEVELS };
+export { TOTAL_PAIRS_LEVELS, TOTAL_CLASSIC_LEVELS, TOTAL_BOTANICAL_LEVELS };
 
 export const RANKS = [
   { name: 'Aspirant', symbol: '🌱', minLevel: 1, maxLevel: 25 },
@@ -132,12 +131,34 @@ export class GameManager {
     this.levelsSinceLastEpiphany = 0;
     this.nextEpiphanyTarget = Math.floor(Math.random() * 7) + 6; // 6 to 12
     this.isEpiphanyActive = false;
+    this.isEpiphanyLevelActive = false;
+    this.serenityMeter = 100;
+    this.epiphanyState = 'IDLE'; // 'IDLE' | 'OFFERED' | 'ACTIVE' | 'TRIUMPH' | 'DISSOLVED' | 'POSTPONED'
+    this.epiphaniesUnlocked = [];
 
     // Callbacks
     this.onStateChange = options.onStateChange || null;
     this.onMatchSuccess = options.onMatchSuccess || null;
     this.onGameOver = options.onGameOver || null;
     this.onStageComplete = options.onStageComplete || null;
+  }
+
+  resetActivePlayerState() {
+    this.player = {
+      name: '',
+      currentLevel: 1,
+      sparks: 100,
+      score: 0,
+      focusIQ: 80,
+      isNewUser: true
+    };
+    this.profilesMap = {};
+    this.levelsSinceLastEpiphany = 0;
+    this.isEpiphanyActive = false;
+    this.isEpiphanyLevelActive = false;
+    this.serenityMeter = 100;
+    this.epiphanyState = 'IDLE';
+    this.notifyState();
   }
 
   loadProfilesMap() {
@@ -151,11 +172,18 @@ export class GameManager {
   }
 
   saveProfilesMap(profiles) {
+    if (isPurgeActive()) {
+      console.warn('[GameManager] saveProfilesMap blocked: Purge is active.');
+      return false;
+    }
     try {
       if (typeof localStorage !== 'undefined') {
         localStorage.setItem('auromatch_player_profiles', JSON.stringify(profiles));
       }
+      setItemAsync('auromatch_player_profiles', profiles);
+      return true;
     } catch (e) {}
+    return false;
   }
 
   loadStandardTheme() {
@@ -172,8 +200,11 @@ export class GameManager {
     const valid = (themeKey === 'royal_lapis') ? 'royal_lapis' : 'imperial_gold';
     this.standardTheme = valid;
     try {
-      if (typeof localStorage !== 'undefined') {
-        localStorage.setItem('auromatch_standard_theme', valid);
+      if (!isPurgeActive()) {
+        if (typeof localStorage !== 'undefined') {
+          localStorage.setItem('auromatch_standard_theme', valid);
+        }
+        setItemAsync('auromatch_standard_theme', valid);
       }
     } catch (e) {}
 
@@ -233,8 +264,12 @@ export class GameManager {
             sparks: typeof parsed.sparks === 'number' ? parsed.sparks : 100,
             score: typeof parsed.score === 'number' ? parsed.score : 0,
             focusIQ: typeof parsed.focusIQ === 'number' ? parsed.focusIQ : (80 + Math.min(120, ((parsed.currentLevel || 1) - 1) * 2)),
+            goldenAuraLevelsRemaining: typeof parsed.goldenAuraLevelsRemaining === 'number' ? parsed.goldenAuraLevelsRemaining : 0,
             isNewUser: parsed.currentLevel === 1 && !parsed.hasProgress
           };
+          if (Array.isArray(parsed.epiphaniesUnlocked)) {
+            this.epiphaniesUnlocked = parsed.epiphaniesUnlocked;
+          }
           if (state.name) {
             const profiles = this.loadProfilesMap();
             if (!profiles[state.name]) {
@@ -258,16 +293,50 @@ export class GameManager {
   }
 
   savePlayerState() {
+    if (isPurgeActive()) {
+      console.warn('[GameManager] savePlayerState blocked: Purge is active.');
+      return false;
+    }
     try {
       if (typeof localStorage !== 'undefined') {
-        localStorage.setItem('auromatch_player_state', JSON.stringify({
+        // Fresh-Read-Before-Merge: Prevent stale in-memory snapshot from rolling back concurrent progress
+        const storedRaw = localStorage.getItem('auromatch_player_state');
+        if (storedRaw) {
+          try {
+            const stored = JSON.parse(storedRaw);
+            if (stored && stored.name === this.player.name) {
+              if (typeof stored.currentLevel === 'number' && stored.currentLevel > this.player.currentLevel) {
+                this.player.currentLevel = stored.currentLevel;
+              }
+              if (typeof stored.sparks === 'number' && stored.sparks > this.player.sparks) {
+                this.player.sparks = stored.sparks;
+              }
+              if (typeof stored.score === 'number' && stored.score > (this.player.score || 0)) {
+                this.player.score = stored.score;
+              }
+              if (typeof stored.focusIQ === 'number' && stored.focusIQ > (this.player.focusIQ || 80)) {
+                this.player.focusIQ = stored.focusIQ;
+              }
+            }
+          } catch (e) {}
+        }
+
+        const payload = {
           name: this.player.name || '',
           currentLevel: this.player.currentLevel,
           sparks: this.player.sparks,
           score: this.player.score || 0,
           focusIQ: this.player.focusIQ || 80,
+          goldenAuraLevelsRemaining: this.player.goldenAuraLevelsRemaining || 0,
+          epiphaniesUnlocked: this.epiphaniesUnlocked || [],
           hasProgress: this.player.currentLevel > 1 || this.player.sparks !== 100 || (this.player.score || 0) > 0
-        }));
+        };
+
+        localStorage.setItem('auromatch_player_state', JSON.stringify(payload));
+        localStorage.setItem('auromatch_level_index', String(this.player.currentLevel || 1));
+        localStorage.setItem('auromatch_sparks_balance', String(this.player.sparks || 100));
+        localStorage.setItem('auromatch_gameplay_mode', this.gameplayMode || 'botanical');
+        setItemAsync('auromatch_player_state', payload);
 
         if (this.player.name) {
           const profiles = this.loadProfilesMap();
@@ -281,10 +350,12 @@ export class GameManager {
           };
           this.saveProfilesMap(profiles);
         }
+        return true;
       }
     } catch (e) {
       console.warn('Failed to save player state:', e);
     }
+    return false;
   }
 
   setPlayerName(name, avatar = null) {
@@ -593,8 +664,10 @@ export class GameManager {
     const rootEl = document.getElementById('app-wrapper') || document.body;
     if (this.seniorView) {
       rootEl.classList.add('senior-view');
+      rootEl.classList.add('senior-view-active');
     } else {
       rootEl.classList.remove('senior-view');
+      rootEl.classList.remove('senior-view-active');
     }
     // Persist to storage
     if (profileState && profileState.settings) {
@@ -661,9 +734,80 @@ export class GameManager {
     }
   }
 
+  startEpiphanyTrial() {
+    this.isEpiphanyLevelActive = true;
+    this.serenityMeter = 100;
+    this.epiphanyState = 'ACTIVE';
+    this.isEpiphanyActive = false;
+    this.isStageCompleted = false;
+    this.isPaused = false;
+    this.tray = [];
+    this.matchedPairs = [];
+    this.moveHistory = [];
+    this.hintsUsedInStage = 0;
+
+    const mandalaCoords = VitaBoardGenerator.getEpiphanyMandalaCoordinates(48);
+    this.tiles = VitaBoardGenerator.generateSolvableBoard(mandalaCoords, floraCatalog, 'tile_club');
+    this.currentFormationName = 'Epiphany Mandala (Matrimandir Lotus)';
+
+    if (this.boardRenderer) {
+      this.boardRenderer.setTiles(this.tiles);
+      this.boardRenderer.render();
+    }
+    this.notifyState();
+  }
+
+  postponeEpiphanyTrial() {
+    this.epiphanyState = 'POSTPONED';
+    this.isEpiphanyActive = false;
+    this.isEpiphanyLevelActive = false;
+    this.notifyState();
+  }
+
+  decaySerenity(amount = 4) {
+    if (!this.isEpiphanyLevelActive) return;
+    this.serenityMeter = Math.max(0, this.serenityMeter - amount);
+    if (this.serenityMeter <= 0) {
+      this.dissolveEpiphanyStage('FOCUS_DEPLETED');
+    } else {
+      this.notifyState();
+    }
+  }
+
+  completeEpiphanyStage() {
+    this.isEpiphanyLevelActive = false;
+    this.isStageCompleted = true;
+    this.epiphanyState = 'TRIUMPH';
+    this.player.sparks = (this.player.sparks || 0) + 60; // Gated +60 Triple Sparks Reward earned!
+    this.player.goldenAuraLevelsRemaining = 10;
+    this.epiphaniesUnlocked = this.epiphaniesUnlocked || [];
+    this.epiphaniesUnlocked.push({
+      level: this.player.currentLevel,
+      timestamp: Date.now(),
+      score: this.player.score,
+      serenityRemaining: this.serenityMeter
+    });
+    this.savePlayerState();
+    playAshramMeditationGong();
+    this.notifyState();
+  }
+
+  dissolveEpiphanyStage(reason = 'TRAY_OVERFLOW') {
+    this.isEpiphanyLevelActive = false;
+    this.isStageCompleted = true;
+    this.epiphanyState = 'DISSOLVED';
+    this.player.sparks = (this.player.sparks || 0) + 20; // Standard base sparks
+    this.levelsSinceLastEpiphany = 0;
+    this.nextEpiphanyTarget = Math.floor(Math.random() * 7) + 6;
+    this.savePlayerState();
+    playBlockedWarningChime();
+    this.notifyState();
+  }
+
   triggerSacredEpiphany() {
     this.isEpiphanyActive = true;
-    this.player.sparks += 60;
+    this.epiphanyState = 'ACTIVE';
+    this.player.sparks = (this.player.sparks || 0) + 60;
     this.savePlayerState();
     this.notifyState();
   }
@@ -675,6 +819,9 @@ export class GameManager {
 
   reshuffleRemaining() {
     if (this.isPaused || this.isStageCompleted) return;
+    if (this.isEpiphanyLevelActive) {
+      this.decaySerenity(15); // Penalty for reshuffle in Epiphany
+    }
     const active = this.tiles.filter(t => !t.isMatched);
     if (active.length <= 1) return;
 
@@ -715,6 +862,9 @@ export class GameManager {
 
     if (!isFree) {
       playBlockedWarningChime();
+      if (this.isEpiphanyLevelActive) {
+        this.decaySerenity(4); // Penalty for blocked tile selection
+      }
       if (typeof document !== 'undefined') {
         const el = document.getElementById(tile.id);
         if (el) {
@@ -731,7 +881,7 @@ export class GameManager {
 
     playTileSelectChime();
 
-    if (this.gameplayMode === 'tile_club') {
+    if (this.gameplayMode === 'tile_club' || this.isEpiphanyLevelActive) {
       this.handleTileClubMatch3Click(tile);
     } else {
       // 'vita' and 'realms' modes use pure Vita Mahjong 2-tile pair matching!
@@ -903,21 +1053,49 @@ export class GameManager {
       }
     }
 
-    if (matchedFloraId) {
+    // Epiphany Mode: Check for Integral Synthesis Triad (3 distinct tiles in same spiritual domain)
+    let matchedSynthesis = null;
+    if (!matchedFloraId && this.isEpiphanyLevelActive && this.tray.length >= 3) {
+      const byDomain = {};
+      this.tray.forEach(t => {
+        const dom = (t.floraData && t.floraData.domain) ? t.floraData.domain : 'Wisdom';
+        byDomain[dom] = byDomain[dom] || [];
+        byDomain[dom].push(t);
+      });
+      for (const dom in byDomain) {
+        if (byDomain[dom].length >= 3) {
+          matchedSynthesis = byDomain[dom].slice(0, 3);
+          break;
+        }
+      }
+    }
+
+    if (matchedFloraId || matchedSynthesis) {
       // Visual Starlight Triad Sparkle
       if (typeof document !== 'undefined') {
-        triggerTrayTriadSparkle(matchedFloraId);
+        triggerTrayTriadSparkle(matchedFloraId || 'synthesis');
       }
 
       // Triad completed!
       const cleared = [];
-      this.tray = this.tray.filter(t => {
-        if (t.floraId === matchedFloraId && cleared.length < 3) {
-          cleared.push(t);
-          return false;
-        }
-        return true;
-      });
+      if (matchedFloraId) {
+        this.tray = this.tray.filter(t => {
+          if (t.floraId === matchedFloraId && cleared.length < 3) {
+            cleared.push(t);
+            return false;
+          }
+          return true;
+        });
+      } else {
+        const clearedIds = new Set(matchedSynthesis.map(m => m.id));
+        this.tray = this.tray.filter(t => {
+          if (clearedIds.has(t.id)) {
+            cleared.push(t);
+            return false;
+          }
+          return true;
+        });
+      }
 
       playTileSmashWhoosh();
       playAshramMeditationGong();
@@ -941,9 +1119,13 @@ export class GameManager {
     } else if (this.tray.length >= 7) {
       // Tray overflow failure
       playBlockedWarningChime();
-      if (this.onGameOver) {
+      if (this.isEpiphanyLevelActive) {
+        this.dissolveEpiphanyStage('TRAY_OVERFLOW');
+      } else if (this.onGameOver) {
         this.onGameOver({ reason: 'GAME_OVER_TRAY_OVERFLOW' });
       }
+    } else if (this.isEpiphanyLevelActive && this.tray.length >= 6) {
+      this.decaySerenity(2); // Danger zone penalty
     }
 
     this.notifyState();
@@ -1132,6 +1314,17 @@ export class GameManager {
       const iqBonus = cleanSolve ? 3 : 2;
       this.player.focusIQ = (this.player.focusIQ || 80) + iqBonus;
 
+      // Decrement Golden Aura Wheel if active
+      if (this.player && this.player.goldenAuraLevelsRemaining > 0) {
+        this.player.goldenAuraLevelsRemaining = Math.max(0, this.player.goldenAuraLevelsRemaining - 1);
+      }
+
+      // Check if this was an Epiphany level
+      if (this.isEpiphanyLevelActive) {
+        this.completeEpiphanyStage();
+        return;
+      }
+
       // Sacred Epiphany System tracking (Periodic 6-12 level window)
       this.levelsSinceLastEpiphany = (this.levelsSinceLastEpiphany || 0) + 1;
       let sacredEpiphanyTriggered = false;
@@ -1140,6 +1333,7 @@ export class GameManager {
         this.levelsSinceLastEpiphany = 0;
         this.nextEpiphanyTarget = Math.floor(Math.random() * 7) + 6;
         this.isEpiphanyActive = true;
+        this.epiphanyState = 'OFFERED';
         earnedSparks += 60; // +60 Triple Sparks Epiphany Bonus
       }
 
@@ -1192,6 +1386,10 @@ export class GameManager {
         hintsUsedInStage: this.hintsUsedInStage,
         standardTheme: this.standardTheme,
         isEpiphanyActive: !!this.isEpiphanyActive,
+        isEpiphanyLevelActive: !!this.isEpiphanyLevelActive,
+        serenityMeter: this.serenityMeter || 0,
+        epiphanyState: this.epiphanyState || 'IDLE',
+        goldenAuraLevelsRemaining: (this.player && this.player.goldenAuraLevelsRemaining) || 0,
         levelsSinceLastEpiphany: this.levelsSinceLastEpiphany || 0
       });
     }

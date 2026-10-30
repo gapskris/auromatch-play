@@ -720,6 +720,68 @@ export class VitaBoardGenerator {
     return VitaBoardGenerator._padToTarget(coords, targetCount);
   }
 
+  // Sacred Epiphany 12-Petalled Lotus Mandala (4 Tiers, 48 Tiles)
+  static getEpiphanyMandalaCoordinates(targetCount = 48) {
+    const coords = [];
+    const cx = 3.5, cy = 3.5;
+
+    // Tier 3: Central Golden Bindu Core (4 tiles)
+    coords.push({ x: cx - 0.5, y: cy - 0.5, z: 3 });
+    coords.push({ x: cx + 0.5, y: cy - 0.5, z: 3 });
+    coords.push({ x: cx - 0.5, y: cy + 0.5, z: 3 });
+    coords.push({ x: cx + 0.5, y: cy + 0.5, z: 3 });
+
+    // Tier 2: The Four Powers Cross (8 tiles: 4 cardinal arms of 2 tiles)
+    coords.push({ x: cx, y: cy - 1.5, z: 2 });
+    coords.push({ x: cx, y: cy - 2.5, z: 2 });
+    coords.push({ x: cx, y: cy + 1.5, z: 2 });
+    coords.push({ x: cx, y: cy + 2.5, z: 2 });
+    coords.push({ x: cx - 1.5, y: cy, z: 2 });
+    coords.push({ x: cx - 2.5, y: cy, z: 2 });
+    coords.push({ x: cx + 1.5, y: cy, z: 2 });
+    coords.push({ x: cx + 2.5, y: cy, z: 2 });
+
+    // Tier 1: Inner Octagonal Petal Ring (16 tiles: 4 diagonal rays with 4 tiles each)
+    const diagAngles = [45, 135, 225, 315];
+    for (const angleDeg of diagAngles) {
+      const rad = (angleDeg * Math.PI) / 180;
+      coords.push({ x: Math.round((cx + 1.2 * Math.cos(rad)) * 2) / 2, y: Math.round((cy + 1.2 * Math.sin(rad)) * 2) / 2, z: 1 });
+      coords.push({ x: Math.round((cx + 2.2 * Math.cos(rad)) * 2) / 2, y: Math.round((cy + 2.2 * Math.sin(rad)) * 2) / 2, z: 1 });
+      const radFlank1 = ((angleDeg - 18) * Math.PI) / 180;
+      const radFlank2 = ((angleDeg + 18) * Math.PI) / 180;
+      coords.push({ x: Math.round((cx + 2.6 * Math.cos(radFlank1)) * 2) / 2, y: Math.round((cy + 2.6 * Math.sin(radFlank1)) * 2) / 2, z: 1 });
+      coords.push({ x: Math.round((cx + 2.6 * Math.cos(radFlank2)) * 2) / 2, y: Math.round((cy + 2.6 * Math.sin(radFlank2)) * 2) / 2, z: 1 });
+    }
+
+    // Tier 0: Outer 12 Divine Qualities Base Ring (20 tiles)
+    for (let i = 0; i < 12; i++) {
+      const rad = (i * 30 * Math.PI) / 180;
+      coords.push({ x: Math.round((cx + 3.6 * Math.cos(rad)) * 2) / 2, y: Math.round((cy + 3.6 * Math.sin(rad)) * 2) / 2, z: 0 });
+    }
+    const outerAngles = [22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5];
+    for (const angleDeg of outerAngles) {
+      const rad = (angleDeg * Math.PI) / 180;
+      coords.push({ x: Math.round((cx + 4.0 * Math.cos(rad)) * 2) / 2, y: Math.round((cy + 4.0 * Math.sin(rad)) * 2) / 2, z: 0 });
+    }
+
+    // Deduplicate preserving order
+    const seen = new Set();
+    const unique = [];
+    for (const c of coords) {
+      const k = `${c.x}_${c.y}_${c.z}`;
+      if (!seen.has(k)) {
+        seen.add(k);
+        unique.push(c);
+      }
+    }
+
+    return targetCount === 48 ? unique : VitaBoardGenerator._padToTarget(unique, targetCount);
+  }
+
+  static _genEpiphanyMandala(targetCount = 48) {
+    return VitaBoardGenerator.getEpiphanyMandalaCoordinates(targetCount);
+  }
+
   static FORMATIONS = [
     { name: 'Pyramid (Shikhara)', generator: VitaBoardGenerator._genPyramid },
     { name: 'Twin Pillars (H-Gate)', generator: VitaBoardGenerator._genHGate },

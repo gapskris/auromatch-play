@@ -1,5 +1,11 @@
 :root {
 
+    /* Android & iOS Safe Area Inset Support (Notches & Cutouts) */
+    --safe-top: env(safe-area-inset-top, 0px);
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-left: env(safe-area-inset-left, 0px);
+    --safe-right: env(safe-area-inset-right, 0px);
+
     /* Solar Evening / Sanctuary Palette */
 
     --bg-evening: radial-gradient(circle at center, #1e1302 0%, #0d0701 100%);
@@ -3756,7 +3762,7 @@ body {
 /* Senior View [Aa] Accessibility Mode */
 
 .senior-view .tile-element,
-
+.senior-view-active .tile-element,
 .senior-tile {
 
     border-width: 3px !important;
@@ -3801,7 +3807,8 @@ body {
 
 /* Contrast ratio > 11:1 for senior readability */
 
-.senior-view {
+.senior-view,
+.senior-view-active {
 
     --text-current: #ffffff !important;
 
@@ -6472,11 +6479,23 @@ body[data-theme="royal_lapis"] .settings-modal {
    ========================================================================== */
 
 /* 1. Base Modal & Card Shells */
+.modal-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    display: none;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 10000 !important;
+    backdrop-filter: blur(18px) !important;
+    box-sizing: border-box !important;
+}
+
 .stage-clear-overlay,
 .realms-browser-overlay,
 .onboarding-overlay,
-.match-overlay,
-.modal-overlay {
+.match-overlay {
     backdrop-filter: blur(18px) !important;
 }
 
@@ -7588,4 +7607,81 @@ body[data-theme="royal_lapis"] .header-realm-dropdown-pill {
         font-size: 11px;
         padding: 4px 12px;
     }
+}
+
+
+/* =========================================================================
+   CONTAINER QUERIES FOR SEAMLESS TABLET & CROSS-DEVICE HEADER UNIFORMITY
+   ========================================================================= */
+.app-container {
+    container-type: inline-size;
+}
+@container (max-width: 520px) {
+    .brand-tagline-text {
+        display: none !important;
+    }
+    .brand-umbrella-eyebrow {
+        font-size: 0.52rem !important;
+        letter-spacing: 1.5px !important;
+    }
+    .hud-player-badge {
+        max-width: 105px !important;
+        font-size: 0.70rem !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+    .header-nav-actions, .app-header > div:last-child {
+        flex-shrink: 0 !important;
+    }
+}
+
+/* =========================================================================
+   VITA MAHJONG PIC 3 PARCHMENT CARD & RUBY RIBBON (CROSS-APP PARITY)
+   ========================================================================= */
+.epiphany-parchment-card {
+    position: relative !important;
+    width: 100% !important;
+    max-width: 380px !important;
+    background: linear-gradient(180deg, #fffcf5 0%, #fbf3e2 50%, #f0e1c2 100%) !important;
+    border: 3.5px solid #b8860b !important;
+    border-radius: 26px !important;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.65), 0 0 35px rgba(212,175,55,0.4) !important;
+    padding: 2rem 1.4rem 1.4rem !important;
+    text-align: center !important;
+    color: #2b1704 !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    gap: 10px !important;
+    overflow: visible !important;
+    animation: fadeInScale 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards !important;
+}
+.epiphany-parchment-card .epiphany-title {
+    color: #451a03 !important;
+    font-weight: 800 !important;
+}
+.epiphany-parchment-card .epiphany-quote {
+    color: #572605 !important;
+}
+.epiphany-parchment-card .epiphany-quote cite {
+    color: #b45309 !important;
+}
+.epiphany-ribbon-tag {
+    position: absolute !important;
+    top: -14px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    background: linear-gradient(90deg, #991b1b, #dc2626, #991b1b) !important;
+    border: 1.5px solid #fde68a !important;
+    color: #fef08a !important;
+    font-family: 'Cinzel', serif !important;
+    font-size: 0.72rem !important;
+    font-weight: 800 !important;
+    letter-spacing: 1.5px !important;
+    padding: 0.22rem 1.2rem !important;
+    border-radius: 999px !important;
+    box-shadow: 0 4px 12px rgba(153,27,27,0.5) !important;
+    white-space: nowrap !important;
+    z-index: 10 !important;
 }

@@ -8,7 +8,7 @@ try {
     if (document.body) document.body.setAttribute('data-theme', initialTheme);
   }
 } catch (e) {}
-import { loadProfileState, saveProfileState, encryptAndExportBackup, decryptAndImportBackup, executeAbsolutePurge, profileState } from './controllers/storageAdapter.js';
+import { loadProfileState, saveProfileState, encryptAndExportBackup, decryptAndImportBackup, executeAbsolutePurge, profileState, isPurgeActive, autoHealFromIndexedDB, setItemAsync } from './controllers/storageAdapter.js';
 import { initAudioEngine, playAshramMeditationGong, play432HzBowlChime } from './audio/synthesizer.js';
 import { updateVolumeSetting, updateVoicePreference, updateSanctuaryMode, toggleSecularTerminology, updateExperienceMode } from './controllers/settings.js';
 import { triggerReflectionDissolve } from './ui/particles.js';
@@ -27,7 +27,12 @@ import {
 import { ThemeManager, REALMS } from './controllers/themeManager.js';
 import { reshuffleBoard, renderBoard } from './ui/boardRenderer.js';
 
-window.addEventListener('load', () => {
+window.addEventListener('load', async () => {
+    // 0. Auto-heal: restore all state from AuroMatchDB if localStorage was wiped (e.g. Safari 7-day ITP)
+    try {
+        await autoHealFromIndexedDB();
+    } catch (e) {}
+
     // Load local state
     loadProfileState();
     
@@ -62,7 +67,21 @@ window.addEventListener('load', () => {
         // 2. Tray visibility & floating gameplay prompt
         const trayContainer = document.getElementById('tray-container');
         if (trayContainer) {
-            trayContainer.style.display = state.gameplayMode === 'tile_club' ? 'flex' : 'none';
+            trayContainer.style.display = (state.gameplayMode === 'tile_club' || state.isEpiphanyLevelActive) ? 'flex' : 'none';
+        }
+
+        const serenityWrap = document.getElementById('epiphany-serenity-wrap');
+        const serenityVal = document.getElementById('serenity-val');
+        const serenityFill = document.getElementById('serenity-fill-bar');
+        if (serenityWrap) {
+            serenityWrap.style.display = state.isEpiphanyLevelActive ? 'flex' : 'none';
+            if (serenityVal) serenityVal.innerText = `${state.serenityMeter || 0}%`;
+            if (serenityFill) serenityFill.style.width = `${state.serenityMeter || 0}%`;
+        }
+
+        const auraWheel = document.getElementById('epiphany-aura-wheel');
+        if (auraWheel) {
+            auraWheel.style.display = (state.goldenAuraLevelsRemaining > 0 || state.isEpiphanyLevelActive) ? 'block' : 'none';
         }
 
         const promptEl = document.getElementById('gameplay-prompt');
@@ -462,13 +481,53 @@ window.addEventListener('load', () => {
         }
     };
 
-    // Global Modal Keyboard Interceptions (Enter, Space, Escape)
+    // Global Modal & In-Game Keyboard Interceptions (Enter, Space, Escape, U, H, R, S, L)
     window.addEventListener('keydown', (e) => {
+        // Avoid capturing inputs if user is typing in a textarea or input field
+        const activeTag = document.activeElement ? document.activeElement.tagName.toLowerCase() : '';
+        if (activeTag === 'textarea' || activeTag === 'input') return;
+
         const stageModal = document.getElementById('stage-clear-modal');
         if (stageModal && stageModal.classList.contains('active')) {
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
                 window.nextLevelStage();
+                return;
+            }
+        }
+
+        const epiphanyModal = document.getElementById('epiphany-modal');
+        if (epiphanyModal && epiphanyModal.style.display === 'flex') {
+            if (e.key === 'Escape' || e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                window.closeEpiphanyModal();
+                return;
+            }
+        }
+
+        const levelJumpModal = document.getElementById('level-jump-modal');
+        if (levelJumpModal && levelJumpModal.style.display === 'flex') {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                window.closeLevelJumpModal();
+                return;
+            }
+        }
+
+        const purgeModal = document.getElementById('purge-modal');
+        if (purgeModal && purgeModal.style.display === 'flex') {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                window.closePurgeModal();
+                return;
+            }
+        }
+
+        const realmsBrowserModal = document.getElementById('realms-browser-modal');
+        if (realmsBrowserModal && (realmsBrowserModal.style.display === 'flex' || realmsBrowserModal.classList.contains('active'))) {
+            if (e.key === 'Escape') {
+                e.preventDefault();
+                window.closeRealmsBrowser();
                 return;
             }
         }
@@ -524,6 +583,44 @@ window.addEventListener('load', () => {
                 e.preventDefault();
                 darshanModal.style.display = 'none';
                 return;
+            }
+        }
+
+        // Tactical in-game shortcuts (when gameplay screen is active and no modals are open)
+        const gameScreen = document.getElementById('game-screen');
+        if (gameScreen && gameScreen.classList.contains('active-screen')) {
+            const keyLower = e.key.toLowerCase();
+            if (keyLower === 'u') {
+                e.preventDefault();
+                if (activeGameManager && typeof activeGameManager.undo === 'function') {
+                    activeGameManager.undo();
+                }
+            } else if (keyLower === 'h') {
+                e.preventDefault();
+                if (activeGameManager && typeof activeGameManager.provideHint === 'function') {
+                    activeGameManager.provideHint();
+                }
+            } else if (keyLower === 'r') {
+                e.preventDefault();
+                if (activeGameManager && typeof activeGameManager.restartStage === 'function') {
+                    activeGameManager.restartStage();
+                }
+            } else if (keyLower === 's') {
+                e.preventDefault();
+                if (typeof window.handleShuffleBoard === 'function') {
+                    window.handleShuffleBoard();
+                }
+            } else if (keyLower === 'l') {
+                e.preventDefault();
+                if (typeof window.openLoreCard === 'function') {
+                    window.openLoreCard();
+                }
+            } else if (e.key === 'Escape') {
+                const backdrop = document.getElementById('drawer-backdrop');
+                if (backdrop && backdrop.classList.contains('active')) {
+                    e.preventDefault();
+                    window.closeAllDrawers();
+                }
             }
         }
     });
@@ -1113,17 +1210,38 @@ window.addEventListener('load', () => {
         reader.readAsText(file);
     };
 
+    let isPurgeExecuting = false;
+
     window.triggerPurgeReset = () => {
         const modal = document.getElementById('purge-modal');
         const input = document.getElementById('purge-confirm-input');
+        const btn = document.getElementById('btn-confirm-purge');
         if (modal) {
-            if (input) input.value = '';
+            isPurgeExecuting = false;
+            if (input) {
+                input.value = '';
+                input.oninput = () => {
+                    const isExact = (input.value || '').trim() === 'PURGE';
+                    if (btn) {
+                        btn.disabled = !isExact;
+                        btn.style.opacity = isExact ? '1' : '0.5';
+                        btn.style.cursor = isExact ? 'pointer' : 'not-allowed';
+                    }
+                };
+            }
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Confirm Purge ⚠️';
+                btn.style.opacity = '0.5';
+                btn.style.cursor = 'not-allowed';
+            }
             modal.style.display = 'flex';
             setTimeout(() => { if (input) input.focus(); }, 100);
         }
     };
 
     window.closePurgeModal = () => {
+        isPurgeExecuting = false;
         const modal = document.getElementById('purge-modal');
         if (modal) modal.style.display = 'none';
         if (window.showToastMessage) {
@@ -1131,13 +1249,23 @@ window.addEventListener('load', () => {
         }
     };
 
-    window.confirmPurgeReset = () => {
+    window.confirmPurgeReset = async () => {
+        if (isPurgeExecuting) return;
         const input = document.getElementById('purge-confirm-input');
+        const btn = document.getElementById('btn-confirm-purge');
         const val = input ? input.value.trim() : '';
         if (val === 'PURGE') {
+            isPurgeExecuting = true;
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = 'Cleansing Sanctuary...';
+                btn.style.opacity = '0.7';
+                btn.style.cursor = 'wait';
+            }
             const modal = document.getElementById('purge-modal');
             if (modal) modal.style.display = 'none';
-            executeAbsolutePurge();
+            window.activeGameManager = activeGameManager;
+            await executeAbsolutePurge();
             if (window.showToastMessage) {
                 window.showToastMessage("🌿 Sanctuary Cleansed · All storage purged successfully.");
             }
@@ -1154,6 +1282,24 @@ window.addEventListener('load', () => {
             }
         }
     };
+
+    // Cross-tab broadcast coordination
+    if (typeof BroadcastChannel !== 'undefined') {
+        try {
+            const bus = new BroadcastChannel('auromatch_storage_bus');
+            bus.onmessage = (event) => {
+                if (event.data && event.data.type === 'AUROMATCH_PURGE_EXECUTED') {
+                    if (activeGameManager && typeof activeGameManager.resetActivePlayerState === 'function') {
+                        activeGameManager.resetActivePlayerState();
+                    }
+                    if (window.showToastMessage) {
+                        window.showToastMessage("🌿 Sanctuary reset by another tab. Refreshing...");
+                    }
+                    setTimeout(() => window.location.reload(), 1000);
+                }
+            };
+        } catch (e) {}
+    }
 
     // Glossary sheets click interception
     document.addEventListener('click', (e) => {
@@ -1293,7 +1439,41 @@ window.addEventListener('load', () => {
     });
 
     window.updateGatewayUI = () => {
-        const player = activeGameManager ? activeGameManager.player : null;
+        // Synchronous storage read for instantaneous zero-FOUC hydration
+        let storedLevel = 1;
+        let storedSparks = 100;
+        let storedName = '';
+        let storedMode = (activeGameManager && activeGameManager.gameplayMode) ? activeGameManager.gameplayMode : 'botanical';
+        let hasStoredProgress = false;
+
+        try {
+            if (typeof localStorage !== 'undefined') {
+                const rawLevel = localStorage.getItem('auromatch_level_index');
+                const rawSparks = localStorage.getItem('auromatch_sparks_balance');
+                const rawMode = localStorage.getItem('auromatch_gameplay_mode');
+                const rawState = localStorage.getItem('auromatch_player_state');
+                if (rawState) {
+                    const parsed = JSON.parse(rawState);
+                    if (parsed) {
+                        if (typeof parsed.currentLevel === 'number') storedLevel = parsed.currentLevel;
+                        if (typeof parsed.sparks === 'number') storedSparks = parsed.sparks;
+                        if (parsed.name) storedName = parsed.name;
+                        if (parsed.gameplayMode) storedMode = parsed.gameplayMode;
+                        if (parsed.hasProgress || parsed.currentLevel > 1 || parsed.sparks !== 100) hasStoredProgress = true;
+                    }
+                }
+                if (rawLevel) storedLevel = parseInt(rawLevel, 10) || storedLevel;
+                if (rawSparks) storedSparks = parseInt(rawSparks, 10) || storedSparks;
+                if (rawMode) storedMode = rawMode;
+            }
+        } catch (e) {}
+
+        const player = (activeGameManager && activeGameManager.player) ? activeGameManager.player : { currentLevel: storedLevel, sparks: storedSparks, name: storedName };
+        if (storedLevel > (player.currentLevel || 1)) player.currentLevel = storedLevel;
+        if (storedSparks > (player.sparks || 100)) player.sparks = storedSparks;
+        if (storedName && !player.name) player.name = storedName;
+        if (player.currentLevel > 1 || player.sparks !== 100 || (player.score || 0) > 0) hasStoredProgress = true;
+
         const gateScreen = document.getElementById('gate-screen');
         const doors = document.getElementById('sanctuary-doors');
         const innerPortal = document.getElementById('door-inner-revelation-portal');
@@ -1313,8 +1493,8 @@ window.addEventListener('load', () => {
         const sparksResume = document.getElementById('gate-resume-sparks');
         const lblPlayer = document.getElementById('gate-player-label');
 
-        const hasVisited = localStorage.getItem('auromatch_has_entered_sanctuary') === 'true';
-        const isReturning = hasVisited || (player && player.name && (player.currentLevel > 1 || player.score > 0));
+        const hasVisited = (typeof localStorage !== 'undefined') && localStorage.getItem('auromatch_has_entered_sanctuary') === 'true';
+        const isReturning = hasVisited || hasStoredProgress || (player && player.name && (player.currentLevel > 1 || player.score > 0));
 
         if (!isReturning) {
             if (newActions) newActions.style.display = 'flex';
@@ -1323,7 +1503,14 @@ window.addEventListener('load', () => {
             if (newActions) newActions.style.display = 'none';
             if (retActions) retActions.style.display = 'flex';
             if (txtResume) {
-                const formation = activeGameManager.currentFormationName || 'Sanctuary';
+                let formation = (activeGameManager && activeGameManager.currentFormationName) ? activeGameManager.currentFormationName : 'Sanctuary';
+                if (storedMode === 'botanical') {
+                    formation = 'Botanical Art';
+                } else if (storedMode === 'tile_club') {
+                    formation = 'Tile Club';
+                } else if (storedMode === 'realms' && activeGameManager && activeGameManager.currentRealm) {
+                    formation = activeGameManager.currentRealm.name;
+                }
                 txtResume.innerText = `Resume: Level ${player.currentLevel || 1} (${formation})`;
             }
             if (sparksResume) {
@@ -1394,14 +1581,20 @@ window.addEventListener('load', () => {
         const hasName = activeGameManager && activeGameManager.player && activeGameManager.player.name;
         if (!hasName) {
             window.openNameModal(() => {
-                localStorage.setItem('auromatch_has_entered_sanctuary', 'true');
+                if (!isPurgeActive()) {
+                    localStorage.setItem('auromatch_has_entered_sanctuary', 'true');
+                    setItemAsync('auromatch_has_entered_sanctuary', 'true');
+                }
                 window.executeDoorOpeningCeremony(() => {
                     routeToScreen('realms_hub');
                     window.updateHubCardsUI();
                 });
             });
         } else {
-            localStorage.setItem('auromatch_has_entered_sanctuary', 'true');
+            if (!isPurgeActive()) {
+                localStorage.setItem('auromatch_has_entered_sanctuary', 'true');
+                setItemAsync('auromatch_has_entered_sanctuary', 'true');
+            }
             window.executeDoorOpeningCeremony(() => {
                 routeToScreen('realms_hub');
                 window.updateHubCardsUI();
@@ -1413,13 +1606,19 @@ window.addEventListener('load', () => {
         const hasName = activeGameManager && activeGameManager.player && activeGameManager.player.name;
         if (!hasName) {
             window.openNameModal(() => {
-                localStorage.setItem('auromatch_has_entered_sanctuary', 'true');
+                if (!isPurgeActive()) {
+                    localStorage.setItem('auromatch_has_entered_sanctuary', 'true');
+                    setItemAsync('auromatch_has_entered_sanctuary', 'true');
+                }
                 window.executeDoorOpeningCeremony(() => {
                     window.beginDirectJourney();
                 });
             });
         } else {
-            localStorage.setItem('auromatch_has_entered_sanctuary', 'true');
+            if (!isPurgeActive()) {
+                localStorage.setItem('auromatch_has_entered_sanctuary', 'true');
+                setItemAsync('auromatch_has_entered_sanctuary', 'true');
+            }
             window.executeDoorOpeningCeremony(() => {
                 window.beginDirectJourney();
             });
@@ -1540,14 +1739,78 @@ window.addEventListener('load', () => {
     };
 
     window.checkSacredEpiphany = () => {
-        if (activeGameManager && activeGameManager.isEpiphanyActive) {
-            const modal = document.getElementById('epiphany-modal');
-            if (modal) {
-                modal.style.display = 'flex';
-                if (typeof playAshramMeditationGong === 'function') {
-                    playAshramMeditationGong();
-                }
+        if (!activeGameManager) return;
+        const modal = document.getElementById('epiphany-modal');
+        if (!modal) return;
+
+        const eyebrow = document.getElementById('epiphany-eyebrow');
+        const title = document.getElementById('epiphany-verse-title');
+        const quote = document.getElementById('epiphany-verse-quote');
+        const rewardText = document.getElementById('epiphany-reward-text');
+        const rewardTag = document.getElementById('epiphany-reward-tag');
+        const actionRow = document.getElementById('epiphany-action-row');
+
+        if (activeGameManager.epiphanyState === 'OFFERED' || activeGameManager.isEpiphanyActive) {
+            // Epiphany Trial Invitation Mode
+            if (eyebrow) eyebrow.innerText = 'SACRED EPIPHANY TRIAL';
+            if (title) title.innerText = 'The 12-Petalled Lotus Mandala';
+            if (quote) {
+                quote.innerHTML = '“Concentrate all your consciousness in the heart, and call upon the Divine with sincere aspiration.”<cite>— SRI AUROBINDO</cite>';
             }
+            if (rewardText) rewardText.innerText = '⚡ +60 TRIPLE SPARKS REWARD';
+            if (rewardTag) rewardTag.innerText = 'Gated Challenge';
+            if (actionRow) {
+                actionRow.innerHTML = `
+                    <button class="cta-btn epiphany-claim-btn" id="btn-enter-epiphany" onclick="window.enterEpiphanyTrial()">
+                        Enter Sacred Trial ➔
+                    </button>
+                    <button class="btn-secondary epiphany-postpone-btn" id="btn-postpone-epiphany" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #cbd5e1; border-radius: 8px; padding: 10px 16px; cursor: pointer;" onclick="window.postponeEpiphanyTrial()">
+                        Postpone
+                    </button>
+                `;
+            }
+            modal.style.display = 'flex';
+            if (typeof playAshramMeditationGong === 'function') {
+                playAshramMeditationGong();
+            }
+        } else if (activeGameManager.epiphanyState === 'TRIUMPH') {
+            // Triumphant Illumination Mode
+            if (eyebrow) eyebrow.innerText = 'SACRED EPIPHANY ATTAINED';
+            if (title) title.innerText = 'The Golden Contemplation';
+            if (quote) {
+                quote.innerHTML = '“All life is only a lavish and manifold opportunity given us to discover, realise, express the Divine.”<cite>— SRI AUROBINDO</cite>';
+            }
+            if (rewardText) rewardText.innerText = '⚡ +60 TRIPLE SPARKS GRANTED!';
+            if (rewardTag) rewardTag.innerText = '10-Level Golden Aura Active';
+            if (actionRow) {
+                actionRow.innerHTML = `
+                    <button class="cta-btn epiphany-claim-btn" onclick="window.closeEpiphanyModal()">
+                        Proceed in Light ➔
+                    </button>
+                `;
+            }
+            modal.style.display = 'flex';
+            if (typeof playAshramMeditationGong === 'function') {
+                playAshramMeditationGong();
+            }
+        }
+    };
+
+    window.enterEpiphanyTrial = () => {
+        const modal = document.getElementById('epiphany-modal');
+        if (modal) modal.style.display = 'none';
+        if (activeGameManager) {
+            activeGameManager.startEpiphanyTrial();
+            routeToScreen('game');
+        }
+    };
+
+    window.postponeEpiphanyTrial = () => {
+        const modal = document.getElementById('epiphany-modal');
+        if (modal) modal.style.display = 'none';
+        if (activeGameManager) {
+            activeGameManager.postponeEpiphanyTrial();
+            window.nextLevelStage();
         }
     };
 
@@ -1555,9 +1818,14 @@ window.addEventListener('load', () => {
         const modal = document.getElementById('epiphany-modal');
         if (modal) modal.style.display = 'none';
         const wheel = document.getElementById('epiphany-aura-wheel');
-        if (wheel) wheel.style.display = 'block';
+        if (wheel) wheel.style.display = (activeGameManager && activeGameManager.player && activeGameManager.player.goldenAuraLevelsRemaining > 0) ? 'block' : 'none';
         if (activeGameManager) {
-            activeGameManager.dismissEpiphany();
+            if (activeGameManager.epiphanyState === 'TRIUMPH') {
+                activeGameManager.epiphanyState = 'IDLE';
+                window.nextLevelStage();
+            } else {
+                activeGameManager.dismissEpiphany();
+            }
         }
     };
 
