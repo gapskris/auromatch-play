@@ -7871,3 +7871,16 @@ body[data-theme="royal_lapis"] .header-realm-dropdown-pill {
         gap: 0.75rem !important;
     }
 }
+
+
+/* Stage Clear Overlay Absolute Isolation (Zero Bleed-Through) */
+.stage-clear-overlay {
+    z-index: 5000 !important;
+}
+
+body:has(.stage-clear-overlay.active) .floating-gameplay-prompt,
+body:has(.stage-clear-overlay.active) .gameplay-action-bar,
+.stage-clear-overlay.active ~ * .floating-gameplay-prompt,
+.stage-clear-overlay.active ~ * .gameplay-action-bar {
+    display: none !important;
+}
