@@ -1078,6 +1078,18 @@
     </div>
 
     <!-- Modular JS entry loading -->
+    <!-- Offline-First PWA Service Worker (AuroProject Policy AP-PWA-014) -->
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+          navigator.serviceWorker.register('./sw.js').then(function(reg) {
+            console.log('[PWA] AuroMatch ServiceWorker registered with scope:', reg.scope);
+          }).catch(function(err) {
+            console.warn('[PWA] ServiceWorker registration failed:', err);
+          });
+        });
+      }
+    </script>
     <script type="module" src="./src/main.js"></script>
 </body>
 </html>
