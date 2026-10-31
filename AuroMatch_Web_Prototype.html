@@ -64172,8 +64172,14 @@ window.addEventListener('load', async () => {
         const sparksResume = document.getElementById('gate-resume-sparks');
         const lblPlayer = document.getElementById('gate-player-label');
 
-        const hasVisited = (typeof localStorage !== 'undefined') && localStorage.getItem('auromatch_has_entered_sanctuary') === 'true';
-        const isReturning = hasVisited || hasStoredProgress || (player && player.name && (player.currentLevel > 1 || player.score > 0));
+        const hasRealProgress = Boolean(
+            (player && player.name && player.name !== 'Seeker') ||
+            (player && player.currentLevel > 1) ||
+            (player && (player.score || 0) > 0) ||
+            (player && player.sparks && player.sparks !== 100) ||
+            hasStoredProgress
+        );
+        const isReturning = hasRealProgress;
 
         if (!isReturning) {
             if (newActions) newActions.style.display = 'flex';
@@ -64257,28 +64263,14 @@ window.addEventListener('load', async () => {
     };
 
     window.handleGatewayEnter = () => {
-        const hasName = activeGameManager && activeGameManager.player && activeGameManager.player.name;
-        if (!hasName) {
-            window.openNameModal(() => {
-                if (!isPurgeActive()) {
-                    localStorage.setItem('auromatch_has_entered_sanctuary', 'true');
-                    setItemAsync('auromatch_has_entered_sanctuary', 'true');
-                }
-                window.executeDoorOpeningCeremony(() => {
-                    routeToScreen('realms_hub');
-                    window.updateHubCardsUI();
-                });
-            });
-        } else {
-            if (!isPurgeActive()) {
-                localStorage.setItem('auromatch_has_entered_sanctuary', 'true');
-                setItemAsync('auromatch_has_entered_sanctuary', 'true');
-            }
-            window.executeDoorOpeningCeremony(() => {
-                routeToScreen('realms_hub');
-                window.updateHubCardsUI();
-            });
+        if (!isPurgeActive()) {
+            localStorage.setItem('auromatch_has_entered_sanctuary', 'true');
+            setItemAsync('auromatch_has_entered_sanctuary', 'true');
         }
+        window.executeDoorOpeningCeremony(() => {
+            routeToScreen('realms_hub');
+            window.updateHubCardsUI();
+        });
     };
 
     window.handleGatewayResume = () => {
@@ -64305,7 +64297,12 @@ window.addEventListener('load', async () => {
     };
 
     window.handleDoorClick = () => {
-        window.handleGatewayResume();
+        const newActions = document.getElementById('gate-actions-new-user');
+        if (newActions && newActions.style.display !== 'none') {
+            window.handleGatewayEnter();
+        } else {
+            window.handleGatewayResume();
+        }
     };
 
     window.handleGatewayExplore = () => {
@@ -64333,9 +64330,19 @@ window.addEventListener('load', async () => {
 
     window.selectHubMode = (mode) => {
         window.switchGameplayMode(mode);
-        window.executeDoorOpeningCeremony(() => {
-            window.beginDirectJourney();
-        });
+        const hasName = activeGameManager && activeGameManager.player && activeGameManager.player.name && activeGameManager.player.name !== 'Seeker';
+        const launch = () => {
+            window.executeDoorOpeningCeremony(() => {
+                window.beginDirectJourney();
+            });
+        };
+        if (!hasName) {
+            window.openNameModal(() => {
+                launch();
+            });
+        } else {
+            launch();
+        }
     };
 
     window.setHubStandardTheme = (themeKey) => {

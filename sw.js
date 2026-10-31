@@ -1,6 +1,6 @@
 // Service Worker for AuroMatch: Concentration Quest (PWA Offline First with Fresh Online Updates)
 // Conforms strictly to AuroProject Master Policy AP-PWA-014 (100% parity with Vak)
-const CACHE_NAME = 'auro-match-v1.0';
+const CACHE_NAME = 'auro-match-v1.1';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
